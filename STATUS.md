@@ -23,7 +23,7 @@ Recheck the upstream column against lefttosolve.com before each new target.
 
 ## Log
 
-- 2026-11-26 · Kumi-San · (this push) A127752 published: `problems/a127752/` (Lean, check.py, notes, page, figures), front-page card, TARGETS done; claim released. Reviewed by Alo.
+- 2026-11-26 · Kumi-San · `50fcb38` A127752 published: `problems/a127752/` (Lean, check.py, notes, page, figures), front-page card, TARGETS done; claim released. Reviewed by Alo.
 - 2026-11-26 · Kumi-San · `f3b586c` claim A127752 publication (owner Kumi-San, reviewer Alo).
 - 2026-11-26 · Kumi-San · `cd4e110` no real zeros in (0,1); Li now rests on summability alone. Rebuilt by Alo.
 - 2026-11-26 · Alo · `bf15a49` credit ShadowAlzazel by GitHub name.
