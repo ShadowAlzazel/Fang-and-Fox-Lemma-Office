@@ -1,0 +1,53 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,amsthm}
+\newtheorem{lemma}{Lemma}\newtheorem{theorem}{Theorem}
+\title{Records Never Stop: Infinitely Many Maximal Prime Gaps}
+\author{Fang \& Fox Lemma Office (Arbiter, Kumi-San, Alo)}
+\date{Status: \textbf{proven} (textbook; pipeline warmup)}
+\begin{document}\maketitle
+
+\paragraph{The picture.} Walk along the primes and keep a high-water mark of the
+widest gap seen so far. Each time the water rises, that index is a \emph{record}.
+The question is whether the water ever stops rising. It cannot: there are deserts
+of composites as wide as we like, and the first gap that beats the old mark is,
+by its very firstness, a new record.
+
+\paragraph{Setup.} Write $p_n$ for the $n$-th prime ($p_0=2$) and $g_n=p_{n+1}-p_n$.
+Index $n$ is a \emph{record} if $g_m<g_n$ for every $m<n$.
+
+\begin{lemma}[Factorial desert \texttt{(gap\_unbounded)}]
+For every $k\ge 1$ there is $n$ with $g_n\ge k+1$.
+\end{lemma}
+\begin{proof}
+Let $N=(k+1)!$. For $2\le j\le k+1$, $j\mid N$ and $j\mid j$, so $j\mid N+j$ with
+$N+j>j$; hence $N+2,\dots,N+k+1$ are all composite. Let $p_n$ be the largest prime
+$\le N+1$ (it exists since $2\le N+1$). The next prime lies beyond the desert, so
+$p_{n+1}\ge N+k+2$ and $g_n\ge k+1$.
+\end{proof}
+
+\begin{lemma}[First to beat the mark \texttt{(first\_exceeder\_is\_record)}]
+Fix $M$ and let $H=\max_{m\le M} g_m$. If $n$ is the \emph{least} index with
+$g_n>H$, then $n>M$ and $n$ is a record.
+\end{lemma}
+\begin{proof}
+$n>M$ because every $g_m$ with $m\le M$ is $\le H$. Take $m<n$. If $m\le M$ then
+$g_m\le H<g_n$. If $M<m<n$ then $g_m\le H$ by minimality of $n$, so again $g_m<g_n$.
+\end{proof}
+
+\begin{theorem}[\texttt{infinite\_maximalPrimeGapIndex}]
+There are infinitely many record indices.
+\end{theorem}
+\begin{proof}
+Given any $M$, Lemma~1 with $k=H$ gives some $g_n>H$; the least such $n$ is a record
+beyond $M$ by Lemma~2. A set of naturals with an element past every bound is infinite.
+\end{proof}
+
+\paragraph{Why it matters for us.} Nothing here is deep; that is the point. The
+\emph{shape} of the argument (an unbounded quantity forces infinitely many records,
+via least-exceeder) is the same skeleton our \texttt{near\_misses.py} records use,
+and it isolates exactly what the open Shanks record-index problem asks beyond this:
+not \emph{whether} records recur, but \emph{how fast}, $g_n\sim(\log p_n)^2$.
+
+\paragraph{Honesty.} Proven, elementary. No use of RH or any heuristic. The
+Lean file should mirror Lemma~1, Lemma~2, Theorem in that order.
+\end{document}
