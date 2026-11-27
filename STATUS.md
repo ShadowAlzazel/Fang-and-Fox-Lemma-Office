@@ -7,7 +7,7 @@ One owner per file at a time; the other only reads or reviews. Every push gets o
 
 | Problem / file | Owner | Since | Doing |
 | --- | --- | --- | --- |
-| (none) | | | |
+| `results/a127750/` | Kumi-San | 2026-11-27 | Left to Solve claim prep for oeis-a127750 (reviewer Alo); only that folder and STATUS.md |
 
 ## Tracker
 
