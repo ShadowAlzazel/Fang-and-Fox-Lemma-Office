@@ -1,0 +1,6 @@
+verdict: accepted
+reason: the statement compiles; it now needs a human review of the translation
+lint: {"file": "statements/oeis-a127750.lean", "type": "statement", "problem": "oeis-a127750", "ok": true, "errors": []}
+--- log tail ---
+OMASubmission_516834.lean:46:8: warning: declaration uses `sorry`
+'OMA.S_oeis_a127750.main' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
