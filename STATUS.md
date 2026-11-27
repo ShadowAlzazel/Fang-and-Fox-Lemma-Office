@@ -7,7 +7,7 @@ One owner per file at a time; the other only reads or reviews. Every push gets o
 
 | Problem / file | Owner | Since | Doing |
 | --- | --- | --- | --- |
-| (none) | | | |
+| Restructure to results/ + CI | Alo | 2026-11-26 | Move problems/ to results/, PROOF.md per result, README results table, Lean CI |
 
 ## Tracker
 
