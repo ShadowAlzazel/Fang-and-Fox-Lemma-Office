@@ -1,0 +1,90 @@
+name: Lean
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lean:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout this repository
+        uses: actions/checkout@v4
+        with:
+          path: office
+
+      - name: Checkout formal-conjectures
+        uses: actions/checkout@v4
+        with:
+          repository: google-deepmind/formal-conjectures
+          ref: 9097e2f90e66d2f6244209cb1c07f7120d17ec53
+          path: formal-conjectures
+
+      - name: Install elan
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Get Mathlib cache
+        working-directory: formal-conjectures
+        run: lake exe cache get
+
+      - name: Forbid sorry, admit, native_decide
+        working-directory: office
+        run: |
+          if grep -rnE 'sorry|admit|native_decide' results --include='*.lean'; then
+            echo "forbidden tactic or keyword found in results/**/*.lean"
+            exit 1
+          fi
+          echo "no sorry, admit, or native_decide"
+
+      - name: Build every Lean file and check axioms
+        run: |
+          set -euo pipefail
+          shopt -s globstar nullglob
+          python3 << 'PY'
+          import re
+          import subprocess
+          import sys
+          from pathlib import Path
+
+          allowed = {"propext", "Classical.choice", "Quot.sound"}
+          office = Path("office")
+          files = sorted(office.glob("results/**/*.lean"))
+          if not files:
+              print("no Lean files under results/", file=sys.stderr)
+              sys.exit(1)
+
+          failed = False
+          for src in files:
+              dest = Path("formal-conjectures") / src.name
+              dest.write_bytes(src.read_bytes())
+              print(f"==> lake env lean {src.name}  ({src})", flush=True)
+              proc = subprocess.run(
+                  ["lake", "env", "lean", src.name],
+                  cwd="formal-conjectures",
+                  text=True,
+                  capture_output=True,
+              )
+              out = (proc.stdout or "") + (proc.stderr or "")
+              sys.stdout.write(out)
+              if proc.returncode != 0:
+                  print(f"ERROR: {src} failed to compile (exit {proc.returncode})", file=sys.stderr)
+                  failed = True
+              if "sorryAx" in out:
+                  print(f"ERROR: {src} #print axioms mentions sorryAx", file=sys.stderr)
+                  failed = True
+              for m in re.finditer(r"depends on axioms:\s*\[([^\]]*)\]", out):
+                  axioms = [a.strip() for a in m.group(1).split(",") if a.strip()]
+                  bad = [a for a in axioms if a not in allowed]
+                  if bad:
+                      print(f"ERROR: {src} unexpected axioms: {bad}", file=sys.stderr)
+                      failed = True
+              dest.unlink(missing_ok=True)
+
+          if failed:
+              sys.exit(1)
+          print("all Lean files compiled; axioms within {propext, Classical.choice, Quot.sound}")
+          PY
