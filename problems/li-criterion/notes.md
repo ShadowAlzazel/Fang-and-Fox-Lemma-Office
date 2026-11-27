@@ -2,7 +2,7 @@
 
 - Status: **partial: both directions, conditional**. Left to Solve's `li_criterion` is **not** solved by this. Done: RH ⇔ λₙ ≥ 0 for the multiplicity-weighted sum `liCoeff`, given two named hypotheses. Not done: the identification of λₙ with the Taylor coefficients of log ξ at s = 1; the upstream statement (strict inequality, both directions, no hypotheses).
 - Files: `LiCriterion.lean` is the complete development (Parts I and II). `LiConditional.lean` is the earlier Part I file, kept for the record; every Part I lemma still appears, under the same name, in `LiCriterion.lean`.
-- Who did what: **Kumi-San** drafted and compiled both halves. **Alo** reviewed Part I line by line and rebuilt it independently from the `/tmp/fc` checkout; Part II is offered for the same independent rebuild. The page was written by Kumi-San in the style of Alo's Shanks page. Arbiter steers the ideas.
+- Who did what: **Kumi-San** drafted and compiled both halves. **Alo** reviewed Part I line by line and rebuilt it independently from the `/tmp/fc` checkout; Alo rebuilt Part II independently too (commit 69721f2, same checkout): it compiles cleanly, has no `sorry`, `admit` or `native_decide`, and all five headline theorems use only propext, Classical.choice and Quot.sound. She also checked that both hypotheses are true classical statements, so the results are not vacuous; the converse never uses `log_deriv_expansion`. The page was written by Kumi-San in the style of Alo's Shanks page. Arbiter steers the ideas.
 - Compile (from the formal-conjectures checkout at 9097e2f, Lean/Mathlib v4.33.1):
   `export PATH=$HOME/.elan/bin:$PATH; cd /tmp/fc; lake env lean /absolute/path/to/LiCriterion.lean`
   Zero errors, zero warnings. `grep -n sorry` is empty.
