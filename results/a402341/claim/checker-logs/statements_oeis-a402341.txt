@@ -1,0 +1,9 @@
+verdict: accepted
+reason: the statement compiles; it now needs a human review of the translation
+lint: {"file": "statements/oeis-a402341.lean", "type": "statement", "problem": "oeis-a402341", "module": "OMAStatements.S_oeis_a402341", "ok": true, "kind": "statement", "polarity": "proof", "theorem": "OMA.S_oeis_a402341.main", "imports": "Mathlib", "errors": []}
+sha256: 876362681b19a98e0bef180bedbe658f2cc1e2dd6b7fa2d18312b5938842d346  statements/oeis-a402341.lean
+pin: formal-conjectures 9097e2f90e66d2f6244209cb1c07f7120d17ec53 (OMA_FC=/tmp/fc-oma), Lean / Mathlib v4.33.1
+checked: 2026-11-27, America/Los_Angeles
+--- log tail ---
+OMASubmission_627910.lean:47:8: warning: declaration uses `sorry`
+'OMA.S_oeis_a402341.main' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
