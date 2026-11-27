@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Li's Criterion, the Flower on the Circle · Fang &amp; Fox Lemma Office</title>
+<meta name="description" content="Li's criterion: the Möbius map sends the critical line to the unit circle, so under RH every Li coefficient is a sum of nonnegative terms. A conditional Lean 4 proof of the easy direction, with the honest caveats up front.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@500;600;700&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'\\(',right:'\\)',display:false}]})"></script>
+<style>
+:root{--paper:#f5f6f9;--surface:#fff;--ink:#1b2230;--muted:#586275;--rule:#d8dde7;--petal:#cf5428;--line:#2563b8;--proven:#1d7f54;--proven-bg:#e3f3ea;--open:#a8681a;--open-bg:#f8ecd9;
+--fd:"Instrument Sans","Helvetica Neue",Arial,sans-serif;--fb:"STIX Two Text",Cambria,Georgia,serif;--fm:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+@media (prefers-color-scheme:dark){:root{--paper:#10141c;--surface:#171d28;--ink:#e3e7ef;--muted:#9aa4b5;--rule:#29313f;--petal:#f0804f;--line:#73a9ee;--proven:#5fcf98;--proven-bg:#173226;--open:#e6b25c;--open-bg:#3a2c15;color-scheme:dark}}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:1.125rem/1.62 var(--fb);padding:0 16px}
+main{max-width:46rem;margin:0 auto;padding:2.5rem 0 5rem}a{color:var(--line)}
+.crumb{font:600 .8rem var(--fd);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font:700 clamp(2rem,5vw,2.9rem)/1.1 var(--fd);margin:.4rem 0 .6rem}h2{font:600 1.35rem var(--fd);margin:2.6rem 0 .6rem;border-top:1px solid var(--rule);padding-top:1.6rem}
+.tag{display:inline-block;font:600 .78rem var(--fd);padding:.15rem .6rem;border-radius:99px;background:var(--proven-bg);color:var(--proven);margin-right:.4rem}.tag.open{background:var(--open-bg);color:var(--open)}
+.lede{font-size:1.25rem;color:var(--muted)}
+figure{margin:1.8rem -1rem;background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:1rem}figure svg{width:100%;height:auto}figcaption{font:.9rem/1.45 var(--fd);color:var(--muted);margin-top:.5rem}
+.step{background:var(--surface);border:1px solid var(--rule);border-left:4px solid var(--petal);border-radius:10px;padding:1rem 1.2rem;margin:1.2rem 0}
+.step h3{font:600 1.05rem var(--fd);margin:0 0 .3rem}.step code,.nmref{font:.85rem var(--fm);color:var(--line)}
+.warn{background:var(--open-bg);border:1px solid var(--rule);border-left:4px solid var(--open);border-radius:10px;padding:1rem 1.2rem;margin:1.2rem 0}.warn h3{font:600 1.05rem var(--fd);margin:0 0 .3rem;color:var(--open)}.warn p{margin:.4rem 0}
+pre{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:1rem;overflow-x:auto;font:.8rem/1.5 var(--fm)}.nm{color:var(--petal);font-weight:500}
+.check li{margin:.2rem 0}footer{font:.85rem var(--fd);color:var(--muted);margin-top:3rem}
+</style></head><body><main>
+<div class="crumb"><a href="../../">Fang &amp; Fox Lemma Office</a> · Problem 1 · Li's criterion</div>
+<h1>The flower on the circle</h1>
+<p><span class="tag open">partial / in progress</span><span class="tag" style="background:none;border:1px solid var(--rule);color:var(--muted)">Lean 4 · conditional · kernel-checked</span></p>
+<p class="lede">Bend the critical line into a circle. If the Riemann Hypothesis holds, every zero of \(\zeta\) lands on that circle, and Li's coefficients become sums of squares. We prove that easy direction in Lean, with the analytic input named as an explicit assumption. The converse, positivity implies RH, is not done.</p>
+
+<div class="warn"><h3>Read this first</h3>
+<p><strong>This does not solve Li's Criterion on Left to Solve.</strong> That problem asks for a statement we have not proved. What is here is the conditional easy direction: RH, plus two named hypotheses, gives \(\lambda_n&gt;0\). The converse is in progress. Every caveat is in <a href="#honesty">the honesty section</a>.</p></div>
+
+<h2>The statement</h2>
+<p>Let \(\rho\) run over the nontrivial zeros of \(\zeta\), counted with multiplicity. Li's coefficients are
+$$\lambda_n=\sum_{\rho}\Bigl[1-\Bigl(1-\frac1\rho\Bigr)^{n}\Bigr],\qquad n\ge 1,$$
+summed in conjugate pairs so that the series converges. <strong>Li's criterion</strong> (Li 1997, in the form of Bombieri and Lagarias 1999): RH holds if and only if \(\lambda_n\ge0\) for every \(n\ge1\). The first one is \(\lambda_1=1+\tfrac\gamma2-\tfrac12\log4\pi\approx0.0230957\).</p>
+<p>In the Lean file the sum is taken over zeros with \(\operatorname{Im}\rho&gt;0\), each doubled by \(2\operatorname{Re}\), which is the same thing once zeros are paired with their conjugates.</p>
+
+<h2>The picture</h2>
+<p>Send \(\rho\) to \(w=1-\frac1\rho=\frac{\rho-1}{\rho}\). Then \(|w|=1\) exactly when \(|\rho-1|=|\rho|\), that is, when \(\operatorname{Re}\rho=\tfrac12\). <em>The Möbius map sends the critical line to the unit circle.</em> The two symmetries of the zeros (\(\rho\mapsto\bar\rho\) and \(\rho\mapsto1-\rho\)) become \(w\mapsto\bar w\) and \(w\mapsto1/w\). So a zero off the line would arrive as a quartet \(w,\ \bar w,\ 1/w,\ 1/\bar w\), two points inside the circle and two outside.</p>
+
+<figure><svg viewBox="0 0 720 470" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="The first 100 zeta zeros, sent by w = 1 - 1/rho, lie exactly on the unit circle with their conjugates, all within a short arc near w = 1; a schematic off-line zero would land off the circle in a pair w and 1 over w-bar">
+<style>.ax{stroke:var(--muted,#586275);stroke-width:1}.tk{font:11px 'IBM Plex Mono',monospace;fill:var(--muted,#586275)}.ci{fill:none;stroke:var(--line,#2563b8);stroke-width:1.8}.dot{fill:var(--petal,#cf5428)}.gh{fill:none;stroke:var(--muted,#586275);stroke-width:1.3;stroke-dasharray:3 3}.lg{font:12px 'Instrument Sans',sans-serif;fill:var(--ink,#1b2230)}.bx{fill:none;stroke:var(--muted,#586275);stroke-width:.8;stroke-dasharray:4 3}</style>
+<text x="20" y="22" class="lg"><tspan fill="var(--line,#2563b8)">&#9679;</tspan> unit circle |w| = 1, the image of Re &#961; = 1/2</text>
+<text x="20" y="40" class="lg"><tspan fill="var(--petal,#cf5428)">&#9679;</tspan> w = 1 &#8722; 1/&#961; for the first 100 zeros and their conjugates</text>
+<text x="20" y="58" class="lg"><tspan fill="var(--muted,#586275)">&#9675;</tspan> dashed: where a schematic off-line zero (0.85 + 2.5i, not a real zero) would land: w, conj(w), 1/w, 1/conj(w)</text>
+<line x1="40" x2="390" y1="250" y2="250" class="ax"/><line x1="215" x2="215" y1="75" y2="430" class="ax"/>
+<circle cx="215" cy="250" r="160" class="ci"/>
+<text x="379" y="264" class="tk">1</text><text x="41" y="264" class="tk">-1</text><text x="221" y="84" class="tk">i</text><text x="221" y="426" class="tk">-i</text>
+<circle cx="374.6" cy="238.7" r="2.4" class="dot"/><circle cx="374.6" cy="261.3" r="2.4" class="dot"/><circle cx="374.8" cy="242.4" r="2.4" class="dot"/><circle cx="374.8" cy="257.6" r="2.4" class="dot"/><circle cx="374.9" cy="243.6" r="2.4" class="dot"/><circle cx="374.9" cy="256.4" r="2.4" class="dot"/><circle cx="374.9" cy="244.7" r="2.4" class="dot"/><circle cx="374.9" cy="255.3" r="2.4" class="dot"/><circle cx="374.9" cy="245.1" r="2.4" class="dot"/><circle cx="374.9" cy="254.9" r="2.4" class="dot"/><circle cx="374.9" cy="245.7" r="2.4" class="dot"/><circle cx="374.9" cy="254.3" r="2.4" class="dot"/><circle cx="375.0" cy="246.1" r="2.4" class="dot"/><circle cx="375.0" cy="253.9" r="2.4" class="dot"/><circle cx="375.0" cy="246.3" r="2.4" class="dot"/><circle cx="375.0" cy="253.7" r="2.4" class="dot"/><circle cx="375.0" cy="246.7" r="2.4" class="dot"/><circle cx="375.0" cy="253.3" r="2.4" class="dot"/><circle cx="375.0" cy="246.8" r="2.4" class="dot"/><circle cx="375.0" cy="253.2" r="2.4" class="dot"/><circle cx="375.0" cy="247.0" r="2.4" class="dot"/><circle cx="375.0" cy="253.0" r="2.4" class="dot"/><circle cx="375.0" cy="247.2" r="2.4" class="dot"/><circle cx="375.0" cy="252.8" r="2.4" class="dot"/><circle cx="375.0" cy="247.3" r="2.4" class="dot"/><circle cx="375.0" cy="252.7" r="2.4" class="dot"/><circle cx="375.0" cy="247.4" r="2.4" class="dot"/><circle cx="375.0" cy="252.6" r="2.4" class="dot"/><circle cx="375.0" cy="247.5" r="2.4" class="dot"/><circle cx="375.0" cy="252.5" r="2.4" class="dot"/><circle cx="375.0" cy="247.6" r="2.4" class="dot"/><circle cx="375.0" cy="252.4" r="2.4" class="dot"/><circle cx="375.0" cy="247.7" r="2.4" class="dot"/><circle cx="375.0" cy="252.3" r="2.4" class="dot"/><circle cx="375.0" cy="247.8" r="2.4" class="dot"/><circle cx="375.0" cy="252.2" r="2.4" class="dot"/><circle cx="375.0" cy="247.9" r="2.4" class="dot"/><circle cx="375.0" cy="252.1" r="2.4" class="dot"/><circle cx="375.0" cy="247.9" r="2.4" class="dot"/><circle cx="375.0" cy="252.1" r="2.4" class="dot"/><circle cx="375.0" cy="248.0" r="2.4" class="dot"/><circle cx="375.0" cy="252.0" r="2.4" class="dot"/><circle cx="375.0" cy="248.1" r="2.4" class="dot"/><circle cx="375.0" cy="251.9" r="2.4" class="dot"/><circle cx="375.0" cy="248.1" r="2.4" class="dot"/><circle cx="375.0" cy="251.9" r="2.4" class="dot"/><circle cx="375.0" cy="248.2" r="2.4" class="dot"/><circle cx="375.0" cy="251.8" r="2.4" class="dot"/><circle cx="375.0" cy="248.2" r="2.4" class="dot"/><circle cx="375.0" cy="251.8" r="2.4" class="dot"/><circle cx="375.0" cy="248.3" r="2.4" class="dot"/><circle cx="375.0" cy="251.7" r="2.4" class="dot"/><circle cx="375.0" cy="248.3" r="2.4" class="dot"/><circle cx="375.0" cy="251.7" r="2.4" class="dot"/><circle cx="375.0" cy="248.3" r="2.4" class="dot"/><circle cx="375.0" cy="251.7" r="2.4" class="dot"/><circle cx="375.0" cy="248.4" r="2.4" class="dot"/><circle cx="375.0" cy="251.6" r="2.4" class="dot"/><circle cx="375.0" cy="248.4" r="2.4" class="dot"/><circle cx="375.0" cy="251.6" r="2.4" class="dot"/><circle cx="375.0" cy="248.5" r="2.4" class="dot"/><circle cx="375.0" cy="251.5" r="2.4" class="dot"/><circle cx="375.0" cy="248.5" r="2.4" class="dot"/><circle cx="375.0" cy="251.5" r="2.4" class="dot"/><circle cx="375.0" cy="248.5" r="2.4" class="dot"/><circle cx="375.0" cy="251.5" r="2.4" class="dot"/><circle cx="375.0" cy="248.6" r="2.4" class="dot"/><circle cx="375.0" cy="251.4" r="2.4" class="dot"/><circle cx="375.0" cy="248.6" r="2.4" class="dot"/><circle cx="375.0" cy="251.4" r="2.4" class="dot"/><circle cx="375.0" cy="248.6" r="2.4" class="dot"/><circle cx="375.0" cy="251.4" r="2.4" class="dot"/><circle cx="375.0" cy="248.6" r="2.4" class="dot"/><circle cx="375.0" cy="251.4" r="2.4" class="dot"/><circle cx="375.0" cy="248.7" r="2.4" class="dot"/><circle cx="375.0" cy="251.3" r="2.4" class="dot"/><circle cx="375.0" cy="248.7" r="2.4" class="dot"/><circle cx="375.0" cy="251.3" r="2.4" class="dot"/><circle cx="375.0" cy="248.7" r="2.4" class="dot"/><circle cx="375.0" cy="251.3" r="2.4" class="dot"/><circle cx="375.0" cy="248.7" r="2.4" class="dot"/><circle cx="375.0" cy="251.3" r="2.4" class="dot"/><circle cx="375.0" cy="248.7" r="2.4" class="dot"/><circle cx="375.0" cy="251.3" r="2.4" class="dot"/><circle cx="375.0" cy="248.8" r="2.4" class="dot"/><circle cx="375.0" cy="251.2" r="2.4" class="dot"/><circle cx="375.0" cy="248.8" r="2.4" class="dot"/><circle cx="375.0" cy="251.2" r="2.4" class="dot"/><circle cx="375.0" cy="248.8" r="2.4" class="dot"/><circle cx="375.0" cy="251.2" r="2.4" class="dot"/><circle cx="375.0" cy="248.8" r="2.4" class="dot"/><circle cx="375.0" cy="251.2" r="2.4" class="dot"/><circle cx="375.0" cy="248.8" r="2.4" class="dot"/><circle cx="375.0" cy="251.2" r="2.4" class="dot"/><circle cx="375.0" cy="248.9" r="2.4" class="dot"/><circle cx="375.0" cy="251.1" r="2.4" class="dot"/><circle cx="375.0" cy="248.9" r="2.4" class="dot"/><circle cx="375.0" cy="251.1" r="2.4" class="dot"/><circle cx="375.0" cy="248.9" r="2.4" class="dot"/><circle cx="375.0" cy="251.1" r="2.4" class="dot"/><circle cx="375.0" cy="248.9" r="2.4" class="dot"/><circle cx="375.0" cy="251.1" r="2.4" class="dot"/><circle cx="375.0" cy="248.9" r="2.4" class="dot"/><circle cx="375.0" cy="251.1" r="2.4" class="dot"/><circle cx="375.0" cy="248.9" r="2.4" class="dot"/><circle cx="375.0" cy="251.1" r="2.4" class="dot"/><circle cx="375.0" cy="248.9" r="2.4" class="dot"/><circle cx="375.0" cy="251.1" r="2.4" class="dot"/><circle cx="375.0" cy="249.0" r="2.4" class="dot"/><circle cx="375.0" cy="251.0" r="2.4" class="dot"/><circle cx="375.0" cy="249.0" r="2.4" class="dot"/><circle cx="375.0" cy="251.0" r="2.4" class="dot"/><circle cx="375.0" cy="249.0" r="2.4" class="dot"/><circle cx="375.0" cy="251.0" r="2.4" class="dot"/><circle cx="375.0" cy="249.0" r="2.4" class="dot"/><circle cx="375.0" cy="251.0" r="2.4" class="dot"/><circle cx="375.0" cy="249.0" r="2.4" class="dot"/><circle cx="375.0" cy="251.0" r="2.4" class="dot"/><circle cx="375.0" cy="249.0" r="2.4" class="dot"/><circle cx="375.0" cy="251.0" r="2.4" class="dot"/><circle cx="375.0" cy="249.0" r="2.4" class="dot"/><circle cx="375.0" cy="251.0" r="2.4" class="dot"/><circle cx="375.0" cy="249.0" r="2.4" class="dot"/><circle cx="375.0" cy="251.0" r="2.4" class="dot"/><circle cx="375.0" cy="249.1" r="2.4" class="dot"/><circle cx="375.0" cy="250.9" r="2.4" class="dot"/><circle cx="375.0" cy="249.1" r="2.4" class="dot"/><circle cx="375.0" cy="250.9" r="2.4" class="dot"/><circle cx="375.0" cy="249.1" r="2.4" class="dot"/><circle cx="375.0" cy="250.9" r="2.4" class="dot"/><circle cx="375.0" cy="249.1" r="2.4" class="dot"/><circle cx="375.0" cy="250.9" r="2.4" class="dot"/><circle cx="375.0" cy="249.1" r="2.4" class="dot"/><circle cx="375.0" cy="250.9" r="2.4" class="dot"/><circle cx="375.0" cy="249.1" r="2.4" class="dot"/><circle cx="375.0" cy="250.9" r="2.4" class="dot"/><circle cx="375.0" cy="249.1" r="2.4" class="dot"/><circle cx="375.0" cy="250.9" r="2.4" class="dot"/><circle cx="375.0" cy="249.1" r="2.4" class="dot"/><circle cx="375.0" cy="250.9" r="2.4" class="dot"/><circle cx="375.0" cy="249.1" r="2.4" class="dot"/><circle cx="375.0" cy="250.9" r="2.4" class="dot"/><circle cx="375.0" cy="249.1" r="2.4" class="dot"/><circle cx="375.0" cy="250.9" r="2.4" class="dot"/><circle cx="375.0" cy="249.1" r="2.4" class="dot"/><circle cx="375.0" cy="250.9" r="2.4" class="dot"/><circle cx="375.0" cy="249.2" r="2.4" class="dot"/><circle cx="375.0" cy="250.8" r="2.4" class="dot"/><circle cx="375.0" cy="249.2" r="2.4" class="dot"/><circle cx="375.0" cy="250.8" r="2.4" class="dot"/><circle cx="375.0" cy="249.2" r="2.4" class="dot"/><circle cx="375.0" cy="250.8" r="2.4" class="dot"/><circle cx="375.0" cy="249.2" r="2.4" class="dot"/><circle cx="375.0" cy="250.8" r="2.4" class="dot"/><circle cx="375.0" cy="249.2" r="2.4" class="dot"/><circle cx="375.0" cy="250.8" r="2.4" class="dot"/><circle cx="375.0" cy="249.2" r="2.4" class="dot"/><circle cx="375.0" cy="250.8" r="2.4" class="dot"/><circle cx="375.0" cy="249.2" r="2.4" class="dot"/><circle cx="375.0" cy="250.8" r="2.4" class="dot"/><circle cx="375.0" cy="249.2" r="2.4" class="dot"/><circle cx="375.0" cy="250.8" r="2.4" class="dot"/><circle cx="375.0" cy="249.2" r="2.4" class="dot"/><circle cx="375.0" cy="250.8" r="2.4" class="dot"/><circle cx="375.0" cy="249.2" r="2.4" class="dot"/><circle cx="375.0" cy="250.8" r="2.4" class="dot"/><circle cx="375.0" cy="249.2" r="2.4" class="dot"/><circle cx="375.0" cy="250.8" r="2.4" class="dot"/><circle cx="375.0" cy="249.2" r="2.4" class="dot"/><circle cx="375.0" cy="250.8" r="2.4" class="dot"/><circle cx="375.0" cy="249.2" r="2.4" class="dot"/><circle cx="375.0" cy="250.8" r="2.4" class="dot"/><circle cx="375.0" cy="249.3" r="2.4" class="dot"/><circle cx="375.0" cy="250.7" r="2.4" class="dot"/><circle cx="375.0" cy="249.3" r="2.4" class="dot"/><circle cx="375.0" cy="250.7" r="2.4" class="dot"/><circle cx="375.0" cy="249.3" r="2.4" class="dot"/><circle cx="375.0" cy="250.7" r="2.4" class="dot"/><circle cx="375.0" cy="249.3" r="2.4" class="dot"/><circle cx="375.0" cy="250.7" r="2.4" class="dot"/><circle cx="375.0" cy="249.3" r="2.4" class="dot"/><circle cx="375.0" cy="250.7" r="2.4" class="dot"/><circle cx="375.0" cy="249.3" r="2.4" class="dot"/><circle cx="375.0" cy="250.7" r="2.4" class="dot"/><circle cx="375.0" cy="249.3" r="2.4" class="dot"/><circle cx="375.0" cy="250.7" r="2.4" class="dot"/><circle cx="375.0" cy="249.3" r="2.4" class="dot"/><circle cx="375.0" cy="250.7" r="2.4" class="dot"/><circle cx="375.0" cy="249.3" r="2.4" class="dot"/><circle cx="375.0" cy="250.7" r="2.4" class="dot"/><circle cx="375.0" cy="249.3" r="2.4" class="dot"/><circle cx="375.0" cy="250.7" r="2.4" class="dot"/><circle cx="375.0" cy="249.3" r="2.4" class="dot"/><circle cx="375.0" cy="250.7" r="2.4" class="dot"/><circle cx="375.0" cy="249.3" r="2.4" class="dot"/><circle cx="375.0" cy="250.7" r="2.4" class="dot"/><circle cx="375.0" cy="249.3" r="2.4" class="dot"/><circle cx="375.0" cy="250.7" r="2.4" class="dot"/><circle cx="375.0" cy="249.3" r="2.4" class="dot"/><circle cx="375.0" cy="250.7" r="2.4" class="dot"/><circle cx="355.5" cy="192.6" r="4" class="gh"/><circle cx="355.5" cy="307.4" r="4" class="gh"/><circle cx="371.2" cy="313.8" r="4" class="gh"/><circle cx="371.2" cy="186.2" r="4" class="gh"/>
+<rect x="371.8" y="236.8" width="6.4" height="26.4" class="bx"/>
+<text x="215" y="452" class="tk" text-anchor="middle">the whole circle</text>
+<polyline points="568.2,414.8 568.4,412.1 568.6,409.3 568.9,406.6 569.1,403.8 569.3,401.1 569.5,398.4 569.7,395.6 569.9,392.9 570.1,390.1 570.3,387.4 570.5,384.6 570.6,381.9 570.8,379.2 571.0,376.4 571.2,373.7 571.3,370.9 571.5,368.2 571.7,365.4 571.8,362.7 572.0,359.9 572.1,357.2 572.3,354.5 572.4,351.7 572.6,349.0 572.7,346.2 572.8,343.5 572.9,340.7 573.1,338.0 573.2,335.2 573.3,332.5 573.4,329.7 573.5,327.0 573.6,324.2 573.7,321.5 573.8,318.7 573.9,316.0 574.0,313.2 574.1,310.5 574.2,307.7 574.2,305.0 574.3,302.2 574.4,299.5 574.5,296.7 574.5,294.0 574.6,291.2 574.6,288.5 574.7,285.7 574.7,283.0 574.8,280.2 574.8,277.5 574.8,274.7 574.9,272.0 574.9,269.2 574.9,266.5 575.0,263.7 575.0,261.0 575.0,258.2 575.0,255.5 575.0,252.7 575.0,250.0 575.0,247.3 575.0,244.5 575.0,241.8 575.0,239.0 575.0,236.3 574.9,233.5 574.9,230.8 574.9,228.0 574.8,225.3 574.8,222.5 574.8,219.8 574.7,217.0 574.7,214.3 574.6,211.5 574.6,208.8 574.5,206.0 574.5,203.3 574.4,200.5 574.3,197.8 574.2,195.0 574.2,192.3 574.1,189.5 574.0,186.8 573.9,184.0 573.8,181.3 573.7,178.5 573.6,175.8 573.5,173.0 573.4,170.3 573.3,167.5 573.2,164.8 573.1,162.0 572.9,159.3 572.8,156.5 572.7,153.8 572.6,151.0 572.4,148.3 572.3,145.5 572.1,142.8 572.0,140.1 571.8,137.3 571.7,134.6 571.5,131.8 571.3,129.1 571.2,126.3 571.0,123.6 570.8,120.8 570.6,118.1 570.5,115.4 570.3,112.6 570.1,109.9 569.9,107.1 569.7,104.4 569.5,101.6 569.3,98.9 569.1,96.2 568.9,93.4 568.6,90.7 568.4,87.9 568.2,85.2" class="ci"/>
+<circle cx="570.0" cy="108.7" r="2.4" class="dot"/><circle cx="570.0" cy="391.3" r="2.4" class="dot"/><circle cx="572.7" cy="154.9" r="2.4" class="dot"/><circle cx="572.7" cy="345.1" r="2.4" class="dot"/><circle cx="573.4" cy="170.1" r="2.4" class="dot"/><circle cx="573.4" cy="329.9" r="2.4" class="dot"/><circle cx="573.9" cy="184.3" r="2.4" class="dot"/><circle cx="573.9" cy="315.7" r="2.4" class="dot"/><circle cx="574.1" cy="189.3" r="2.4" class="dot"/><circle cx="574.1" cy="310.7" r="2.4" class="dot"/><circle cx="574.3" cy="196.8" r="2.4" class="dot"/><circle cx="574.3" cy="303.2" r="2.4" class="dot"/><circle cx="574.4" cy="201.1" r="2.4" class="dot"/><circle cx="574.4" cy="298.9" r="2.4" class="dot"/><circle cx="574.5" cy="203.8" r="2.4" class="dot"/><circle cx="574.5" cy="296.2" r="2.4" class="dot"/><circle cx="574.6" cy="208.3" r="2.4" class="dot"/><circle cx="574.6" cy="291.7" r="2.4" class="dot"/><circle cx="574.6" cy="209.8" r="2.4" class="dot"/><circle cx="574.6" cy="290.2" r="2.4" class="dot"/><circle cx="574.6" cy="212.2" r="2.4" class="dot"/><circle cx="574.6" cy="287.8" r="2.4" class="dot"/><circle cx="574.7" cy="214.6" r="2.4" class="dot"/><circle cx="574.7" cy="285.4" r="2.4" class="dot"/><circle cx="574.7" cy="216.3" r="2.4" class="dot"/><circle cx="574.7" cy="283.7" r="2.4" class="dot"/><circle cx="574.7" cy="217.1" r="2.4" class="dot"/><circle cx="574.7" cy="282.9" r="2.4" class="dot"/><circle cx="574.8" cy="219.3" r="2.4" class="dot"/><circle cx="574.8" cy="280.7" r="2.4" class="dot"/><circle cx="574.8" cy="220.2" r="2.4" class="dot"/><circle cx="574.8" cy="279.8" r="2.4" class="dot"/><circle cx="574.8" cy="221.2" r="2.4" class="dot"/><circle cx="574.8" cy="278.8" r="2.4" class="dot"/><circle cx="574.8" cy="222.2" r="2.4" class="dot"/><circle cx="574.8" cy="277.8" r="2.4" class="dot"/><circle cx="574.8" cy="223.6" r="2.4" class="dot"/><circle cx="574.8" cy="276.4" r="2.4" class="dot"/><circle cx="574.8" cy="224.1" r="2.4" class="dot"/><circle cx="574.8" cy="275.9" r="2.4" class="dot"/><circle cx="574.8" cy="224.8" r="2.4" class="dot"/><circle cx="574.8" cy="275.2" r="2.4" class="dot"/><circle cx="574.9" cy="225.9" r="2.4" class="dot"/><circle cx="574.9" cy="274.1" r="2.4" class="dot"/><circle cx="574.9" cy="226.4" r="2.4" class="dot"/><circle cx="574.9" cy="273.6" r="2.4" class="dot"/><circle cx="574.9" cy="227.1" r="2.4" class="dot"/><circle cx="574.9" cy="272.9" r="2.4" class="dot"/><circle cx="574.9" cy="227.5" r="2.4" class="dot"/><circle cx="574.9" cy="272.5" r="2.4" class="dot"/><circle cx="574.9" cy="228.4" r="2.4" class="dot"/><circle cx="574.9" cy="271.6" r="2.4" class="dot"/><circle cx="574.9" cy="228.9" r="2.4" class="dot"/><circle cx="574.9" cy="271.1" r="2.4" class="dot"/><circle cx="574.9" cy="229.1" r="2.4" class="dot"/><circle cx="574.9" cy="270.9" r="2.4" class="dot"/><circle cx="574.9" cy="229.8" r="2.4" class="dot"/><circle cx="574.9" cy="270.2" r="2.4" class="dot"/><circle cx="574.9" cy="230.3" r="2.4" class="dot"/><circle cx="574.9" cy="269.7" r="2.4" class="dot"/><circle cx="574.9" cy="230.7" r="2.4" class="dot"/><circle cx="574.9" cy="269.3" r="2.4" class="dot"/><circle cx="574.9" cy="231.0" r="2.4" class="dot"/><circle cx="574.9" cy="269.0" r="2.4" class="dot"/><circle cx="574.9" cy="231.3" r="2.4" class="dot"/><circle cx="574.9" cy="268.7" r="2.4" class="dot"/><circle cx="574.9" cy="232.0" r="2.4" class="dot"/><circle cx="574.9" cy="268.0" r="2.4" class="dot"/><circle cx="574.9" cy="232.1" r="2.4" class="dot"/><circle cx="574.9" cy="267.9" r="2.4" class="dot"/><circle cx="574.9" cy="232.5" r="2.4" class="dot"/><circle cx="574.9" cy="267.5" r="2.4" class="dot"/><circle cx="574.9" cy="232.8" r="2.4" class="dot"/><circle cx="574.9" cy="267.2" r="2.4" class="dot"/><circle cx="574.9" cy="233.2" r="2.4" class="dot"/><circle cx="574.9" cy="266.8" r="2.4" class="dot"/><circle cx="574.9" cy="233.5" r="2.4" class="dot"/><circle cx="574.9" cy="266.5" r="2.4" class="dot"/><circle cx="574.9" cy="233.7" r="2.4" class="dot"/><circle cx="574.9" cy="266.3" r="2.4" class="dot"/><circle cx="574.9" cy="233.9" r="2.4" class="dot"/><circle cx="574.9" cy="266.1" r="2.4" class="dot"/><circle cx="574.9" cy="234.3" r="2.4" class="dot"/><circle cx="574.9" cy="265.7" r="2.4" class="dot"/><circle cx="574.9" cy="234.6" r="2.4" class="dot"/><circle cx="574.9" cy="265.4" r="2.4" class="dot"/><circle cx="574.9" cy="234.7" r="2.4" class="dot"/><circle cx="574.9" cy="265.3" r="2.4" class="dot"/><circle cx="574.9" cy="235.0" r="2.4" class="dot"/><circle cx="574.9" cy="265.0" r="2.4" class="dot"/><circle cx="574.9" cy="235.2" r="2.4" class="dot"/><circle cx="574.9" cy="264.8" r="2.4" class="dot"/><circle cx="574.9" cy="235.5" r="2.4" class="dot"/><circle cx="574.9" cy="264.5" r="2.4" class="dot"/><circle cx="574.9" cy="235.7" r="2.4" class="dot"/><circle cx="574.9" cy="264.3" r="2.4" class="dot"/><circle cx="574.9" cy="235.8" r="2.4" class="dot"/><circle cx="574.9" cy="264.2" r="2.4" class="dot"/><circle cx="575.0" cy="236.0" r="2.4" class="dot"/><circle cx="575.0" cy="264.0" r="2.4" class="dot"/><circle cx="575.0" cy="236.3" r="2.4" class="dot"/><circle cx="575.0" cy="263.7" r="2.4" class="dot"/><circle cx="575.0" cy="236.4" r="2.4" class="dot"/><circle cx="575.0" cy="263.6" r="2.4" class="dot"/><circle cx="575.0" cy="236.7" r="2.4" class="dot"/><circle cx="575.0" cy="263.3" r="2.4" class="dot"/><circle cx="575.0" cy="236.7" r="2.4" class="dot"/><circle cx="575.0" cy="263.3" r="2.4" class="dot"/><circle cx="575.0" cy="236.9" r="2.4" class="dot"/><circle cx="575.0" cy="263.1" r="2.4" class="dot"/><circle cx="575.0" cy="237.2" r="2.4" class="dot"/><circle cx="575.0" cy="262.8" r="2.4" class="dot"/><circle cx="575.0" cy="237.3" r="2.4" class="dot"/><circle cx="575.0" cy="262.7" r="2.4" class="dot"/><circle cx="575.0" cy="237.4" r="2.4" class="dot"/><circle cx="575.0" cy="262.6" r="2.4" class="dot"/><circle cx="575.0" cy="237.6" r="2.4" class="dot"/><circle cx="575.0" cy="262.4" r="2.4" class="dot"/><circle cx="575.0" cy="237.7" r="2.4" class="dot"/><circle cx="575.0" cy="262.3" r="2.4" class="dot"/><circle cx="575.0" cy="237.9" r="2.4" class="dot"/><circle cx="575.0" cy="262.1" r="2.4" class="dot"/><circle cx="575.0" cy="238.0" r="2.4" class="dot"/><circle cx="575.0" cy="262.0" r="2.4" class="dot"/><circle cx="575.0" cy="238.2" r="2.4" class="dot"/><circle cx="575.0" cy="261.8" r="2.4" class="dot"/><circle cx="575.0" cy="238.2" r="2.4" class="dot"/><circle cx="575.0" cy="261.8" r="2.4" class="dot"/><circle cx="575.0" cy="238.5" r="2.4" class="dot"/><circle cx="575.0" cy="261.5" r="2.4" class="dot"/><circle cx="575.0" cy="238.6" r="2.4" class="dot"/><circle cx="575.0" cy="261.4" r="2.4" class="dot"/><circle cx="575.0" cy="238.7" r="2.4" class="dot"/><circle cx="575.0" cy="261.3" r="2.4" class="dot"/><circle cx="575.0" cy="238.8" r="2.4" class="dot"/><circle cx="575.0" cy="261.2" r="2.4" class="dot"/><circle cx="575.0" cy="238.9" r="2.4" class="dot"/><circle cx="575.0" cy="261.1" r="2.4" class="dot"/><circle cx="575.0" cy="239.0" r="2.4" class="dot"/><circle cx="575.0" cy="261.0" r="2.4" class="dot"/><circle cx="575.0" cy="239.2" r="2.4" class="dot"/><circle cx="575.0" cy="260.8" r="2.4" class="dot"/><circle cx="575.0" cy="239.2" r="2.4" class="dot"/><circle cx="575.0" cy="260.8" r="2.4" class="dot"/><circle cx="575.0" cy="239.3" r="2.4" class="dot"/><circle cx="575.0" cy="260.7" r="2.4" class="dot"/><circle cx="575.0" cy="239.4" r="2.4" class="dot"/><circle cx="575.0" cy="260.6" r="2.4" class="dot"/><circle cx="575.0" cy="239.6" r="2.4" class="dot"/><circle cx="575.0" cy="260.4" r="2.4" class="dot"/><circle cx="575.0" cy="239.6" r="2.4" class="dot"/><circle cx="575.0" cy="260.4" r="2.4" class="dot"/><circle cx="575.0" cy="239.8" r="2.4" class="dot"/><circle cx="575.0" cy="260.2" r="2.4" class="dot"/><circle cx="575.0" cy="239.8" r="2.4" class="dot"/><circle cx="575.0" cy="260.2" r="2.4" class="dot"/><circle cx="575.0" cy="239.9" r="2.4" class="dot"/><circle cx="575.0" cy="260.1" r="2.4" class="dot"/><circle cx="575.0" cy="240.1" r="2.4" class="dot"/><circle cx="575.0" cy="259.9" r="2.4" class="dot"/><circle cx="575.0" cy="240.1" r="2.4" class="dot"/><circle cx="575.0" cy="259.9" r="2.4" class="dot"/><circle cx="575.0" cy="240.2" r="2.4" class="dot"/><circle cx="575.0" cy="259.8" r="2.4" class="dot"/><circle cx="575.0" cy="240.3" r="2.4" class="dot"/><circle cx="575.0" cy="259.7" r="2.4" class="dot"/><circle cx="575.0" cy="240.4" r="2.4" class="dot"/><circle cx="575.0" cy="259.6" r="2.4" class="dot"/><circle cx="575.0" cy="240.5" r="2.4" class="dot"/><circle cx="575.0" cy="259.5" r="2.4" class="dot"/><circle cx="575.0" cy="240.6" r="2.4" class="dot"/><circle cx="575.0" cy="259.4" r="2.4" class="dot"/><circle cx="575.0" cy="240.6" r="2.4" class="dot"/><circle cx="575.0" cy="259.4" r="2.4" class="dot"/><circle cx="575.0" cy="240.7" r="2.4" class="dot"/><circle cx="575.0" cy="259.3" r="2.4" class="dot"/><circle cx="575.0" cy="240.7" r="2.4" class="dot"/><circle cx="575.0" cy="259.3" r="2.4" class="dot"/><circle cx="575.0" cy="240.9" r="2.4" class="dot"/><circle cx="575.0" cy="259.1" r="2.4" class="dot"/><circle cx="575.0" cy="240.9" r="2.4" class="dot"/><circle cx="575.0" cy="259.1" r="2.4" class="dot"/><circle cx="575.0" cy="241.0" r="2.4" class="dot"/><circle cx="575.0" cy="259.0" r="2.4" class="dot"/><circle cx="575.0" cy="241.1" r="2.4" class="dot"/><circle cx="575.0" cy="258.9" r="2.4" class="dot"/><circle cx="575.0" cy="241.1" r="2.4" class="dot"/><circle cx="575.0" cy="258.9" r="2.4" class="dot"/><circle cx="575.0" cy="241.2" r="2.4" class="dot"/><circle cx="575.0" cy="258.8" r="2.4" class="dot"/><circle cx="575.0" cy="241.3" r="2.4" class="dot"/><circle cx="575.0" cy="258.7" r="2.4" class="dot"/><circle cx="575.0" cy="241.4" r="2.4" class="dot"/><circle cx="575.0" cy="258.6" r="2.4" class="dot"/><circle cx="575.0" cy="241.4" r="2.4" class="dot"/><circle cx="575.0" cy="258.6" r="2.4" class="dot"/><circle cx="575.0" cy="241.4" r="2.4" class="dot"/><circle cx="575.0" cy="258.6" r="2.4" class="dot"/><circle cx="575.0" cy="241.5" r="2.4" class="dot"/><circle cx="575.0" cy="258.5" r="2.4" class="dot"/>
+<text x="505" y="75" class="tk">zoom &#215;2000 at w = 1</text>
+<text x="575" y="452" class="tk" text-anchor="middle">all 200 points sit on the arc (|&#952;| &lt; 0.075)</text>
+</svg>
+<figcaption>Left: the first 100 zeta zeros and their conjugates, sent by \(w=1-1/\rho\), on the unit circle (data: <a href="figures/zeta_zeros_on_circle.csv">csv</a>, script: <a href="figures/make_figure.py">make_figure.py</a>). They bunch near \(w=1\), because \(|\rho|\) is large. Right: the same points, magnified 2000 times at \(w=1\). The dashed circles on the left are a <em>schematic</em> off-line zero at \(0.85+2.5i\), which is not a real zero, to show where such a quartet would land. This is an illustration, not evidence: the zero heights come from mpmath, which places them on the line, and RH has only been checked numerically to a finite height.</figcaption></figure>
+
+<p>Now the payoff. For \(|w|=1\) and \(u=w^n\), also on the circle,
+$$2\operatorname{Re}(1-u)=|1-u|^2\ \ge 0 .$$
+So under RH every term of \(\lambda_n\) is a square, and the sum cannot be negative. If a zero is off the line, \(|w|\ne1\), and for large \(n\) the power \(w^n\) (or \(\bar w^{-n}\)) spirals out and drives that term negative. That is the converse. It is the half we have not formalized.</p>
+
+<h2>What is proved</h2>
+<p>Each step is a lemma in <code>LiConditional.lean</code>, in the order below. Names link to the code.</p>
+<div class="step"><h3>1 · The critical line goes to the circle <a class="nmref" href="#lean-norm_sub_one_eq_of_re_half">norm_sub_one_eq_of_re_half</a> <a class="nmref" href="#lean-norm_one_sub_inv_eq_one">norm_one_sub_inv_eq_one</a></h3>
+<p>If \(\operatorname{Re}\rho=\tfrac12\) then \(|\rho-1|=|\rho|\), hence \(|1-1/\rho|=1\). Unconditional.</p></div>
+<div class="step"><h3>2 · Terms on the circle are squares <a class="nmref" href="#lean-re_one_sub_pow_nonneg">re_one_sub_pow_nonneg</a> <a class="nmref" href="#lean-re_one_sub_pow_pos">re_one_sub_pow_pos</a> <a class="nmref" href="#lean-re_one_sub_pow_le">re_one_sub_pow_le</a></h3>
+<p>For \(|w|=1\): \(\operatorname{Re}(1-w^n)=|1-w^n|^2/2\ge0\), and it is strictly positive when \(w^n\ne1\). A geometric sum gives \(|1-w^n|\le n|1-w|\), so \(\operatorname{Re}(1-w^n)\le n^2|1-w|^2/2\). With \(w=1-1/\rho\) this is \(\le n^2/(2|\rho|^2)\), which is what makes the series converge. Unconditional.</p></div>
+<div class="step"><h3>3 · The completed zeta function and multiplicities <a class="nmref" href="#lean-xi_eq">xi_eq</a> <a class="nmref" href="#lean-zetaMult_pos">zetaMult_pos</a></h3>
+<p>\(\xi(s)=\tfrac12(1+s(s-1)\Lambda_0(s))\) is built from Mathlib's entire \(\Lambda_0\), and <code>xi_eq</code> checks it equals \(\tfrac12s(s-1)\Lambda(s)\) away from \(0,1\). <code>zetaMult_pos</code> says every nontrivial zero with \(\operatorname{Im}\rho&gt;0\) has multiplicity at least 1: \(\zeta\) is analytic off \(s=1\), not identically zero (it is nonzero at \(2+i\)), and the identity theorem on the convex quadrant \(\{\operatorname{Re}&gt;0,\operatorname{Im}&gt;0\}\) rules out an infinite-order zero. Unconditional.</p></div>
+<div class="step"><h3>4 · RH puts every zero on the line <a class="nmref" href="#lean-re_eq_half_of_RH">re_eq_half_of_RH</a></h3>
+<p>Mathlib's <code>RiemannHypothesis</code> excludes trivial zeros and \(s=1\); we check a nontrivial zero is neither.</p></div>
+<div class="step"><h3>5 · RH gives \(\lambda_n\ge0\), and, with the hypotheses, convergence and \(\lambda_n&gt;0\) <a class="nmref" href="#lean-liCoeff_nonneg">liCoeff_nonneg</a> <a class="nmref" href="#lean-liCoeff_summable">liCoeff_summable</a> <a class="nmref" href="#lean-liCoeff_pos">liCoeff_pos</a></h3>
+<p><code>liCoeff_nonneg</code>: under RH every term is \(\ge0\), so \(\lambda_n\ge0\). <code>liCoeff_summable</code>: under RH and <code>HadamardHypothesis</code>, comparison with \(n^2\sum m(\rho)/|\rho|^2\) shows the series converges absolutely. <code>liCoeff_pos</code>: add <code>hinf</code>, infinitely many zeros. Only finitely many points of the circle satisfy \(w^n=1\), and \(\rho\mapsto w(\rho)\) is injective, so some zero has \(w^n\ne1\), and its term is strictly positive. A convergent sum of nonnegative terms with one positive term is positive.</p></div>
+
+<h2>The two named assumptions</h2>
+<div class="step"><h3><a class="nmref" href="#lean-HadamardHypothesis">HadamardHypothesis</a>: the Hadamard product for \(\xi\)</h3>
+<p>Mathlib does not yet have the Hadamard factorization of \(\xi\). We state its consequences as a structure with two fields: (1) \(\sum_\rho m(\rho)/|\rho|^2&lt;\infty\), and (2) \(\xi'/\xi(s)=B+\sum_\rho m(\rho)\bigl(\tfrac1{s-\rho}+\tfrac1\rho\bigr)\) for a constant \(B\). <strong>Why this is honest:</strong> this is the classical factorization of an entire function of order 1, proved unconditionally by Hadamard in 1893. It does not mention RH, and nothing in it is Li's criterion in disguise. We also ran a coarse numerical sanity check (<code>check_xi.py</code>, mpmath): the constant \(B\) computed from \(\xi'/\xi\) near \(s=1\) came out as \(-0.0230957089661\), equal to \(-\lambda_1=-(1+\tfrac\gamma2-\tfrac12\log4\pi)\) to about 10 digits or better. The zero sum itself, truncated at 300 conjugate pairs, gave \(0.1048\) at \(s=3\) against the true \(0.1144\). That gap is the slowly decaying tail, about \(0.012\) by a density estimate, so this part of the check is only consistent with the expansion, not a precise confirmation. The easy direction uses <em>only field (1)</em>. Field (2) is stated for the bridge to the Taylor coefficients of \(\log\xi\), which is not proved here.</p></div>
+<div class="step"><h3><code>hinf</code>: infinitely many zeros</h3>
+<p><code>nontrivialPosZeros.Infinite</code> is a classical fact (for instance from the zero-counting formula \(N(T)\sim\frac T{2\pi}\log\frac T{2\pi e}\)) that Mathlib does not have, so <code>liCoeff_pos</code> takes it as a hypothesis. It is needed only for strict positivity, not for \(\ge0\).</p></div>
+
+<h2 id="honesty">Honesty notes</h2>
+<div class="warn"><h3>(a) <code>liCoeff_nonneg</code> alone is nearly empty</h3>
+<p>Lean's <code>tsum</code> returns \(0\) when a family is not summable. So "RH implies \(0\le\lambda_n\)" is true for a cheap reason if the series failed to converge. The real content arrives only together with <code>liCoeff_summable</code>. Read the two as a pair, not <code>liCoeff_nonneg</code> as a result by itself.</p></div>
+<div class="warn"><h3>(b) Real zeros in the strip are excluded by the setup</h3>
+<p>The sum runs over zeros with \(\operatorname{Im}\rho&gt;0\), doubled. A zero on the real segment \((0,1)\) would be missed. There are none, because \(\zeta&lt;0\) on \((0,1)\), but that is a fact we <strong>state, not formalize</strong>, in this file.</p></div>
+<div class="warn"><h3>(c) Multiplicity: our \(\lambda\) is not upstream's</h3>
+<p><code>liCoeff</code> counts each zero with multiplicity, as in Bombieri–Lagarias. The statement in google-deepmind/formal-conjectures (the Left to Solve version), <code>lambda</code>, counts each zero once. The two agree only if all zeros are simple, which is not known. <strong>No bridge between them is proved.</strong></p></div>
+<div class="warn"><h3>(d) Status</h3>
+<p>The easy direction (RH \(\Rightarrow\) positivity) is done, conditionally. The converse (positivity \(\Rightarrow\) RH) is in progress. We have <strong>not</strong> identified <code>liCoeff n</code> with the Taylor coefficients of \(\log\xi\) at \(s=1\); that identification is the bridge that would make this the literal Li statement. Left to Solve's Li problem is not solved by this page.</p></div>
+
+<h2>The Lean half</h2>
+<p>The file compiles against <a href="https://github.com/google-deepmind/formal-conjectures/tree/9097e2f90e66d2f6244209cb1c07f7120d17ec53">formal-conjectures at 9097e2f</a> on Lean and Mathlib v4.33.1. It imports <code>FormalConjectures.Paper.RiemannHypothesisEquivalents</code> for Mathlib's <code>RiemannHypothesis</code> and <code>nontrivialPosZeros</code>. Download: <a href="LiConditional.lean">LiConditional.lean</a>.</p>
+<pre>import FormalConjectures.Paper.RiemannHypothesisEquivalents
+
+/-!
+# Li's criterion, the conditional (multiplicity-weighted) half
+
+**Human proof sketch.**  Put `w(ρ) = 1 - 1/ρ = (ρ - 1)/ρ`, the Möbius map used by Li.
+
+* *(unconditional)* If `Re ρ = 1/2` then `|ρ - 1| = |ρ|`, so `|w(ρ)| = 1`: the critical line goes
+  to the unit circle.  For `|w| = 1` and any `n`, `Re (1 - wⁿ) = |1 - wⁿ|²/2 ≥ 0`.
+  Moreover `|1 - wⁿ| ≤ n |1 - w| = n/|ρ|`, so `Re (1 - wⁿ) ≤ n²/(2|ρ|²)`.
+* Hence under RH every term of `liCoeff n = ∑_ρ m(ρ) · 2 Re (1 - w(ρ)ⁿ)` is `≥ 0` – so
+  `0 ≤ liCoeff n` (a `tsum` of nonnegative terms).
+* For strict positivity we need (i) summability, which follows from the bound above and the
+  classical convergence of `∑ m(ρ)/|ρ|²` (part of `HadamardHypothesis`), and (ii) one zero with
+  `w(ρ)ⁿ ≠ 1`.  Since `ρ ↦ w(ρ)` is injective and there are only `n` many `n`-th roots of unity,
+  infinitely many zeros (`hinf`, a classical fact not in Mathlib) give such a zero.
+
+**What is NOT done here.**  The converse (Li ⇒ RH) and the identification of `liCoeff n` with the
+Taylor coefficients of `log ξ` at `s = 1` (the "bridge", which is where the Hadamard expansion
+of `ξ'/ξ` in `HadamardHypothesis` would be used) are not proved.  The easy direction below only
+uses the *summability* field of the hypothesis.
+
+Nothing here assumes RH or Li's criterion except where a theorem's hypothesis says `RiemannHypothesis`.
+-/
+
+open Complex
+
+namespace LiConditional
+
+open RiemannHypothesis (nontrivialPosZeros)
+
+/- ### Definitions -/
+
+/-- All nontrivial zeros of `ζ` (both signs of the imaginary part): `0 &lt; Re ρ &lt; 1`, `ζ ρ = 0`. -/
+def <span class="nm" id="lean-nontrivialZeros">nontrivialZeros</span> : Set ℂ := {z | 0 &lt; z.re ∧ z.re &lt; 1 ∧ riemannZeta z = 0}
+
+lemma <span class="nm" id="lean-nontrivialPosZeros_subset">nontrivialPosZeros_subset</span> : nontrivialPosZeros ⊆ nontrivialZeros :=
+  fun _ h =&gt; ⟨h.1, h.2.1, h.2.2.2⟩
+
+/-- The multiplicity of `ρ` as a zero of `ζ` (analytic order at `ρ`; `ζ` is analytic away from
+`1`, and not identically zero, so for a zero this is the usual finite positive multiplicity). -/
+noncomputable def <span class="nm" id="lean-zetaMult">zetaMult</span> (ρ : ℂ) : ℕ := analyticOrderNatAt riemannZeta ρ
+
+/-- **Multiplicity-weighted Li coefficient**
+`λₙ = ∑_{ρ, Im ρ &gt; 0} m(ρ) · 2 Re (1 - (1 - 1/ρ)ⁿ)`,
+summing over nontrivial zeros with positive imaginary part, each counted with multiplicity. -/
+noncomputable def <span class="nm" id="lean-liCoeff">liCoeff</span> (n : ℕ) : ℝ :=
+  ∑' ρ : nontrivialPosZeros, (zetaMult ρ.1 : ℝ) * (2 * (1 - (1 - 1 / ρ.1) ^ n).re)
+
+/-- The completed zeta function `ξ(s) = ½ (1 + s(s-1) Λ₀(s))`, entire, equal to
+`½ s (s-1) π^{-s/2} Γ(s/2) ζ(s)` for `s ≠ 0, 1`.  (Built from Mathlib's entire `Λ₀`, so no junk
+values at `s = 0, 1`: `ξ 0 = ξ 1 = 1/2`.) -/
+noncomputable def <span class="nm" id="lean-xi">xi</span> (s : ℂ) : ℂ := (1 + s * (s - 1) * completedRiemannZeta₀ s) / 2
+
+/-- Sanity check: `xi` is the usual `½ s (s-1) Λ(s)` away from `s = 0, 1`. -/
+lemma <span class="nm" id="lean-xi_eq">xi_eq</span> {s : ℂ} (h0 : s ≠ 0) (h1 : s ≠ 1) :
+    xi s = s * (s - 1) * completedRiemannZeta s / 2 := by
+  have hs1 : s - 1 ≠ 0 := sub_ne_zero.mpr h1
+  have hs2 : 1 - s ≠ 0 := sub_ne_zero.mpr (Ne.symm h1)
+  rw [xi, completedRiemannZeta_eq]
+  field_simp
+  ring
+
+/-- **The analytic input, as an explicit assumption** (the Hadamard factorization of `ξ`,
+a classical *theorem* since 1893 that Mathlib does not have; it is true unconditionally and does
+*not* involve RH).  Two parts, both about all nontrivial zeros counted with multiplicity:
+
+1. `summable_inv_sq`: `∑ m(ρ)/|ρ|² &lt; ∞` (finite order ≤ 1 of `ξ`);
+2. `log_deriv_expansion`: for some constant `B`, for every `s` with `ξ s ≠ 0`,
+   `ξ'(s)/ξ(s) = B + ∑_ρ m(ρ) (1/(s-ρ) + 1/ρ)` (convergent sum).
+
+The easy direction of Li uses only (1).  (2) is what the bridge to `log ξ` Taylor coefficients
+would use. -/
+structure <span class="nm" id="lean-HadamardHypothesis">HadamardHypothesis</span> : Prop where
+  summable_inv_sq :
+    Summable fun ρ : nontrivialZeros =&gt; (zetaMult ρ.1 : ℝ) / ‖ρ.1‖ ^ 2
+  log_deriv_expansion :
+    ∃ B : ℂ, ∀ s : ℂ, xi s ≠ 0 →
+      HasSum (fun ρ : nontrivialZeros =&gt; (zetaMult ρ.1 : ℂ) * (1 / (s - ρ.1) + 1 / ρ.1))
+        (deriv xi s / xi s - B)
+
+/- ### Unconditional facts about the Möbius map `ρ ↦ 1 - 1/ρ` -/
+
+/-- On the critical line, `|ρ - 1| = |ρ|`. -/
+lemma <span class="nm" id="lean-norm_sub_one_eq_of_re_half">norm_sub_one_eq_of_re_half</span> {ρ : ℂ} (h : ρ.re = 1 / 2) : ‖ρ - 1‖ = ‖ρ‖ := by
+  rw [← sq_eq_sq₀ (norm_nonneg _) (norm_nonneg _), Complex.sq_norm, Complex.sq_norm,
+    Complex.normSq_apply, Complex.normSq_apply]
+  simp [h]
+  ring
+
+/-- **Möbius fact**: for `Re ρ = 1/2` (so `ρ ≠ 0`), `|1 - 1/ρ| = 1`. -/
+lemma <span class="nm" id="lean-norm_one_sub_inv_eq_one">norm_one_sub_inv_eq_one</span> {ρ : ℂ} (h : ρ.re = 1 / 2) : ‖1 - 1 / ρ‖ = 1 := by
+  have hρ : ρ ≠ 0 := by
+    intro h0; rw [h0] at h; simp at h
+  have : 1 - 1 / ρ = (ρ - 1) / ρ := by field_simp
+  rw [this, norm_div, norm_sub_one_eq_of_re_half h, div_self (norm_ne_zero_iff.mpr hρ)]
+
+/-- For `|u| = 1`, `Re (1 - u) = |1 - u|² / 2`. -/
+lemma <span class="nm" id="lean-re_one_sub_eq_norm_sq">re_one_sub_eq_norm_sq</span> {u : ℂ} (hu : ‖u‖ = 1) : (1 - u).re = ‖1 - u‖ ^ 2 / 2 := by
+  have h1 : u.re * u.re + u.im * u.im = 1 := by
+    have := Complex.sq_norm u
+    rw [hu, Complex.normSq_apply] at this
+    linarith
+  rw [Complex.sq_norm, Complex.normSq_apply]
+  simp
+  nlinarith
+
+/-- For `|w| = 1`, every `n`: `0 ≤ Re (1 - wⁿ)`. -/
+lemma <span class="nm" id="lean-re_one_sub_pow_nonneg">re_one_sub_pow_nonneg</span> {w : ℂ} (hw : ‖w‖ = 1) (n : ℕ) : 0 ≤ (1 - w ^ n).re := by
+  rw [re_one_sub_eq_norm_sq (by simp [hw])]
+  positivity
+
+/-- For `|w| = 1`: `Re (1 - wⁿ) &gt; 0` as soon as `wⁿ ≠ 1`. -/
+lemma <span class="nm" id="lean-re_one_sub_pow_pos">re_one_sub_pow_pos</span> {w : ℂ} (hw : ‖w‖ = 1) {n : ℕ} (h : w ^ n ≠ 1) :
+    0 &lt; (1 - w ^ n).re := by
+  rw [re_one_sub_eq_norm_sq (by simp [hw])]
+  have : ‖1 - w ^ n‖ ≠ 0 := norm_ne_zero_iff.mpr (sub_ne_zero.mpr (Ne.symm h))
+  positivity
+
+/-- `|1 - wⁿ| ≤ n |1 - w|` when `|w| = 1` (geometric sum). -/
+lemma <span class="nm" id="lean-norm_one_sub_pow_le">norm_one_sub_pow_le</span> {w : ℂ} (hw : ‖w‖ = 1) (n : ℕ) : ‖1 - w ^ n‖ ≤ n * ‖1 - w‖ := by
+  have h : 1 - w ^ n = (∑ i ∈ Finset.range n, w ^ i) * (1 - w) := by
+    have := geom_sum_mul w n
+    linear_combination this
+  rw [h, norm_mul]
+  gcongr
+  calc ‖∑ i ∈ Finset.range n, w ^ i‖ ≤ ∑ i ∈ Finset.range n, ‖w ^ i‖ := norm_sum_le _ _
+    _ = n := by simp [hw]
+
+/-- The quantitative bound used for summability: `Re (1 - wⁿ) ≤ n² |1 - w|² / 2`. -/
+lemma <span class="nm" id="lean-re_one_sub_pow_le">re_one_sub_pow_le</span> {w : ℂ} (hw : ‖w‖ = 1) (n : ℕ) :
+    (1 - w ^ n).re ≤ (n : ℝ) ^ 2 * ‖1 - w‖ ^ 2 / 2 := by
+  rw [re_one_sub_eq_norm_sq (by simp [hw])]
+  have := norm_one_sub_pow_le hw n
+  have h0 := norm_nonneg (1 - w ^ n)
+  have : ‖1 - w ^ n‖ ^ 2 ≤ ((n : ℝ) * ‖1 - w‖) ^ 2 := by gcongr
+  nlinarith
+
+/- ### Zeros: multiplicity and RH -/
+
+/-- Under RH a nontrivial zero lies on the critical line. -/
+lemma <span class="nm" id="lean-re_eq_half_of_RH">re_eq_half_of_RH</span> (hRH : RiemannHypothesis) {ρ : ℂ} (h : ρ ∈ nontrivialZeros) :
+    ρ.re = 1 / 2 := by
+  refine hRH ρ h.2.2 ?_ ?_
+  · rintro ⟨k, hk⟩
+    have := h.1
+    rw [hk] at this
+    simp at this
+    have : (0 : ℝ) ≤ k := Nat.cast_nonneg k
+    linarith
+  · rintro rfl
+    exact absurd h.2.1 (by simp)
+
+/-- A nontrivial zero with positive imaginary part has multiplicity `≥ 1`.
+(Needs `ζ` not identically zero near `ρ`: identity theorem on the convex set
+`{Re &gt; 0, Im &gt; 0}`, which avoids the pole at `1` and contains `2 + i`, where `ζ ≠ 0`.) -/
+lemma <span class="nm" id="lean-zetaMult_pos">zetaMult_pos</span> {ρ : ℂ} (h : ρ ∈ nontrivialPosZeros) : 0 &lt; zetaMult ρ := by
+  have hρ1 : ρ ≠ 1 := by rintro rfl; exact absurd h.2.1 (by simp)
+  have hd : DifferentiableOn ℂ riemannZeta {(1 : ℂ)}ᶜ :=
+    fun s hs =&gt; (differentiableAt_riemannZeta hs).differentiableWithinAt
+  have hall : AnalyticOnNhd ℂ riemannZeta {(1 : ℂ)}ᶜ := hd.analyticOnNhd isOpen_compl_singleton
+  have hana : AnalyticAt ℂ riemannZeta ρ := hall ρ hρ1
+  set U : Set ℂ := {s | 0 &lt; s.re ∧ 0 &lt; s.im} with hU
+  have hUc : Convex ℝ U := (convex_halfSpace_re_gt 0).inter (convex_halfSpace_im_gt 0)
+  have hUana : AnalyticOnNhd ℂ riemannZeta U := by
+    intro s hs
+    exact hall s (by rintro rfl; exact absurd hs.2 (by simp))
+  have hρU : ρ ∈ U := ⟨h.1, h.2.2.1⟩
+  have hpt : (2 + Complex.I) ∈ U := by simp [hU]
+  have hne : analyticOrderAt riemannZeta ρ ≠ ⊤ := by
+    intro htop
+    rw [analyticOrderAt_eq_top] at htop
+    have := hUana.eqOn_zero_of_preconnected_of_eventuallyEq_zero hUc.isPreconnected hρU htop hpt
+    exact riemannZeta_ne_zero_of_one_le_re (s := 2 + Complex.I) (by simp) this
+  have hpos : analyticOrderAt riemannZeta ρ ≠ 0 := by
+    rw [Ne, analyticOrderAt_eq_zero]
+    push Not
+    exact ⟨hana, h.2.2.2⟩
+  unfold zetaMult analyticOrderNatAt
+  exact ENat.toNat_pos hpos hne
+
+/- ### The easy direction -/
+
+/-- Under RH each term of the Li sum is `≥ 0`. -/
+lemma <span class="nm" id="lean-liTerm_nonneg">liTerm_nonneg</span> (hRH : RiemannHypothesis) (n : ℕ) (ρ : nontrivialPosZeros) :
+    0 ≤ (zetaMult ρ.1 : ℝ) * (2 * (1 - (1 - 1 / ρ.1) ^ n).re) := by
+  have h := norm_one_sub_inv_eq_one (re_eq_half_of_RH hRH (nontrivialPosZeros_subset ρ.2))
+  have := re_one_sub_pow_nonneg h n
+  positivity
+
+/-- **RH ⇒ `0 ≤ λₙ`** (needs no analytic hypothesis: a `tsum` of nonnegative terms). -/
+theorem <span class="nm" id="lean-liCoeff_nonneg">liCoeff_nonneg</span> (hRH : RiemannHypothesis) (n : ℕ) : 0 ≤ liCoeff n :=
+  tsum_nonneg (liTerm_nonneg hRH n)
+
+/-- Under RH and `HadamardHypothesis` the Li series converges absolutely. -/
+theorem <span class="nm" id="lean-liCoeff_summable">liCoeff_summable</span> (hRH : RiemannHypothesis) (H : HadamardHypothesis) (n : ℕ) :
+    Summable fun ρ : nontrivialPosZeros =&gt;
+      (zetaMult ρ.1 : ℝ) * (2 * (1 - (1 - 1 / ρ.1) ^ n).re) := by
+  have hsub : Summable fun ρ : nontrivialPosZeros =&gt; (zetaMult ρ.1 : ℝ) / ‖ρ.1‖ ^ 2 := by
+    have := H.summable_inv_sq.comp_injective
+      (Set.inclusion_injective nontrivialPosZeros_subset)
+    exact this
+  refine Summable.of_nonneg_of_le (liTerm_nonneg hRH n) (fun ρ =&gt; ?_) (hsub.mul_left ((n : ℝ) ^ 2))
+  have hre := re_eq_half_of_RH hRH (nontrivialPosZeros_subset ρ.2)
+  have hw := norm_one_sub_inv_eq_one hre
+  have hρ : ρ.1 ≠ 0 := by intro h0; have := ρ.2.1; rw [h0] at this; simp at this
+  have h1 : ‖1 - (1 - 1 / ρ.1)‖ = 1 / ‖ρ.1‖ := by simp
+  have := re_one_sub_pow_le hw n
+  rw [h1] at this
+  have hm : (0 : ℝ) ≤ zetaMult ρ.1 := Nat.cast_nonneg _
+  calc (zetaMult ρ.1 : ℝ) * (2 * (1 - (1 - 1 / ρ.1) ^ n).re)
+      ≤ (zetaMult ρ.1 : ℝ) * (2 * ((n : ℝ) ^ 2 * (1 / ‖ρ.1‖) ^ 2 / 2)) := by gcongr
+    _ = (n : ℝ) ^ 2 * ((zetaMult ρ.1 : ℝ) / ‖ρ.1‖ ^ 2) := by
+        field_simp
+
+/-- **RH ⇒ `0 &lt; λₙ`** for `n ≥ 1`, from RH, the Hadamard-type summability hypothesis, and
+infinitely many zeros in the upper half of the strip (`hinf`; classical, but not in Mathlib,
+so stated as an explicit hypothesis). -/
+theorem <span class="nm" id="lean-liCoeff_pos">liCoeff_pos</span> (hRH : RiemannHypothesis) (H : HadamardHypothesis)
+    (hinf : nontrivialPosZeros.Infinite) {n : ℕ} (hn : 0 &lt; n) : 0 &lt; liCoeff n := by
+  -- some zero has `w ^ n ≠ 1`
+  have hex : ∃ ρ : nontrivialPosZeros, (1 - 1 / ρ.1) ^ n ≠ 1 := by
+    by_contra hcon
+    push Not at hcon
+    have hfin : nontrivialPosZeros.Finite := by
+      refine Set.Finite.of_injOn (f := fun ρ : ℂ =&gt; 1 - 1 / ρ)
+        (t := ((Polynomial.nthRootsFinset n (1 : ℂ) : Finset ℂ) : Set ℂ)) ?_ ?_
+        (Finset.finite_toSet _)
+      · intro ρ hρ
+        simpa [Polynomial.mem_nthRootsFinset hn] using hcon ⟨ρ, hρ⟩
+      · intro ρ hρ ρ' hρ' heq
+        have a : ρ ≠ 0 := by intro h0; have := hρ.1; rw [h0] at this; simp at this
+        have b : ρ' ≠ 0 := by intro h0; have := hρ'.1; rw [h0] at this; simp at this
+        have : 1 / ρ = 1 / ρ' := by simpa using heq
+        simpa [a, b] using this
+    exact hinf hfin
+  obtain ⟨ρ₀, hρ₀⟩ := hex
+  have hw := norm_one_sub_inv_eq_one (re_eq_half_of_RH hRH (nontrivialPosZeros_subset ρ₀.2))
+  have hpos : 0 &lt; (zetaMult ρ₀.1 : ℝ) * (2 * (1 - (1 - 1 / ρ₀.1) ^ n).re) := by
+    have := re_one_sub_pow_pos hw hρ₀
+    have hm : (0 : ℝ) &lt; zetaMult ρ₀.1 := Nat.cast_pos.mpr (zetaMult_pos ρ₀.2)
+    positivity
+  exact (liCoeff_summable hRH H n).tsum_pos (liTerm_nonneg hRH n) ρ₀ hpos
+
+end LiConditional
+</pre>
+
+<h2>Honesty checklist</h2>
+<ul class="check">
+<li>Compiles on Lean/Mathlib v4.33.1 against formal-conjectures at 9097e2f. Written and compiled by Kumi-San, rebuilt independently by Alo.</li>
+<li>No <code>sorry</code>, <code>native_decide</code> or new <code>axiom</code>. <code>#print axioms</code> of <code>liCoeff_pos</code>, <code>liCoeff_nonneg</code>, <code>zetaMult_pos</code> and <code>xi_eq</code>: propext, Classical.choice, Quot.sound only. The hypotheses are theorem arguments, not axioms.</li>
+<li>Assumes RH only where a theorem takes <code>hRH : RiemannHypothesis</code>. <code>HadamardHypothesis</code> is a classical unconditional theorem, stated as an assumption because Mathlib lacks it. <code>hinf</code> is likewise classical and missing from Mathlib.</li>
+<li>Only the summability field of <code>HadamardHypothesis</code> is used. The log-derivative expansion field is stated but unused.</li>
+<li><code>liCoeff_nonneg</code> is meaningful only paired with <code>liCoeff_summable</code>. Real zeros in \((0,1)\) are excluded by the setup (none exist). Multiplicity differs from upstream, with no bridge proved.</li>
+<li>The figure is an illustration. It proves nothing and the dashed quartet is schematic.</li>
+<li>Not proved: the converse (Li \(\Rightarrow\) RH), the identification with Taylor coefficients of \(\log\xi\), and the link to upstream <code>lambda</code>. Status: partial / in progress.</li>
+</ul>
+<footer>Fang &amp; Fox Lemma Office · Arbiter steers the ideas · Kumi-San drafted and compiled the Lean · Alo reviewed it and rebuilt it independently.</footer>
+</main></body></html>
