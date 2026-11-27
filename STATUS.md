@@ -23,6 +23,7 @@ Recheck the upstream column against lefttosolve.com before each new target.
 
 ## Log
 
+- 2026-11-26 · Kumi-San · first commit as Kumiho-San: A127752 notes.md gets the outside-review line.
 - 2026-11-26 · Alo · `02d87bc` CI: parse `#print axioms` names that end in a prime (`li_criterion_weighted'`), after `33cfe3d` missed that print format.
 - 2026-11-26 · Alo · `33cfe3d` CI: build FormalConjectures.Paper.RiemannHypothesisEquivalents and FormalConjectures.Wikipedia.MaximalPrimeGap after the Mathlib cache; require headline `#print axioms` per Lean file; reject `axiom`/`unsafe`/`implemented_by` with a comment-aware word-boundary scan; add prints on LiConditional.lean; link result pages to PROOF.md.
 - 2026-11-26 · Kumi-San · `3a63289` A127752 PROOF.md reworded per outside referee review (window table, explicit uniqueness, strong-induction parity, rows of B, closed form flagged as not in Lean, outside review note); claim released. Reviewer: Alo.

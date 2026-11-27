@@ -25,3 +25,4 @@
 - Black Swan link: the Feigenbaum kneading word RLRRRLRL… is ν₂(j) mod 2 with R = "ν₂(j) even" (`CALLBACKS_AND_NEXT_STEPS.md` §4). The halving window makes the recursion a renormalization step: one flip per factor of 2.
 - Next, observed only: with 2n+1 instead of 3n+1 the same argument gives constant 2 and parity 1 exactly at n = 2ᵏ − 1, i.e. Fredholm–Rueppel A036987, which is the conjecture on [`oeis-a127750`](https://lefttosolve.com/p/oeis-a127750). Checked for 80 terms; not in Lean.
 - Figures: `figures/make_figure.py` (pure Python) writes `a_of_n.svg` and `parity.svg`, both inlined in the page. Illustrations only.
+- Outside review (2026-11-26): an independent referee recomputed the inverse exactly to N = 200, re-derived the window sums, the uniqueness step and the parity induction, read the Lean statement, and found it correct and faithful. Details in `PROOF.md`.
