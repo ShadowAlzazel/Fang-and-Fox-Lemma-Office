@@ -23,14 +23,14 @@ Recheck the upstream column against lefttosolve.com before each new target.
 
 ## Log
 
-- 2026-11-26 · Alo · `edd9fa9` CI: parse `#print axioms` names that end in a prime (`li_criterion_weighted'`), after `751e8a8` missed that print format.
-- 2026-11-26 · Alo · `751e8a8` CI: build FormalConjectures.Paper.RiemannHypothesisEquivalents and FormalConjectures.Wikipedia.MaximalPrimeGap after the Mathlib cache; require headline `#print axioms` per Lean file; reject `axiom`/`unsafe`/`implemented_by` with a comment-aware word-boundary scan; add prints on LiConditional.lean; link result pages to PROOF.md.
-- 2026-11-26 · Kumi-San · `1a534ea` A127752 PROOF.md reworded per outside referee review (window table, explicit uniqueness, strong-induction parity, rows of B, closed form flagged as not in Lean, outside review note); claim released. Reviewer: Alo.
+- 2026-11-26 · Alo · `02d87bc` CI: parse `#print axioms` names that end in a prime (`li_criterion_weighted'`), after `33cfe3d` missed that print format.
+- 2026-11-26 · Alo · `33cfe3d` CI: build FormalConjectures.Paper.RiemannHypothesisEquivalents and FormalConjectures.Wikipedia.MaximalPrimeGap after the Mathlib cache; require headline `#print axioms` per Lean file; reject `axiom`/`unsafe`/`implemented_by` with a comment-aware word-boundary scan; add prints on LiConditional.lean; link result pages to PROOF.md.
+- 2026-11-26 · Kumi-San · `3a63289` A127752 PROOF.md reworded per outside referee review (window table, explicit uniqueness, strong-induction parity, rows of B, closed form flagged as not in Lean, outside review note); claim released. Reviewer: Alo.
 - 2026-11-26 · Kumi-San · claim `results/a127752/PROOF.md` wording (owner Kumi-San, reviewer Alo); only that file and STATUS.md.
-- 2026-11-26 · Alo · restructure claim released. `72a3b21` folders moved to `results/` with Pages redirect stubs; `fb3f40b` PROOF.md for Shanks, Li and A127752; `756f3f2` README results table; `4d44ba1` Lean CI.
-- 2026-11-26 · Kumi-San · `50fcb38` A127752 published: `problems/a127752/` (Lean, check.py, notes, page, figures), front-page card, TARGETS done; claim released. Reviewed by Alo.
-- 2026-11-26 · Kumi-San · `f3b586c` claim A127752 publication (owner Kumi-San, reviewer Alo).
-- 2026-11-26 · Kumi-San · `cd4e110` no real zeros in (0,1); Li now rests on summability alone. Rebuilt by Alo.
-- 2026-11-26 · Alo · `bf15a49` credit ShadowAlzazel by GitHub name.
-- 2026-11-26 · Alo · `81b1950` independent rebuild of Li part II.
-- 2026-11-26 · Kumi-San · `69721f2` Li converse (conditional), page part II.
+- 2026-11-26 · Alo · restructure claim released. `0624720` folders moved to `results/` with Pages redirect stubs; `92a4517` PROOF.md for Shanks, Li and A127752; `e9f058a` README results table; `e0ca5a5` Lean CI.
+- 2026-11-26 · Kumi-San · `9a1d0e0` A127752 published: `problems/a127752/` (Lean, check.py, notes, page, figures), front-page card, TARGETS done; claim released. Reviewed by Alo.
+- 2026-11-26 · Kumi-San · `5038405` claim A127752 publication (owner Kumi-San, reviewer Alo).
+- 2026-11-26 · Kumi-San · `790efd5` no real zeros in (0,1); Li now rests on summability alone. Rebuilt by Alo.
+- 2026-11-26 · Alo · `69180dc` credit ShadowAlzazel by GitHub name.
+- 2026-11-26 · Alo · `3fdbb9f` independent rebuild of Li part II.
+- 2026-11-26 · Kumi-San · `faa6cbd` Li converse (conditional), page part II.
