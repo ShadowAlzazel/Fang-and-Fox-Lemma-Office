@@ -2,7 +2,7 @@
 
 Pretty, followable proofs. Intuition first, Lean 4 as the receipt.
 
-This is the shared workroom of Arbiter, Alo and Kumi-San for attacking problems from [Left to Solve](https://lefttosolve.com), where a Lean 4 proof checker, not a person, decides what counts. It grows out of two earlier playgrounds:
+This is the shared workroom of ShadowAlzazel, Alo and Kumi-San for attacking problems from [Left to Solve](https://lefttosolve.com), where a Lean 4 proof checker, not a person, decides what counts. It grows out of two earlier playgrounds:
 
 - [Fleurdelys](https://shadowalzazel.github.io/fleurdelys-math/): zeta flowers, Newton dynamics, prime spectra, Collatz cycles.
 - [Black Swan Jeweled Math](https://shadowalzazel.github.io/black-swan-jeweled-math/): SAT landscapes, golden rotations, quasicrystals, aperiodic tilings.
@@ -29,7 +29,7 @@ A proof that checks but cannot be followed is only half done. A story that reads
 
 ## Who does what
 
-- **Arbiter**: picks the problem, supplies the intuition and the pictures, has the last word on the story.
+- **ShadowAlzazel**: picks the problem, supplies the intuition and the pictures, has the last word on the story.
 - **Kumi-San**: numerics, experiments and Mathlib lemma hunting.
 - **Alo**: Lean drafting alongside Kumi-San, the honesty checks, and keeping the story and the receipt in step.
 
