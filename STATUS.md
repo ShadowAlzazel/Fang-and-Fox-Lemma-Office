@@ -7,8 +7,8 @@ One owner per file at a time; the other only reads or reviews. Every push gets o
 
 | Problem / file | Owner | Since | Doing |
 | --- | --- | --- | --- |
-| A127752 (`problems/a127752/`) | Kumi-San | 2026-11-26 | Pin the OEIS definition and the Left to Solve statement, check it numerically, draft a faithful Lean statement |
-| Review of A127752 statement | Alo | waiting | Independent rebuild and faithfulness check before anything is pushed |
+| A127752 (`problems/a127752/`) | Kumi-San | 2026-11-26 | Proved in Lean (all n); publishing `problems/a127752/` (Lean, check.py, notes, page), front-page link, TARGETS update |
+| Review of A127752 statement | Alo | 2026-11-26 | Reviewer: independent rebuild, OEIS definitions and doubling step checked; reviews the page |
 
 ## Tracker
 
