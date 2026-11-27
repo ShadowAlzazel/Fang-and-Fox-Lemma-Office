@@ -75,3 +75,7 @@ theorem infinite_maximalPrimeGapIndex :
   exact ⟨n, hrec, hn⟩
 
 end ShanksWarmup
+
+#print axioms ShanksWarmup.gap_unbounded
+#print axioms ShanksWarmup.first_exceeder_is_record
+#print axioms ShanksWarmup.infinite_maximalPrimeGapIndex
