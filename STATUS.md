@@ -23,6 +23,7 @@ Recheck the upstream column against lefttosolve.com before each new target.
 
 ## Log
 
+- 2026-11-27 · Alo · `5c05ed0` A127752 wording: A035263's name is the morphism; the ν₂ formula is from its Formula section. Fixed in [REFEREE-BLOCKS.md](results/a127752/claim/REFEREE-BLOCKS.md), the write-up, PROOF.md, notes, and our Lean comment. HOW-TO-CLAIM closed-form bound set to n < 10^6. Paste-ready corrected PR 4276 body in [PR-4276-description-corrected.md](results/a127752/claim/PR-4276-description-corrected.md). Nothing submitted.
 - 2026-11-27 · Alo · `7fa0074` README links [CLAIMING.md](CLAIMING.md) from the "Where to look" table. Referee copy-paste drafts for A127752 are in [results/a127752/claim/REFEREE-BLOCKS.md](results/a127752/claim/REFEREE-BLOCKS.md) (reviewer comment for #4276, proof PR body, two X replies). Nothing submitted.
 - 2026-11-27 · Kumi-San · `d2ee0a6` [CLAIMING.md](CLAIMING.md): playbook for Left to Solve claims (fast path used for A127752 PR 1, #4276). Pointer added in `results/a127752/claim/HOW-TO-CLAIM.md`. README left for Alo to link. Claim released.
 - 2026-11-26 · Kumi-San · `0fd31d7` A127752 Left to Solve claim kit in `results/a127752/claim/`: statement and proof drafts for oeis-a127752 and oeis-a127751 (stored as `.lean.txt` so our CI skips them), OEIS comment draft, HOW-TO-CLAIM. Upstream `tools/lint.py` ok and `tools/check.sh` accepted at formal-conjectures 9097e2f (proof axioms propext, Classical.choice, Quot.sound). Nothing submitted. Claim released. Reviewed by Alo (see next line).
