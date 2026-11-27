@@ -7,7 +7,7 @@ One owner per file at a time; the other only reads or reviews. Every push gets o
 
 | Problem / file | Owner | Since | Doing |
 | --- | --- | --- | --- |
-| Restructure to results/ + CI | Alo | 2026-11-26 | Move problems/ to results/, PROOF.md per result, README results table, Lean CI |
+| (none) | | | |
 
 ## Tracker
 
@@ -23,6 +23,7 @@ Recheck the upstream column against lefttosolve.com before each new target.
 
 ## Log
 
+- 2026-11-26 · Alo · restructure claim released. `72a3b21` folders moved to `results/` with Pages redirect stubs; `fb3f40b` PROOF.md for Shanks, Li and A127752; `756f3f2` README results table; `4d44ba1` Lean CI.
 - 2026-11-26 · Kumi-San · `50fcb38` A127752 published: `problems/a127752/` (Lean, check.py, notes, page, figures), front-page card, TARGETS done; claim released. Reviewed by Alo.
 - 2026-11-26 · Kumi-San · `f3b586c` claim A127752 publication (owner Kumi-San, reviewer Alo).
 - 2026-11-26 · Kumi-San · `cd4e110` no real zeros in (0,1); Li now rests on summability alone. Rebuilt by Alo.
