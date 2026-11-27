@@ -13,11 +13,11 @@ One owner per file at a time; the other only reads or reviews. Every push gets o
 
 | Problem | Left to Solve | Our status | Upstream status | Lean |
 | --- | --- | --- | --- | --- |
-| Shanks: infinitely many record gaps | [link](https://lefttosolve.com/p/MaximalPrimeGap.infinite_maximalPrimeGapIndex) | proven, page done | already solved by someone else (no credit) | `problems/shanks-record-gaps/Proof.lean` |
-| Li's Criterion | [link](https://lefttosolve.com/p/RiemannHypothesis.li_criterion) | both directions, one hypothesis (Hadamard summability) | open; needs no hypotheses and strict λₙ > 0 | `problems/li-criterion/LiCriterion.lean` |
-| No real zeros of ζ in (0,1) | (internal) | proven | n/a | `problems/li-criterion/NoRealZeros.lean` |
+| Shanks: infinitely many record gaps | [link](https://lefttosolve.com/p/MaximalPrimeGap.infinite_maximalPrimeGapIndex) | proven, page done | already solved by someone else (no credit) | `results/shanks-record-gaps/Proof.lean` |
+| Li's Criterion | [link](https://lefttosolve.com/p/RiemannHypothesis.li_criterion) | both directions, one hypothesis (Hadamard summability) | open; needs no hypotheses and strict λₙ > 0 | `results/li-criterion/LiCriterion.lean` |
+| No real zeros of ζ in (0,1) | (internal) | proven | n/a | `results/li-criterion/NoRealZeros.lean` |
 | Hadamard summability Σ m(ρ)/\|ρ\|² | (internal) | open, Mathlib gap | n/a | none yet |
-| OEIS A127752 (and A127751) | [link](https://lefttosolve.com/p/oeis-a127752) | proved in Lean, all n; page done; reviewed by Alo | unformalized, unsolved, unclaimed on LtS (rechecked 2026-11-26); not a credit match | `problems/a127752/A127752.lean` |
+| OEIS A127752 (and A127751) | [link](https://lefttosolve.com/p/oeis-a127752) | proved in Lean, all n; page done; reviewed by Alo | unformalized, unsolved, unclaimed on LtS (rechecked 2026-11-26); not a credit match | `results/a127752/A127752.lean` |
 
 Recheck the upstream column against lefttosolve.com before each new target.
 

@@ -26,7 +26,7 @@ Picked from [Left to Solve](https://lefttosolve.com) on 2026-11-26. Difficulty i
 
 | Problem | Kind | Diff. | Fits | Why |
 | --- | --- | ---: | --- | --- |
-| [OEIS A127752 ≡ Feigenbaum kneading sequence mod 2](https://lefttosolve.com/p/oeis-a127752) (also [oeis-a127751](https://lefttosolve.com/p/oeis-a127751)) | DONE (unformalized upstream) | 45 | [page](problems/a127752/) | Stated and proved in Lean for all n (`problems/a127752/A127752.lean`, `a127752_mod_two`). Window sums 3n+1 give a(2m+1) = a(m) + 3, a(2m+2) = 3, and mod 2 that is the ν₂ bit-flip. Own formalization; formal-conjectures has no statement yet, so not a credit match. |
+| [OEIS A127752 ≡ Feigenbaum kneading sequence mod 2](https://lefttosolve.com/p/oeis-a127752) (also [oeis-a127751](https://lefttosolve.com/p/oeis-a127751)) | DONE (unformalized upstream) | 45 | [page](results/a127752/) | Stated and proved in Lean for all n (`results/a127752/A127752.lean`, `a127752_mod_two`). Window sums 3n+1 give a(2m+1) = a(m) + 3, a(2m+2) = 3, and mod 2 that is the ν₂ bit-flip. Own formalization; formal-conjectures has no statement yet, so not a credit match. |
 | [Collatz step differences, conjecture 1](https://lefttosolve.com/p/OeisA153330.conjecture1) (and siblings) | open | 53–54 | `collatz_structure.py` | Doubling chains and the 8k+4 / 8k+5 merges explain why many differences are 0. A density claim, so likely hard, but our structure lemma may carry real weight. |
 | [Shanks: record indices](https://lefttosolve.com/p/MaximalPrimeGap.shanks_maximal_prime_gap_conjecture.variants.record_indices) | open | 47 | `near_misses.py` | Natural sequel to the Tier 0 warmup. |
 | [Montgomery pair correlation, general interval](https://lefttosolve.com/p/MontgomeryPairCorrelationConjecture.montgomery_pair_correlation_conjecture.variants.general_interval) | open | 48 | `pair_spacing.py` | Our pictures already show it. The dream target; treat as a moonshot. |
@@ -36,7 +36,7 @@ Picked from [Left to Solve](https://lefttosolve.com) on 2026-11-26. Difficulty i
 | Problem | Kind | Diff. | Fits | Why |
 | --- | --- | ---: | --- | --- |
 | [Zeros around the midpoints of Gram intervals](https://lefttosolve.com/p/mo-366237) | unformalized | 55 | Fleurdelys Gram-law counts, `near_misses.py` | A MathOverflow question about where each zero sits inside the Gram interval it maps to. This is petal counting in its rawest form, and our zero tables up to height 30,000 can test it right away. It needs a precise statement first. |
-| [No real zeros of ζ in (0,1)](problems/li-criterion/) | DONE | — | Li page | Proved via a sum-versus-integral bound, not the Dirichlet η function. See Part III of the Li page and `NoRealZeros.lean`. This removes the `NoRealZerosInStrip` hypothesis. |
+| [No real zeros of ζ in (0,1)](results/li-criterion/) | DONE | — | Li page | Proved via a sum-versus-integral bound, not the Dirichlet η function. See Part III of the Li page and `NoRealZeros.lean`. This removes the `NoRealZerosInStrip` hypothesis. |
 | Hadamard summability Σ m(ρ)/|ρ|² < ∞ for the zeros of ζ | Mathlib gap | — | Li page | The multiplicity-weighted bound, classical and unconditional. Mathlib lacks it. This is the analytic input of both directions on the Li page. |
 
 ## Reading, not targets
@@ -52,5 +52,5 @@ Picked from [Left to Solve](https://lefttosolve.com) on 2026-11-26. Difficulty i
 1. Shanks warmup (pipeline).
 2. Li's Criterion (first story worth reading).
 3. Lehmer odd / not-reciprocal, Littlewood mod 4, Cramér (one at a time).
-4. ~~A127752: state it in Lean, then prove it.~~ Done, see `problems/a127752/`.
+4. ~~A127752: state it in Lean, then prove it.~~ Done, see `results/a127752/`.
 5. Sibling [oeis-a127750](https://lefttosolve.com/p/oeis-a127750) (1/(2n+1), Fredholm–Rueppel mod 2): same argument with constant 2; checked numerically, not yet in Lean.

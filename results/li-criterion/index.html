@@ -1,0 +1,1187 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Li's Criterion, the Flower on the Circle · Fang &amp; Fox Lemma Office</title>
+<meta name="description" content="RH ⇔ λₙ ≥ 0 for all n, proven in Lean assuming only the multiplicity-weighted Hadamard summability Σ m(ρ)/|ρ|² &lt; ∞. The theorem is li_criterion_weighted'."
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@500;600;700&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'\\(',right:'\\)',display:false}]})"></script>
+<style>
+:root{--paper:#f5f6f9;--surface:#fff;--ink:#1b2230;--muted:#586275;--rule:#d8dde7;--petal:#cf5428;--line:#2563b8;--proven:#1d7f54;--proven-bg:#e3f3ea;--open:#a8681a;--open-bg:#f8ecd9;
+--fd:"Instrument Sans","Helvetica Neue",Arial,sans-serif;--fb:"STIX Two Text",Cambria,Georgia,serif;--fm:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+@media (prefers-color-scheme:dark){:root{--paper:#10141c;--surface:#171d28;--ink:#e3e7ef;--muted:#9aa4b5;--rule:#29313f;--petal:#f0804f;--line:#73a9ee;--proven:#5fcf98;--proven-bg:#173226;--open:#e6b25c;--open-bg:#3a2c15;color-scheme:dark}}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:1.125rem/1.62 var(--fb);padding:0 16px}
+main{max-width:46rem;margin:0 auto;padding:2.5rem 0 5rem}a{color:var(--line)}
+.crumb{font:600 .8rem var(--fd);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font:700 clamp(2rem,5vw,2.9rem)/1.1 var(--fd);margin:.4rem 0 .6rem}h2{font:600 1.35rem var(--fd);margin:2.6rem 0 .6rem;border-top:1px solid var(--rule);padding-top:1.6rem}
+.tag{display:inline-block;font:600 .78rem var(--fd);padding:.15rem .6rem;border-radius:99px;background:var(--proven-bg);color:var(--proven);margin-right:.4rem}.tag.open{background:var(--open-bg);color:var(--open)}
+.lede{font-size:1.25rem;color:var(--muted)}
+figure{margin:1.8rem -1rem;background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:1rem}figure svg{width:100%;height:auto}figcaption{font:.9rem/1.45 var(--fd);color:var(--muted);margin-top:.5rem}
+.step{background:var(--surface);border:1px solid var(--rule);border-left:4px solid var(--petal);border-radius:10px;padding:1rem 1.2rem;margin:1.2rem 0}
+.step h3{font:600 1.05rem var(--fd);margin:0 0 .3rem}.step code,.nmref{font:.85rem var(--fm);color:var(--line)}
+.warn{background:var(--open-bg);border:1px solid var(--rule);border-left:4px solid var(--open);border-radius:10px;padding:1rem 1.2rem;margin:1.2rem 0}.warn h3{font:600 1.05rem var(--fd);margin:0 0 .3rem;color:var(--open)}.warn p{margin:.4rem 0}
+pre{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:1rem;overflow-x:auto;font:.8rem/1.5 var(--fm)}.nm{color:var(--petal);font-weight:500}
+.synth{background:var(--proven-bg);border:1px solid var(--rule);border-left:4px solid var(--proven);border-radius:10px;padding:1rem 1.2rem;margin:1.2rem 0}.synth h3{font:600 1.05rem var(--fd);margin:0 0 .3rem;color:var(--proven)}.synth p{margin:.4rem 0}
+.check li{margin:.2rem 0}footer{font:.85rem var(--fd);color:var(--muted);margin-top:3rem}
+</style></head><body><main>
+<div class="crumb"><a href="../../">Fang &amp; Fox Lemma Office</a> · Problem 1 · Li's criterion</div>
+<h1>The flower on the circle</h1>
+<p><span class="tag open">partial: both directions, one hypothesis</span><span class="tag" style="background:none;border:1px solid var(--rule);color:var(--muted)">Lean 4 · conditional · kernel-checked</span></p>
+<p class="lede"><strong>\(\mathrm{RH}\iff\lambda_n\ge 0\) for all \(n\ge 1\)</strong>, proven in Lean assuming only the multiplicity-weighted Hadamard summability \(\sum m(\rho)/|\rho|^2&lt;\infty\). That is the theorem <a class="nmref" href="#lean-li_criterion_weighted'">li_criterion_weighted'</a>. The Möbius map \(w=1-1/\rho\) sends the critical line to the unit circle, so under RH every term is a square, and an off-line zero would force some coefficient negative.</p>
+
+<div class="warn"><h3>Read this first</h3>
+<p><strong>This does not solve Li's Criterion on Left to Solve.</strong> Upstream wants both directions, with the strict inequality \(\lambda_n&gt;0\), and no extra hypotheses. What is here is the equivalence \(\mathrm{RH}\iff\lambda_n\ge 0\), still assuming Hadamard summability. The absence of real zeros in \((0,1)\) is now a theorem, not a hypothesis. Every caveat is in <a href="#honesty">the honesty section</a>.</p></div>
+
+<h2>The statement</h2>
+<p>Let \(\rho\) run over the nontrivial zeros of \(\zeta\), counted with multiplicity. Li's coefficients are
+$$\lambda_n=\sum_{\rho}\Bigl[1-\Bigl(1-\frac1\rho\Bigr)^{n}\Bigr],\qquad n\ge 1,$$
+summed in conjugate pairs so that the series converges. <strong>Li's criterion</strong> (Li 1997, in the form of Bombieri and Lagarias 1999): RH holds if and only if \(\lambda_n\ge0\) for every \(n\ge1\). The first one is \(\lambda_1=1+\tfrac\gamma2-\tfrac12\log4\pi\approx0.0230957\).</p>
+<p>In the Lean file the sum is taken over zeros with \(\operatorname{Im}\rho&gt;0\), each doubled by \(2\operatorname{Re}\), which is the same thing once zeros are paired with their conjugates.</p>
+
+<h2>The picture</h2>
+<p>Send \(\rho\) to \(w=1-\frac1\rho=\frac{\rho-1}{\rho}\). Then \(|w|=1\) exactly when \(|\rho-1|=|\rho|\), that is, when \(\operatorname{Re}\rho=\tfrac12\). <em>The Möbius map sends the critical line to the unit circle.</em> The two symmetries of the zeros (\(\rho\mapsto\bar\rho\) and \(\rho\mapsto1-\rho\)) become \(w\mapsto\bar w\) and \(w\mapsto1/w\). So a zero off the line would arrive as a quartet \(w,\ \bar w,\ 1/w,\ 1/\bar w\), two points inside the circle and two outside.</p>
+
+<figure><svg viewBox="0 0 720 470" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="The first 100 zeta zeros, sent by w = 1 - 1/rho, lie exactly on the unit circle with their conjugates, all within a short arc near w = 1; a schematic off-line zero would land off the circle in a pair w and 1 over w-bar">
+<style>.ax{stroke:var(--muted,#586275);stroke-width:1}.tk{font:11px 'IBM Plex Mono',monospace;fill:var(--muted,#586275)}.ci{fill:none;stroke:var(--line,#2563b8);stroke-width:1.8}.dot{fill:var(--petal,#cf5428)}.gh{fill:none;stroke:var(--muted,#586275);stroke-width:1.3;stroke-dasharray:3 3}.lg{font:12px 'Instrument Sans',sans-serif;fill:var(--ink,#1b2230)}.bx{fill:none;stroke:var(--muted,#586275);stroke-width:.8;stroke-dasharray:4 3}</style>
+<text x="20" y="22" class="lg"><tspan fill="var(--line,#2563b8)">&#9679;</tspan> unit circle |w| = 1, the image of Re &#961; = 1/2</text>
+<text x="20" y="40" class="lg"><tspan fill="var(--petal,#cf5428)">&#9679;</tspan> w = 1 &#8722; 1/&#961; for the first 100 zeros and their conjugates</text>
+<text x="20" y="58" class="lg"><tspan fill="var(--muted,#586275)">&#9675;</tspan> dashed: where a schematic off-line zero (0.85 + 2.5i, not a real zero) would land: w, conj(w), 1/w, 1/conj(w)</text>
+<line x1="40" x2="390" y1="250" y2="250" class="ax"/><line x1="215" x2="215" y1="75" y2="430" class="ax"/>
+<circle cx="215" cy="250" r="160" class="ci"/>
+<text x="391" y="286" class="tk">1</text><text x="41" y="264" class="tk">-1</text><text x="221" y="84" class="tk">i</text><text x="221" y="426" class="tk">-i</text>
+<circle cx="374.6" cy="238.7" r="2.4" class="dot"/><circle cx="374.6" cy="261.3" r="2.4" class="dot"/><circle cx="374.8" cy="242.4" r="2.4" class="dot"/><circle cx="374.8" cy="257.6" r="2.4" class="dot"/><circle cx="374.9" cy="243.6" r="2.4" class="dot"/><circle cx="374.9" cy="256.4" r="2.4" class="dot"/><circle cx="374.9" cy="244.7" r="2.4" class="dot"/><circle cx="374.9" cy="255.3" r="2.4" class="dot"/><circle cx="374.9" cy="245.1" r="2.4" class="dot"/><circle cx="374.9" cy="254.9" r="2.4" class="dot"/><circle cx="374.9" cy="245.7" r="2.4" class="dot"/><circle cx="374.9" cy="254.3" r="2.4" class="dot"/><circle cx="375.0" cy="246.1" r="2.4" class="dot"/><circle cx="375.0" cy="253.9" r="2.4" class="dot"/><circle cx="375.0" cy="246.3" r="2.4" class="dot"/><circle cx="375.0" cy="253.7" r="2.4" class="dot"/><circle cx="375.0" cy="246.7" r="2.4" class="dot"/><circle cx="375.0" cy="253.3" r="2.4" class="dot"/><circle cx="375.0" cy="246.8" r="2.4" class="dot"/><circle cx="375.0" cy="253.2" r="2.4" class="dot"/><circle cx="375.0" cy="247.0" r="2.4" class="dot"/><circle cx="375.0" cy="253.0" r="2.4" class="dot"/><circle cx="375.0" cy="247.2" r="2.4" class="dot"/><circle cx="375.0" cy="252.8" r="2.4" class="dot"/><circle cx="375.0" cy="247.3" r="2.4" class="dot"/><circle cx="375.0" cy="252.7" r="2.4" class="dot"/><circle cx="375.0" cy="247.4" r="2.4" class="dot"/><circle cx="375.0" cy="252.6" r="2.4" class="dot"/><circle cx="375.0" cy="247.5" r="2.4" class="dot"/><circle cx="375.0" cy="252.5" r="2.4" class="dot"/><circle cx="375.0" cy="247.6" r="2.4" class="dot"/><circle cx="375.0" cy="252.4" r="2.4" class="dot"/><circle cx="375.0" cy="247.7" r="2.4" class="dot"/><circle cx="375.0" cy="252.3" r="2.4" class="dot"/><circle cx="375.0" cy="247.8" r="2.4" class="dot"/><circle cx="375.0" cy="252.2" r="2.4" class="dot"/><circle cx="375.0" cy="247.9" r="2.4" class="dot"/><circle cx="375.0" cy="252.1" r="2.4" class="dot"/><circle cx="375.0" cy="247.9" r="2.4" class="dot"/><circle cx="375.0" cy="252.1" r="2.4" class="dot"/><circle cx="375.0" cy="248.0" r="2.4" class="dot"/><circle cx="375.0" cy="252.0" r="2.4" class="dot"/><circle cx="375.0" cy="248.1" r="2.4" class="dot"/><circle cx="375.0" cy="251.9" r="2.4" class="dot"/><circle cx="375.0" cy="248.1" r="2.4" class="dot"/><circle cx="375.0" cy="251.9" r="2.4" class="dot"/><circle cx="375.0" cy="248.2" r="2.4" class="dot"/><circle cx="375.0" cy="251.8" r="2.4" class="dot"/><circle cx="375.0" cy="248.2" r="2.4" class="dot"/><circle cx="375.0" cy="251.8" r="2.4" class="dot"/><circle cx="375.0" cy="248.3" r="2.4" class="dot"/><circle cx="375.0" cy="251.7" r="2.4" class="dot"/><circle cx="375.0" cy="248.3" r="2.4" class="dot"/><circle cx="375.0" cy="251.7" r="2.4" class="dot"/><circle cx="375.0" cy="248.3" r="2.4" class="dot"/><circle cx="375.0" cy="251.7" r="2.4" class="dot"/><circle cx="375.0" cy="248.4" r="2.4" class="dot"/><circle cx="375.0" cy="251.6" r="2.4" class="dot"/><circle cx="375.0" cy="248.4" r="2.4" class="dot"/><circle cx="375.0" cy="251.6" r="2.4" class="dot"/><circle cx="375.0" cy="248.5" r="2.4" class="dot"/><circle cx="375.0" cy="251.5" r="2.4" class="dot"/><circle cx="375.0" cy="248.5" r="2.4" class="dot"/><circle cx="375.0" cy="251.5" r="2.4" class="dot"/><circle cx="375.0" cy="248.5" r="2.4" class="dot"/><circle cx="375.0" cy="251.5" r="2.4" class="dot"/><circle cx="375.0" cy="248.6" r="2.4" class="dot"/><circle cx="375.0" cy="251.4" r="2.4" class="dot"/><circle cx="375.0" cy="248.6" r="2.4" class="dot"/><circle cx="375.0" cy="251.4" r="2.4" class="dot"/><circle cx="375.0" cy="248.6" r="2.4" class="dot"/><circle cx="375.0" cy="251.4" r="2.4" class="dot"/><circle cx="375.0" cy="248.6" r="2.4" class="dot"/><circle cx="375.0" cy="251.4" r="2.4" class="dot"/><circle cx="375.0" cy="248.7" r="2.4" class="dot"/><circle cx="375.0" cy="251.3" r="2.4" class="dot"/><circle cx="375.0" cy="248.7" r="2.4" class="dot"/><circle cx="375.0" cy="251.3" r="2.4" class="dot"/><circle cx="375.0" cy="248.7" r="2.4" class="dot"/><circle cx="375.0" cy="251.3" r="2.4" class="dot"/><circle cx="375.0" cy="248.7" r="2.4" class="dot"/><circle cx="375.0" cy="251.3" r="2.4" class="dot"/><circle cx="375.0" cy="248.7" r="2.4" class="dot"/><circle cx="375.0" cy="251.3" r="2.4" class="dot"/><circle cx="375.0" cy="248.8" r="2.4" class="dot"/><circle cx="375.0" cy="251.2" r="2.4" class="dot"/><circle cx="375.0" cy="248.8" r="2.4" class="dot"/><circle cx="375.0" cy="251.2" r="2.4" class="dot"/><circle cx="375.0" cy="248.8" r="2.4" class="dot"/><circle cx="375.0" cy="251.2" r="2.4" class="dot"/><circle cx="375.0" cy="248.8" r="2.4" class="dot"/><circle cx="375.0" cy="251.2" r="2.4" class="dot"/><circle cx="375.0" cy="248.8" r="2.4" class="dot"/><circle cx="375.0" cy="251.2" r="2.4" class="dot"/><circle cx="375.0" cy="248.9" r="2.4" class="dot"/><circle cx="375.0" cy="251.1" r="2.4" class="dot"/><circle cx="375.0" cy="248.9" r="2.4" class="dot"/><circle cx="375.0" cy="251.1" r="2.4" class="dot"/><circle cx="375.0" cy="248.9" r="2.4" class="dot"/><circle cx="375.0" cy="251.1" r="2.4" class="dot"/><circle cx="375.0" cy="248.9" r="2.4" class="dot"/><circle cx="375.0" cy="251.1" r="2.4" class="dot"/><circle cx="375.0" cy="248.9" r="2.4" class="dot"/><circle cx="375.0" cy="251.1" r="2.4" class="dot"/><circle cx="375.0" cy="248.9" r="2.4" class="dot"/><circle cx="375.0" cy="251.1" r="2.4" class="dot"/><circle cx="375.0" cy="248.9" r="2.4" class="dot"/><circle cx="375.0" cy="251.1" r="2.4" class="dot"/><circle cx="375.0" cy="249.0" r="2.4" class="dot"/><circle cx="375.0" cy="251.0" r="2.4" class="dot"/><circle cx="375.0" cy="249.0" r="2.4" class="dot"/><circle cx="375.0" cy="251.0" r="2.4" class="dot"/><circle cx="375.0" cy="249.0" r="2.4" class="dot"/><circle cx="375.0" cy="251.0" r="2.4" class="dot"/><circle cx="375.0" cy="249.0" r="2.4" class="dot"/><circle cx="375.0" cy="251.0" r="2.4" class="dot"/><circle cx="375.0" cy="249.0" r="2.4" class="dot"/><circle cx="375.0" cy="251.0" r="2.4" class="dot"/><circle cx="375.0" cy="249.0" r="2.4" class="dot"/><circle cx="375.0" cy="251.0" r="2.4" class="dot"/><circle cx="375.0" cy="249.0" r="2.4" class="dot"/><circle cx="375.0" cy="251.0" r="2.4" class="dot"/><circle cx="375.0" cy="249.0" r="2.4" class="dot"/><circle cx="375.0" cy="251.0" r="2.4" class="dot"/><circle cx="375.0" cy="249.1" r="2.4" class="dot"/><circle cx="375.0" cy="250.9" r="2.4" class="dot"/><circle cx="375.0" cy="249.1" r="2.4" class="dot"/><circle cx="375.0" cy="250.9" r="2.4" class="dot"/><circle cx="375.0" cy="249.1" r="2.4" class="dot"/><circle cx="375.0" cy="250.9" r="2.4" class="dot"/><circle cx="375.0" cy="249.1" r="2.4" class="dot"/><circle cx="375.0" cy="250.9" r="2.4" class="dot"/><circle cx="375.0" cy="249.1" r="2.4" class="dot"/><circle cx="375.0" cy="250.9" r="2.4" class="dot"/><circle cx="375.0" cy="249.1" r="2.4" class="dot"/><circle cx="375.0" cy="250.9" r="2.4" class="dot"/><circle cx="375.0" cy="249.1" r="2.4" class="dot"/><circle cx="375.0" cy="250.9" r="2.4" class="dot"/><circle cx="375.0" cy="249.1" r="2.4" class="dot"/><circle cx="375.0" cy="250.9" r="2.4" class="dot"/><circle cx="375.0" cy="249.1" r="2.4" class="dot"/><circle cx="375.0" cy="250.9" r="2.4" class="dot"/><circle cx="375.0" cy="249.1" r="2.4" class="dot"/><circle cx="375.0" cy="250.9" r="2.4" class="dot"/><circle cx="375.0" cy="249.1" r="2.4" class="dot"/><circle cx="375.0" cy="250.9" r="2.4" class="dot"/><circle cx="375.0" cy="249.2" r="2.4" class="dot"/><circle cx="375.0" cy="250.8" r="2.4" class="dot"/><circle cx="375.0" cy="249.2" r="2.4" class="dot"/><circle cx="375.0" cy="250.8" r="2.4" class="dot"/><circle cx="375.0" cy="249.2" r="2.4" class="dot"/><circle cx="375.0" cy="250.8" r="2.4" class="dot"/><circle cx="375.0" cy="249.2" r="2.4" class="dot"/><circle cx="375.0" cy="250.8" r="2.4" class="dot"/><circle cx="375.0" cy="249.2" r="2.4" class="dot"/><circle cx="375.0" cy="250.8" r="2.4" class="dot"/><circle cx="375.0" cy="249.2" r="2.4" class="dot"/><circle cx="375.0" cy="250.8" r="2.4" class="dot"/><circle cx="375.0" cy="249.2" r="2.4" class="dot"/><circle cx="375.0" cy="250.8" r="2.4" class="dot"/><circle cx="375.0" cy="249.2" r="2.4" class="dot"/><circle cx="375.0" cy="250.8" r="2.4" class="dot"/><circle cx="375.0" cy="249.2" r="2.4" class="dot"/><circle cx="375.0" cy="250.8" r="2.4" class="dot"/><circle cx="375.0" cy="249.2" r="2.4" class="dot"/><circle cx="375.0" cy="250.8" r="2.4" class="dot"/><circle cx="375.0" cy="249.2" r="2.4" class="dot"/><circle cx="375.0" cy="250.8" r="2.4" class="dot"/><circle cx="375.0" cy="249.2" r="2.4" class="dot"/><circle cx="375.0" cy="250.8" r="2.4" class="dot"/><circle cx="375.0" cy="249.2" r="2.4" class="dot"/><circle cx="375.0" cy="250.8" r="2.4" class="dot"/><circle cx="375.0" cy="249.3" r="2.4" class="dot"/><circle cx="375.0" cy="250.7" r="2.4" class="dot"/><circle cx="375.0" cy="249.3" r="2.4" class="dot"/><circle cx="375.0" cy="250.7" r="2.4" class="dot"/><circle cx="375.0" cy="249.3" r="2.4" class="dot"/><circle cx="375.0" cy="250.7" r="2.4" class="dot"/><circle cx="375.0" cy="249.3" r="2.4" class="dot"/><circle cx="375.0" cy="250.7" r="2.4" class="dot"/><circle cx="375.0" cy="249.3" r="2.4" class="dot"/><circle cx="375.0" cy="250.7" r="2.4" class="dot"/><circle cx="375.0" cy="249.3" r="2.4" class="dot"/><circle cx="375.0" cy="250.7" r="2.4" class="dot"/><circle cx="375.0" cy="249.3" r="2.4" class="dot"/><circle cx="375.0" cy="250.7" r="2.4" class="dot"/><circle cx="375.0" cy="249.3" r="2.4" class="dot"/><circle cx="375.0" cy="250.7" r="2.4" class="dot"/><circle cx="375.0" cy="249.3" r="2.4" class="dot"/><circle cx="375.0" cy="250.7" r="2.4" class="dot"/><circle cx="375.0" cy="249.3" r="2.4" class="dot"/><circle cx="375.0" cy="250.7" r="2.4" class="dot"/><circle cx="375.0" cy="249.3" r="2.4" class="dot"/><circle cx="375.0" cy="250.7" r="2.4" class="dot"/><circle cx="375.0" cy="249.3" r="2.4" class="dot"/><circle cx="375.0" cy="250.7" r="2.4" class="dot"/><circle cx="375.0" cy="249.3" r="2.4" class="dot"/><circle cx="375.0" cy="250.7" r="2.4" class="dot"/><circle cx="375.0" cy="249.3" r="2.4" class="dot"/><circle cx="375.0" cy="250.7" r="2.4" class="dot"/><circle cx="355.5" cy="192.6" r="4" class="gh"/><circle cx="355.5" cy="307.4" r="4" class="gh"/><circle cx="371.2" cy="313.8" r="4" class="gh"/><circle cx="371.2" cy="186.2" r="4" class="gh"/>
+<rect x="371.8" y="236.8" width="6.4" height="26.4" class="bx"/>
+<text x="215" y="452" class="tk" text-anchor="middle">the whole circle</text>
+<polyline points="568.2,414.8 568.4,412.1 568.6,409.3 568.9,406.6 569.1,403.8 569.3,401.1 569.5,398.4 569.7,395.6 569.9,392.9 570.1,390.1 570.3,387.4 570.5,384.6 570.6,381.9 570.8,379.2 571.0,376.4 571.2,373.7 571.3,370.9 571.5,368.2 571.7,365.4 571.8,362.7 572.0,359.9 572.1,357.2 572.3,354.5 572.4,351.7 572.6,349.0 572.7,346.2 572.8,343.5 572.9,340.7 573.1,338.0 573.2,335.2 573.3,332.5 573.4,329.7 573.5,327.0 573.6,324.2 573.7,321.5 573.8,318.7 573.9,316.0 574.0,313.2 574.1,310.5 574.2,307.7 574.2,305.0 574.3,302.2 574.4,299.5 574.5,296.7 574.5,294.0 574.6,291.2 574.6,288.5 574.7,285.7 574.7,283.0 574.8,280.2 574.8,277.5 574.8,274.7 574.9,272.0 574.9,269.2 574.9,266.5 575.0,263.7 575.0,261.0 575.0,258.2 575.0,255.5 575.0,252.7 575.0,250.0 575.0,247.3 575.0,244.5 575.0,241.8 575.0,239.0 575.0,236.3 574.9,233.5 574.9,230.8 574.9,228.0 574.8,225.3 574.8,222.5 574.8,219.8 574.7,217.0 574.7,214.3 574.6,211.5 574.6,208.8 574.5,206.0 574.5,203.3 574.4,200.5 574.3,197.8 574.2,195.0 574.2,192.3 574.1,189.5 574.0,186.8 573.9,184.0 573.8,181.3 573.7,178.5 573.6,175.8 573.5,173.0 573.4,170.3 573.3,167.5 573.2,164.8 573.1,162.0 572.9,159.3 572.8,156.5 572.7,153.8 572.6,151.0 572.4,148.3 572.3,145.5 572.1,142.8 572.0,140.1 571.8,137.3 571.7,134.6 571.5,131.8 571.3,129.1 571.2,126.3 571.0,123.6 570.8,120.8 570.6,118.1 570.5,115.4 570.3,112.6 570.1,109.9 569.9,107.1 569.7,104.4 569.5,101.6 569.3,98.9 569.1,96.2 568.9,93.4 568.6,90.7 568.4,87.9 568.2,85.2" class="ci"/>
+<circle cx="570.0" cy="108.7" r="2.4" class="dot"/><circle cx="570.0" cy="391.3" r="2.4" class="dot"/><circle cx="572.7" cy="154.9" r="2.4" class="dot"/><circle cx="572.7" cy="345.1" r="2.4" class="dot"/><circle cx="573.4" cy="170.1" r="2.4" class="dot"/><circle cx="573.4" cy="329.9" r="2.4" class="dot"/><circle cx="573.9" cy="184.3" r="2.4" class="dot"/><circle cx="573.9" cy="315.7" r="2.4" class="dot"/><circle cx="574.1" cy="189.3" r="2.4" class="dot"/><circle cx="574.1" cy="310.7" r="2.4" class="dot"/><circle cx="574.3" cy="196.8" r="2.4" class="dot"/><circle cx="574.3" cy="303.2" r="2.4" class="dot"/><circle cx="574.4" cy="201.1" r="2.4" class="dot"/><circle cx="574.4" cy="298.9" r="2.4" class="dot"/><circle cx="574.5" cy="203.8" r="2.4" class="dot"/><circle cx="574.5" cy="296.2" r="2.4" class="dot"/><circle cx="574.6" cy="208.3" r="2.4" class="dot"/><circle cx="574.6" cy="291.7" r="2.4" class="dot"/><circle cx="574.6" cy="209.8" r="2.4" class="dot"/><circle cx="574.6" cy="290.2" r="2.4" class="dot"/><circle cx="574.6" cy="212.2" r="2.4" class="dot"/><circle cx="574.6" cy="287.8" r="2.4" class="dot"/><circle cx="574.7" cy="214.6" r="2.4" class="dot"/><circle cx="574.7" cy="285.4" r="2.4" class="dot"/><circle cx="574.7" cy="216.3" r="2.4" class="dot"/><circle cx="574.7" cy="283.7" r="2.4" class="dot"/><circle cx="574.7" cy="217.1" r="2.4" class="dot"/><circle cx="574.7" cy="282.9" r="2.4" class="dot"/><circle cx="574.8" cy="219.3" r="2.4" class="dot"/><circle cx="574.8" cy="280.7" r="2.4" class="dot"/><circle cx="574.8" cy="220.2" r="2.4" class="dot"/><circle cx="574.8" cy="279.8" r="2.4" class="dot"/><circle cx="574.8" cy="221.2" r="2.4" class="dot"/><circle cx="574.8" cy="278.8" r="2.4" class="dot"/><circle cx="574.8" cy="222.2" r="2.4" class="dot"/><circle cx="574.8" cy="277.8" r="2.4" class="dot"/><circle cx="574.8" cy="223.6" r="2.4" class="dot"/><circle cx="574.8" cy="276.4" r="2.4" class="dot"/><circle cx="574.8" cy="224.1" r="2.4" class="dot"/><circle cx="574.8" cy="275.9" r="2.4" class="dot"/><circle cx="574.8" cy="224.8" r="2.4" class="dot"/><circle cx="574.8" cy="275.2" r="2.4" class="dot"/><circle cx="574.9" cy="225.9" r="2.4" class="dot"/><circle cx="574.9" cy="274.1" r="2.4" class="dot"/><circle cx="574.9" cy="226.4" r="2.4" class="dot"/><circle cx="574.9" cy="273.6" r="2.4" class="dot"/><circle cx="574.9" cy="227.1" r="2.4" class="dot"/><circle cx="574.9" cy="272.9" r="2.4" class="dot"/><circle cx="574.9" cy="227.5" r="2.4" class="dot"/><circle cx="574.9" cy="272.5" r="2.4" class="dot"/><circle cx="574.9" cy="228.4" r="2.4" class="dot"/><circle cx="574.9" cy="271.6" r="2.4" class="dot"/><circle cx="574.9" cy="228.9" r="2.4" class="dot"/><circle cx="574.9" cy="271.1" r="2.4" class="dot"/><circle cx="574.9" cy="229.1" r="2.4" class="dot"/><circle cx="574.9" cy="270.9" r="2.4" class="dot"/><circle cx="574.9" cy="229.8" r="2.4" class="dot"/><circle cx="574.9" cy="270.2" r="2.4" class="dot"/><circle cx="574.9" cy="230.3" r="2.4" class="dot"/><circle cx="574.9" cy="269.7" r="2.4" class="dot"/><circle cx="574.9" cy="230.7" r="2.4" class="dot"/><circle cx="574.9" cy="269.3" r="2.4" class="dot"/><circle cx="574.9" cy="231.0" r="2.4" class="dot"/><circle cx="574.9" cy="269.0" r="2.4" class="dot"/><circle cx="574.9" cy="231.3" r="2.4" class="dot"/><circle cx="574.9" cy="268.7" r="2.4" class="dot"/><circle cx="574.9" cy="232.0" r="2.4" class="dot"/><circle cx="574.9" cy="268.0" r="2.4" class="dot"/><circle cx="574.9" cy="232.1" r="2.4" class="dot"/><circle cx="574.9" cy="267.9" r="2.4" class="dot"/><circle cx="574.9" cy="232.5" r="2.4" class="dot"/><circle cx="574.9" cy="267.5" r="2.4" class="dot"/><circle cx="574.9" cy="232.8" r="2.4" class="dot"/><circle cx="574.9" cy="267.2" r="2.4" class="dot"/><circle cx="574.9" cy="233.2" r="2.4" class="dot"/><circle cx="574.9" cy="266.8" r="2.4" class="dot"/><circle cx="574.9" cy="233.5" r="2.4" class="dot"/><circle cx="574.9" cy="266.5" r="2.4" class="dot"/><circle cx="574.9" cy="233.7" r="2.4" class="dot"/><circle cx="574.9" cy="266.3" r="2.4" class="dot"/><circle cx="574.9" cy="233.9" r="2.4" class="dot"/><circle cx="574.9" cy="266.1" r="2.4" class="dot"/><circle cx="574.9" cy="234.3" r="2.4" class="dot"/><circle cx="574.9" cy="265.7" r="2.4" class="dot"/><circle cx="574.9" cy="234.6" r="2.4" class="dot"/><circle cx="574.9" cy="265.4" r="2.4" class="dot"/><circle cx="574.9" cy="234.7" r="2.4" class="dot"/><circle cx="574.9" cy="265.3" r="2.4" class="dot"/><circle cx="574.9" cy="235.0" r="2.4" class="dot"/><circle cx="574.9" cy="265.0" r="2.4" class="dot"/><circle cx="574.9" cy="235.2" r="2.4" class="dot"/><circle cx="574.9" cy="264.8" r="2.4" class="dot"/><circle cx="574.9" cy="235.5" r="2.4" class="dot"/><circle cx="574.9" cy="264.5" r="2.4" class="dot"/><circle cx="574.9" cy="235.7" r="2.4" class="dot"/><circle cx="574.9" cy="264.3" r="2.4" class="dot"/><circle cx="574.9" cy="235.8" r="2.4" class="dot"/><circle cx="574.9" cy="264.2" r="2.4" class="dot"/><circle cx="575.0" cy="236.0" r="2.4" class="dot"/><circle cx="575.0" cy="264.0" r="2.4" class="dot"/><circle cx="575.0" cy="236.3" r="2.4" class="dot"/><circle cx="575.0" cy="263.7" r="2.4" class="dot"/><circle cx="575.0" cy="236.4" r="2.4" class="dot"/><circle cx="575.0" cy="263.6" r="2.4" class="dot"/><circle cx="575.0" cy="236.7" r="2.4" class="dot"/><circle cx="575.0" cy="263.3" r="2.4" class="dot"/><circle cx="575.0" cy="236.7" r="2.4" class="dot"/><circle cx="575.0" cy="263.3" r="2.4" class="dot"/><circle cx="575.0" cy="236.9" r="2.4" class="dot"/><circle cx="575.0" cy="263.1" r="2.4" class="dot"/><circle cx="575.0" cy="237.2" r="2.4" class="dot"/><circle cx="575.0" cy="262.8" r="2.4" class="dot"/><circle cx="575.0" cy="237.3" r="2.4" class="dot"/><circle cx="575.0" cy="262.7" r="2.4" class="dot"/><circle cx="575.0" cy="237.4" r="2.4" class="dot"/><circle cx="575.0" cy="262.6" r="2.4" class="dot"/><circle cx="575.0" cy="237.6" r="2.4" class="dot"/><circle cx="575.0" cy="262.4" r="2.4" class="dot"/><circle cx="575.0" cy="237.7" r="2.4" class="dot"/><circle cx="575.0" cy="262.3" r="2.4" class="dot"/><circle cx="575.0" cy="237.9" r="2.4" class="dot"/><circle cx="575.0" cy="262.1" r="2.4" class="dot"/><circle cx="575.0" cy="238.0" r="2.4" class="dot"/><circle cx="575.0" cy="262.0" r="2.4" class="dot"/><circle cx="575.0" cy="238.2" r="2.4" class="dot"/><circle cx="575.0" cy="261.8" r="2.4" class="dot"/><circle cx="575.0" cy="238.2" r="2.4" class="dot"/><circle cx="575.0" cy="261.8" r="2.4" class="dot"/><circle cx="575.0" cy="238.5" r="2.4" class="dot"/><circle cx="575.0" cy="261.5" r="2.4" class="dot"/><circle cx="575.0" cy="238.6" r="2.4" class="dot"/><circle cx="575.0" cy="261.4" r="2.4" class="dot"/><circle cx="575.0" cy="238.7" r="2.4" class="dot"/><circle cx="575.0" cy="261.3" r="2.4" class="dot"/><circle cx="575.0" cy="238.8" r="2.4" class="dot"/><circle cx="575.0" cy="261.2" r="2.4" class="dot"/><circle cx="575.0" cy="238.9" r="2.4" class="dot"/><circle cx="575.0" cy="261.1" r="2.4" class="dot"/><circle cx="575.0" cy="239.0" r="2.4" class="dot"/><circle cx="575.0" cy="261.0" r="2.4" class="dot"/><circle cx="575.0" cy="239.2" r="2.4" class="dot"/><circle cx="575.0" cy="260.8" r="2.4" class="dot"/><circle cx="575.0" cy="239.2" r="2.4" class="dot"/><circle cx="575.0" cy="260.8" r="2.4" class="dot"/><circle cx="575.0" cy="239.3" r="2.4" class="dot"/><circle cx="575.0" cy="260.7" r="2.4" class="dot"/><circle cx="575.0" cy="239.4" r="2.4" class="dot"/><circle cx="575.0" cy="260.6" r="2.4" class="dot"/><circle cx="575.0" cy="239.6" r="2.4" class="dot"/><circle cx="575.0" cy="260.4" r="2.4" class="dot"/><circle cx="575.0" cy="239.6" r="2.4" class="dot"/><circle cx="575.0" cy="260.4" r="2.4" class="dot"/><circle cx="575.0" cy="239.8" r="2.4" class="dot"/><circle cx="575.0" cy="260.2" r="2.4" class="dot"/><circle cx="575.0" cy="239.8" r="2.4" class="dot"/><circle cx="575.0" cy="260.2" r="2.4" class="dot"/><circle cx="575.0" cy="239.9" r="2.4" class="dot"/><circle cx="575.0" cy="260.1" r="2.4" class="dot"/><circle cx="575.0" cy="240.1" r="2.4" class="dot"/><circle cx="575.0" cy="259.9" r="2.4" class="dot"/><circle cx="575.0" cy="240.1" r="2.4" class="dot"/><circle cx="575.0" cy="259.9" r="2.4" class="dot"/><circle cx="575.0" cy="240.2" r="2.4" class="dot"/><circle cx="575.0" cy="259.8" r="2.4" class="dot"/><circle cx="575.0" cy="240.3" r="2.4" class="dot"/><circle cx="575.0" cy="259.7" r="2.4" class="dot"/><circle cx="575.0" cy="240.4" r="2.4" class="dot"/><circle cx="575.0" cy="259.6" r="2.4" class="dot"/><circle cx="575.0" cy="240.5" r="2.4" class="dot"/><circle cx="575.0" cy="259.5" r="2.4" class="dot"/><circle cx="575.0" cy="240.6" r="2.4" class="dot"/><circle cx="575.0" cy="259.4" r="2.4" class="dot"/><circle cx="575.0" cy="240.6" r="2.4" class="dot"/><circle cx="575.0" cy="259.4" r="2.4" class="dot"/><circle cx="575.0" cy="240.7" r="2.4" class="dot"/><circle cx="575.0" cy="259.3" r="2.4" class="dot"/><circle cx="575.0" cy="240.7" r="2.4" class="dot"/><circle cx="575.0" cy="259.3" r="2.4" class="dot"/><circle cx="575.0" cy="240.9" r="2.4" class="dot"/><circle cx="575.0" cy="259.1" r="2.4" class="dot"/><circle cx="575.0" cy="240.9" r="2.4" class="dot"/><circle cx="575.0" cy="259.1" r="2.4" class="dot"/><circle cx="575.0" cy="241.0" r="2.4" class="dot"/><circle cx="575.0" cy="259.0" r="2.4" class="dot"/><circle cx="575.0" cy="241.1" r="2.4" class="dot"/><circle cx="575.0" cy="258.9" r="2.4" class="dot"/><circle cx="575.0" cy="241.1" r="2.4" class="dot"/><circle cx="575.0" cy="258.9" r="2.4" class="dot"/><circle cx="575.0" cy="241.2" r="2.4" class="dot"/><circle cx="575.0" cy="258.8" r="2.4" class="dot"/><circle cx="575.0" cy="241.3" r="2.4" class="dot"/><circle cx="575.0" cy="258.7" r="2.4" class="dot"/><circle cx="575.0" cy="241.4" r="2.4" class="dot"/><circle cx="575.0" cy="258.6" r="2.4" class="dot"/><circle cx="575.0" cy="241.4" r="2.4" class="dot"/><circle cx="575.0" cy="258.6" r="2.4" class="dot"/><circle cx="575.0" cy="241.4" r="2.4" class="dot"/><circle cx="575.0" cy="258.6" r="2.4" class="dot"/><circle cx="575.0" cy="241.5" r="2.4" class="dot"/><circle cx="575.0" cy="258.5" r="2.4" class="dot"/>
+<text x="505" y="75" class="tk">zoom &#215;2000, both axes, at w = 1</text>
+<text x="575" y="452" class="tk" text-anchor="middle">all 200 points sit on the arc (|&#952;| &lt; 0.075)</text>
+</svg>
+<figcaption>Left: the first 100 zeta zeros and their conjugates, sent by \(w=1-1/\rho\), on the unit circle (data: <a href="figures/zeta_zeros_on_circle.csv">csv</a>, script: <a href="figures/make_figure.py">make_figure.py</a>). They bunch near \(w=1\), because \(|\rho|\) is large. Right: the same points, zoomed \(\times 2000\) in both directions at \(w=1\). The dashed circles on the left are a <em>schematic</em> off-line zero at \(0.85+2.5i\), which is not a real zero, to show where such a quartet would land. This is an illustration, not evidence: the zero heights come from mpmath, which places them on the line, and RH has only been checked numerically to a finite height.</figcaption></figure>
+
+<p>Now the payoff. For \(|w|=1\) and \(u=w^n\), also on the circle,
+$$2\operatorname{Re}(1-u)=|1-u|^2\ \ge 0 .$$
+So under RH every term of \(\lambda_n\) is a square, and the sum cannot be negative. If a zero is off the line, \(|w|\ne1\), and a Kronecker return sends the dominant powers near the positive axis, that term grows like \(-R^n\) and drives some coefficient negative. That is the converse, formalized as Part II, now conditional only on the multiplicity-weighted Hadamard summability.</p>
+
+<h2>Part I · the easy direction</h2>
+<p>Each step is a lemma in <code>LiCriterion.lean</code> (and in the earlier Part I file <code>LiConditional.lean</code>), in the order below. Names link to the code. The standalone file <a href="NoRealZeros.lean"><code>NoRealZeros.lean</code></a> is Part III.</p>
+<div class="step"><h3>1 · The critical line goes to the circle <a class="nmref" href="#lean-norm_sub_one_eq_of_re_half">norm_sub_one_eq_of_re_half</a> <a class="nmref" href="#lean-norm_one_sub_inv_eq_one">norm_one_sub_inv_eq_one</a></h3>
+<p>If \(\operatorname{Re}\rho=\tfrac12\) then \(|\rho-1|=|\rho|\), hence \(|1-1/\rho|=1\). Unconditional.</p></div>
+<div class="step"><h3>2 · Terms on the circle are squares <a class="nmref" href="#lean-re_one_sub_pow_nonneg">re_one_sub_pow_nonneg</a> <a class="nmref" href="#lean-re_one_sub_pow_pos">re_one_sub_pow_pos</a> <a class="nmref" href="#lean-re_one_sub_pow_le">re_one_sub_pow_le</a></h3>
+<p>For \(|w|=1\): \(\operatorname{Re}(1-w^n)=|1-w^n|^2/2\ge0\), and it is strictly positive when \(w^n\ne1\). A geometric sum gives \(|1-w^n|\le n|1-w|\), so \(\operatorname{Re}(1-w^n)\le n^2|1-w|^2/2\). With \(w=1-1/\rho\) this is \(\le n^2/(2|\rho|^2)\), which is what makes the series converge. Unconditional.</p></div>
+<div class="step"><h3>3 · The completed zeta function and multiplicities <a class="nmref" href="#lean-xi_eq">xi_eq</a> <a class="nmref" href="#lean-zetaMult_pos">zetaMult_pos</a></h3>
+<p>\(\xi(s)=\tfrac12(1+s(s-1)\Lambda_0(s))\) is built from Mathlib's entire \(\Lambda_0\), and <code>xi_eq</code> checks it equals \(\tfrac12s(s-1)\Lambda(s)\) away from \(0,1\). <code>zetaMult_pos</code> says every nontrivial zero with \(\operatorname{Im}\rho&gt;0\) has multiplicity at least 1: \(\zeta\) is analytic off \(s=1\), not identically zero (it is nonzero at \(2+i\)), and the identity theorem on the convex quadrant \(\{\operatorname{Re}&gt;0,\operatorname{Im}&gt;0\}\) rules out an infinite-order zero. Unconditional.</p></div>
+<div class="step"><h3>4 · RH puts every zero on the line <a class="nmref" href="#lean-re_eq_half_of_RH">re_eq_half_of_RH</a></h3>
+<p>Mathlib's <code>RiemannHypothesis</code> excludes trivial zeros and \(s=1\); we check a nontrivial zero is neither.</p></div>
+<div class="step"><h3>5 · RH gives \(\lambda_n\ge0\), and, with the hypotheses, convergence and \(\lambda_n&gt;0\) <a class="nmref" href="#lean-liCoeff_nonneg">liCoeff_nonneg</a> <a class="nmref" href="#lean-liCoeff_summable">liCoeff_summable</a> <a class="nmref" href="#lean-liCoeff_pos">liCoeff_pos</a></h3>
+<p><code>liCoeff_nonneg</code>: under RH every term is \(\ge0\), so \(\lambda_n\ge0\). <code>liCoeff_summable</code>: under RH and <code>HadamardHypothesis</code>, comparison with \(n^2\sum m(\rho)/|\rho|^2\) shows the series converges absolutely. <code>liCoeff_pos</code>: add <code>hinf</code>, infinitely many zeros. Only finitely many points of the circle satisfy \(w^n=1\), and \(\rho\mapsto w(\rho)\) is injective, so some zero has \(w^n\ne1\), and its term is strictly positive. A convergent sum of nonnegative terms with one positive term is positive.</p></div>
+
+<h2>The named assumption</h2>
+<div class="step"><h3><a class="nmref" href="#lean-HadamardHypothesis">HadamardHypothesis</a>: the Hadamard product for \(\xi\)</h3>
+<p>Mathlib does not yet have the Hadamard factorization of \(\xi\). We state its consequences as a structure with two fields: (1) the multiplicity-weighted summability \(\sum_\rho m(\rho)/|\rho|^2&lt;\infty\), and (2) \(\xi'/\xi(s)=B+\sum_\rho m(\rho)\bigl(\tfrac1{s-\rho}+\tfrac1\rho\bigr)\) for a constant \(B\). <strong>Why this is honest:</strong> this is the classical factorization of an entire function of order 1, proved unconditionally by Hadamard in 1893. It does not mention RH, and nothing in it is Li's criterion in disguise. We also ran a coarse numerical sanity check (<code>check_xi.py</code>, mpmath): the constant \(B\) computed from \(\xi'/\xi\) near \(s=1\) came out as \(-0.0230957089661\), equal to \(-\lambda_1=-(1+\tfrac\gamma2-\tfrac12\log4\pi)\) to about 10 digits or better. The zero sum itself, truncated at 300 conjugate pairs, gave \(0.1048\) at \(s=3\) against the true \(0.1144\). That gap is the slowly decaying tail, about \(0.012\) by a density estimate, so this part of the check is only consistent with the expansion, not a precise confirmation. <strong>Both directions use only field (1)</strong>, the multiplicity-weighted bound \(\sum m(\rho)/|\rho|^2&lt;\infty\). Field (2) is stated for the bridge to the Taylor coefficients of \(\log\xi\), which is not proved here, and is unused.</p></div>
+<div class="step"><h3><code>hinf</code>: infinitely many zeros</h3>
+<p><code>nontrivialPosZeros.Infinite</code> is a classical fact (for instance from the zero-counting formula \(N(T)\sim\frac T{2\pi}\log\frac T{2\pi e}\)) that Mathlib does not have, so <code>liCoeff_pos</code> takes it as a hypothesis. It is needed only for the strict inequality \(\lambda_n&gt;0\), not for the equivalence with \(\ge 0\).</p></div>
+
+<h2>Part II · the converse</h2>
+<p>Now suppose some zero is off the line, and assume only the multiplicity-weighted Hadamard summability. We show that some Li coefficient is negative. The fact that the off-line zero is not real is the theorem of Part III, not an extra hypothesis. Names again link to the Lean.</p>
+<div class="step"><h3>1 · An off-line zero can be pushed left <a class="nmref" href="#lean-exists_posZero_re_lt_half">exists_posZero_re_lt_half</a> <a class="nmref" href="#lean-zeta_one_sub_conj_eq_zero">zeta_one_sub_conj_eq_zero</a></h3>
+<p>If RH fails, some zero sits in the strip: the functional equation kills zeros with \(\operatorname{Re}s\le 0\) except the trivial ones (<a class="nmref" href="#lean-re_pos_of_zeta_eq_zero">re_pos_of_zeta_eq_zero</a>), and \(\zeta\) has no zeros with \(\operatorname{Re}s\ge 1\). By the theorem <a class="nmref" href="#lean-noRealZerosInStrip_holds">noRealZerosInStrip_holds</a> (Part III) it is not real. Conjugation (<code>riemannZeta_conj</code>) puts it in the upper half-plane, and the proved symmetry \(\rho\mapsto 1-\bar\rho\) — functional equation plus conjugation — then yields a zero with \(\operatorname{Im}\rho&gt;0\) and \(\operatorname{Re}\rho&lt;\tfrac12\).</p></div>
+<div class="step"><h3>2 · Left of the line means outside the circle <a class="nmref" href="#lean-one_lt_norm_one_sub_inv">one_lt_norm_one_sub_inv</a></h3>
+<p>\(\operatorname{Re}\rho&lt;\tfrac12\) if and only if \(|\rho-1|&gt;|\rho|\), if and only if \(|w(\rho)|&gt;1\). So that zero lands strictly outside the unit circle.</p></div>
+<div class="step"><h3>3 · Only finitely many zeros can sit near the largest radius <a class="nmref" href="#lean-exists_neg_of_large">exists_neg_of_large</a></h3>
+<p>Write \(u=1-w=1/\rho\). The multiplicity-weighted Hadamard summability \(\sum m(\rho)/|\rho|^2&lt;\infty\) is \(\sum m_i|u_i|^2&lt;\infty\). With weights \(m_i\ge 1\), this forces \(|u_i|\to 0\), so only finitely many \(w_i\) satisfy \(|w_i|\ge r\) for any \(r&gt;1\). The maximal modulus \(R=\max|w_i|&gt;1\) is therefore attained on a finite set \(S\), and every other point satisfies \(|w_i|\le r&lt;R\).</p></div>
+<div class="step"><h3>4 · The tail is under second-order control <a class="nmref" href="#lean-norm_one_sub_pow_sub_le">norm_one_sub_pow_sub_le</a> <a class="nmref" href="#lean-abs_re_one_sub_pow_le">abs_re_one_sub_pow_le</a></h3>
+<p>For \(|w|\le M\) and \(M\ge 1\), a Taylor remainder gives \(|1-w^n-nu|\le n^2 M^n|u|^2\). In the strip one also has \(|\operatorname{Re}u|\le|u|^2\), so \(|\operatorname{Re}(1-w^n)|\le(n+n^2 M^n)|u|^2\). The non-dominant zeros therefore contribute at most \((n+n^2 r^n)\sum m_i|u_i|^2\), and the Li series converges absolutely for every \(n\), with no appeal to RH.</p></div>
+<div class="step"><h3>5 · A Kronecker return sends the dominant powers near the positive axis <a class="nmref" href="#lean-exists_pow_near_one">exists_pow_near_one</a></h3>
+<p>The finitely many points \(z_i=w_i/R\) on the unit circle, \(i\in S\), return simultaneously: for any \(N\), some \(d\ge N\) has every \(z_i^d\) within \(1/2\) of \(1\) (compactness of the torus, plus the pigeonhole principle along \(k\mapsto(z_i^{Nk})\)). Then \(\operatorname{Re}w_i^d\ge R^d/2\) on \(S\), and the dominant contribution is about \(\bigl(\sum_{i\in S}m_i\bigr)(1-R^d/2)\).</p></div>
+<div class="step"><h3>6 · \(R^d\) beats the tail, so some coefficient is negative <a class="nmref" href="#lean-li_converse">li_converse</a> <a class="nmref" href="#lean-li_criterion_weighted">li_criterion_weighted</a></h3>
+<p>Putting the pieces together,
+$$\frac{\lambda_d}{2}\ \le\ \Bigl(\sum_{i\in S}m_i\Bigr)\Bigl(1-\frac{R^d}{2}\Bigr)+(d+d^2 r^d)\sum_i m_i|u_i|^2.$$
+Because \(r&lt;R\), the geometric \(R^d\) beats the \(d^2 r^d\) tail for large \(d\), and \(\lambda_d&lt;0\). This contradicts the assumption that every coefficient is nonnegative. Hence RH holds. Together with Part I, and with Part III discharging the real-zero hypothesis, that is the equivalence <a class="nmref" href="#lean-li_criterion_weighted'">li_criterion_weighted'</a>, whose only remaining assumption is Hadamard summability.</p></div>
+<div class="step"><h3>Bonus · the same converse for upstream's unweighted \(\lambda\) <a class="nmref" href="#lean-li_converse_unweighted">li_converse_unweighted</a></h3>
+<p>Run the same engine with every weight equal to \(1\). Summability of \(\sum 1/|\rho|^2\) follows from the multiplicity-weighted bound \(\sum m(\rho)/|\rho|^2&lt;\infty\), because \(m(\rho)\ge 1\). So the “\(\Leftarrow\)” half of the upstream statement, about formal-conjectures' unweighted <code>lambda</code>, also holds conditionally on Hadamard summability alone (<a class="nmref" href="#lean-li_converse_unweighted_of_hadamard">li_converse_unweighted_of_hadamard</a>). The “\(\Rightarrow\)” half for that unweighted sum, and the strict inequality, are not proved.</p></div>
+
+<div class="synth"><h3>A synthesis</h3>
+<p>Given only the multiplicity-weighted Hadamard summability \(\sum m(\rho)/|\rho|^2&lt;\infty\), nonnegativity of the zero-sum \(\lambda_n\) is equivalent to RH. That is <a class="nmref" href="#lean-li_criterion_weighted'">li_criterion_weighted'</a>. The engine behind the converse, <a class="nmref" href="#lean-exists_neg_of_large">exists_neg_of_large</a>, is more general still: it applies to any weighted point set whose weights \(a_i\ge 1\) make \(\sum a_i|1-w_i|^2\) summable, once at least one point lies outside the unit circle. The zeta-specific work is only to produce such a point from a failure of RH, and to know — now as a theorem — that the point is not real.</p></div>
+
+<h2>Part III · no real zeros in (0,1)</h2>
+<p>The converse used to take “no real zeros of \(\zeta\) in \((0,1)\)” as a named hypothesis. It is now a theorem. The route is a comparison of the sum with the integral, not the Dirichlet eta function. The standalone file is <a href="NoRealZeros.lean"><code>NoRealZeros.lean</code></a>; the same lemmas are included in <code>LiCriterion.lean</code>.</p>
+<p>For \(n\ge 1\), write
+$$c_m(s)=(1-s)(n+1)^{-s}-\bigl((n+1)^{1-s}-n^{1-s}\bigr),\qquad n=m+1.$$
+Equivalently, \(c_m(s)=(1-s)\int_n^{n+1}\bigl((n+1)^{-s}-x^{-s}\bigr)\,dx\). The definition in Lean is <a class="nmref" href="#lean-corr">corr</a>.</p>
+<div class="step"><h3>1 · A mean-value bound makes \(\sum c_m\) holomorphic on \(\operatorname{Re}s&gt;0\) <a class="nmref" href="#lean-norm_corr_le">norm_corr_le</a> <a class="nmref" href="#lean-summable_corr">summable_corr</a></h3>
+<p>By the mean-value inequality, twice (<a class="nmref" href="#lean-norm_cpow_sub_cpow_le">norm_cpow_sub_cpow_le</a>), \(|c_m(s)|\le|1-s|\,|s|\,n^{-\operatorname{Re}s-1}\). So \(\sum c_m(s)\) converges locally uniformly on \(\operatorname{Re}s&gt;0\), and the sum is holomorphic there.</p></div>
+<div class="step"><h3>2 · For \(\operatorname{Re}s&gt;1\) the identity is elementary <a class="nmref" href="#lean-tsum_corr_of_one_lt_re">tsum_corr_of_one_lt_re</a> <a class="nmref" href="#lean-hasSum_telescope">hasSum_telescope</a></h3>
+<p>Here \(\sum(n+1)^{-s}=\zeta(s)-1\), and \(\sum\bigl((n+1)^{1-s}-n^{1-s}\bigr)=-1\) telescopes, so
+$$(s-1)\zeta(s)=s-\sum_m c_m(s).$$</p></div>
+<div class="step"><h3>3 · The identity theorem extends it to \(\operatorname{Re}s&gt;0\) <a class="nmref" href="#lean-riemannZeta₁_eq_sub_tsum_corr">riemannZeta₁_eq_sub_tsum_corr</a></h3>
+<p>Both sides are holomorphic on a convex open set containing \(s\) and \(s+2\) — the left-hand side is Mathlib’s entire function \(\texttt{riemannZeta}_1=(s-1)\zeta(s)\) — and they agree near \(s+2\). By the identity theorem they agree for every \(\operatorname{Re}s&gt;0\).</p></div>
+<div class="step"><h3>4 · Bernoulli’s inequality makes each \(c_m(\sigma)&lt;0\) <a class="nmref" href="#lean-realCorr_neg">realCorr_neg</a> <a class="nmref" href="#lean-riemannZeta_re_lt_of_mem_Ioo">riemannZeta_re_lt_of_mem_Ioo</a> <a class="nmref" href="#lean-riemannZeta_ne_zero_of_mem_Ioo">riemannZeta_ne_zero_of_mem_Ioo</a></h3>
+<p>For real \(0&lt;\sigma&lt;1\), \(x\mapsto x^{1-\sigma}\) is strictly concave, so its increment over \([n,n+1]\) exceeds its slope at the right end: \((n+1)^{1-\sigma}-n^{1-\sigma}&gt;(1-\sigma)(n+1)^{-\sigma}\). That is Bernoulli’s inequality \((1+x)^p&lt;1+px\), and it says \(c_m(\sigma)&lt;0\). Hence \((\sigma-1)\zeta(\sigma)=\sigma-\sum c_m(\sigma)&gt;\sigma\), and dividing by \(\sigma-1&lt;0\) yields
+$$\zeta(\sigma)&lt;\frac{\sigma}{\sigma-1}&lt;0.$$
+In particular \(\zeta(\sigma)\ne 0\). This is <a class="nmref" href="#lean-noRealZerosInStrip_holds">noRealZerosInStrip_holds</a>, and it is what discharges the last hypothesis besides Hadamard summability.</p></div>
+
+<h2 id="honesty">Honesty notes</h2>
+<div class="warn"><h3>(a) One hypothesis remains</h3>
+<p><strong>\(\mathrm{RH}\iff\lambda_n\ge 0\) for all \(n\) is proved assuming only the multiplicity-weighted Hadamard summability \(\sum m(\rho)/|\rho|^2&lt;\infty\).</strong> That hypothesis is a classical, unconditional theorem, stated as an assumption because Mathlib does not have it. It is not RH or Li in disguise.</p></div>
+<div class="warn"><h3>(b) The deep half of Li is not formalized</h3>
+<p>Li's original criterion identifies \(\lambda_n\) with the Taylor coefficients of \(\log\xi\) at \(s=1\), which can be computed without knowing the zeros. <strong>That identification is not formalized here.</strong> What is proved is an equivalence between RH and the nonnegativity of a sum written directly over the zeros.</p></div>
+<div class="warn"><h3>(c) This is not a credit solve of upstream <code>li_criterion</code></h3>
+<p>The formal-conjectures statement, the one Left to Solve grades, wants both directions, the <em>strict</em> inequality \(\lambda_n&gt;0\), and no extra hypotheses. We have not proved that statement. A proof of it would earn credit; this page does not.</p></div>
+<div class="warn"><h3>(d) The log-derivative field is unused</h3>
+<p>The <code>log_deriv_expansion</code> field of <code>HadamardHypothesis</code> is stated and then never used. Both directions use only the multiplicity-weighted summability \(\sum m(\rho)/|\rho|^2&lt;\infty\).</p></div>
+<div class="warn"><h3>Notes that still apply</h3>
+<p><code>liCoeff_nonneg</code> alone is nearly empty, because Lean's <code>tsum</code> returns \(0\) when a family is not summable. Read it only together with <code>liCoeff_summable</code>. (Alo)</p>
+<p>The sum itself runs over zeros with \(\operatorname{Im}\rho&gt;0\), doubled, so a real zero in \((0,1)\) would be missed by the setup. Part III now proves there are none, so this is no longer an extra hypothesis.</p>
+<p><code>liCoeff</code> counts multiplicity; upstream <code>lambda</code> counts each zero once. They agree only if all zeros are simple, which is not known. No identification between them is proved, though <code>li_converse_unweighted_of_hadamard</code> gives the converse for the unweighted sum on its own terms, still assuming only Hadamard summability.</p></div>
+
+<h2>The Lean half</h2>
+<p>The complete development is <a href="LiCriterion.lean"><code>LiCriterion.lean</code></a>: Part III (no real zeros) concatenated with both directions of the weighted Li criterion, compiled against <a href="https://github.com/google-deepmind/formal-conjectures/tree/9097e2f90e66d2f6244209cb1c07f7120d17ec53">formal-conjectures at 9097e2f</a> on Lean and Mathlib v4.33.1. The standalone Part III file is <a href="NoRealZeros.lean"><code>NoRealZeros.lean</code></a>. The earlier Part I file, <a href="LiConditional.lean"><code>LiConditional.lean</code></a>, is kept for the record; every Part I lemma still appears, under the same name, in <code>LiCriterion.lean</code>.</p>
+<pre>import Mathlib
+import FormalConjectures.Paper.RiemannHypothesisEquivalents
+
+/-!
+# Li's criterion (multiplicity-weighted), conditional only on Hadamard summability
+
+This file is a self-contained concatenation of
+* `NoRealZeros.lean` — an unconditional proof that `ζ(σ) ≠ 0` (indeed `ζ(σ) &lt; σ/(σ-1) &lt; 0`)
+  for real `0 &lt; σ &lt; 1`; and
+* `LiConditional2.lean` — both directions of the weighted Li criterion, conditional on
+  `HadamardHypothesis` (only its summability field `∑ m(ρ)/|ρ|² &lt; ∞` is used) and on
+  `NoRealZerosInStrip`;
+
+(copied verbatim, since the office files are standalone, not a Lake library), followed by the
+discharge `noRealZerosInStrip_holds : NoRealZerosInStrip` and the corollaries
+`li_criterion_weighted'`, `li_converse_of_hadamard`, `li_converse_unweighted_of_hadamard`, whose
+only remaining hypothesis is `HadamardHypothesis`.
+
+Not formalized here: the deep half of Li (that `λₙ` are the Taylor coefficients of `log ξ`), and
+Hadamard summability itself.  So this is **not** a solve of the upstream `li_criterion`.
+-/
+
+section NoRealZerosSection
+
+/-
+# `ζ` has no zeros on the real segment `(0, 1)`
+
+**Main results** (namespace `NoRealZeros`):
+* `riemannZeta_ne_zero_of_mem_Ioo : 0 &lt; σ → σ &lt; 1 → riemannZeta σ ≠ 0`;
+* the sharper `riemannZeta_re_lt_of_mem_Ioo : (riemannZeta σ).re &lt; σ / (σ - 1)` (hence `&lt; 0`,
+  `riemannZeta_re_neg_of_mem_Ioo`) and `riemannZeta_im_eq_zero_of_mem_Ioo : (riemannZeta σ).im = 0`.
+
+**Human proof sketch** (Euler–Maclaurin / "compare the sum with the integral", route B).
+
+For `n ≥ 1` put
+  `c_n(s) = (1 - s)(n+1)^{-s} - ((n+1)^{1-s} - n^{1-s}) = (1 - s) ∫ₙⁿ⁺¹ ((n+1)^{-s} - x^{-s}) dx`.
+1. *Second-order cancellation* (`norm_corr_le`).  By the mean value inequality, twice,
+   `|c_n(s)| ≤ |1 - s| |s| n^{-Re s - 1}`.  So `∑ c_n(s)` converges locally uniformly on
+   `Re s &gt; 0`, and its sum is holomorphic there (`differentiableOn_tsum_of_summable_norm`).
+2. *The identity for `Re s &gt; 1`* (`tsum_corr_of_one_lt_re`).  Here `∑ (n+1)^{-s} = ζ(s) - 1` and
+   `∑ ((n+1)^{1-s} - n^{1-s}) = -1` telescopes, so `(s - 1) ζ(s) = s - ∑ c_n(s)`.
+3. *Analytic continuation* (`riemannZeta₁_eq_sub_tsum_corr`).  Both sides are holomorphic on a
+   convex open set containing `s` and `s + 2` (Mathlib's entire `riemannZeta₁ = (s - 1) ζ(s)` on the
+   left), and agree near `s + 2`; by the identity theorem they agree for every `Re s &gt; 0`.
+4. *Sign on the real axis* (`realCorr_neg`).  For real `0 &lt; σ &lt; 1`, `x ↦ x^{1-σ}` is strictly
+   concave, so its increment over `[n, n+1]` exceeds its slope at the right end:
+   `(n+1)^{1-σ} - n^{1-σ} &gt; (1-σ)(n+1)^{-σ}`, i.e. `c_n(σ) &lt; 0` (Bernoulli's inequality
+   `(1+x)^p &lt; 1 + p x`).  Hence `(σ - 1) ζ(σ) = σ - ∑ c_n(σ) &gt; σ`, and dividing by `σ - 1 &lt; 0`:
+   `ζ(σ) &lt; σ / (σ - 1) &lt; 0`.
+-/
+
+open Complex Filter Topology Set
+
+namespace NoRealZeros
+
+/-- Mean value bound for `t ↦ t ^ w` on the positive reals. -/
+lemma <span class="nm" id="lean-norm_cpow_sub_cpow_le">norm_cpow_sub_cpow_le</span> {a x y : ℝ} (ha : 0 &lt; a) (hax : a ≤ x) (hxy : x ≤ y) {w : ℂ}
+    (hw : w.re ≤ 1) :
+    ‖(y : ℂ) ^ w - (x : ℂ) ^ w‖ ≤ ‖w‖ * a ^ (w.re - 1) * (y - x) := by
+  refine norm_image_sub_le_of_norm_deriv_le_segment' (f := fun t : ℝ =&gt; (t : ℂ) ^ w)
+    (f' := fun t : ℝ =&gt; w * (t : ℂ) ^ (w - 1)) (fun t ht =&gt; ?_) (fun t ht =&gt; ?_) y ⟨hxy, le_rfl⟩
+  · have ht0 : 0 &lt; t := ha.trans_le (hax.trans ht.1)
+    exact ((Complex.hasStrictDerivAt_cpow_const (c := w)
+      (Complex.ofReal_mem_slitPlane.2 ht0)).hasDerivAt.comp_ofReal).hasDerivWithinAt
+  · have ht0 : 0 &lt; t := ha.trans_le (hax.trans ht.1)
+    rw [norm_mul, Complex.norm_cpow_eq_rpow_re_of_pos ht0, sub_re, one_re]
+    exact mul_le_mul_of_nonneg_left
+      (Real.rpow_le_rpow_of_nonpos ha (hax.trans ht.1) (by linarith)) (norm_nonneg w)
+
+
+/-- The `m`-th correction term (with `n = m + 1`):
+`c_m(s) = (1 - s) (n+1)^{-s} - ((n+1)^{1-s} - n^{1-s}) = (1 - s) ∫ₙⁿ⁺¹ ((n+1)^{-s} - x^{-s}) dx`. -/
+noncomputable def <span class="nm" id="lean-corr">corr</span> (s : ℂ) (m : ℕ) : ℂ :=
+  (1 - s) * ((m : ℂ) + 2) ^ (-s) - (((m : ℂ) + 2) ^ (1 - s) - ((m : ℂ) + 1) ^ (1 - s))
+
+/-- Second-order cancellation: `‖c_m(s)‖ ≤ ‖1 - s‖ ‖s‖ n^{-Re s - 1}`. -/
+lemma <span class="nm" id="lean-norm_corr_le">norm_corr_le</span> {s : ℂ} (hs : 0 &lt; s.re) (m : ℕ) :
+    ‖corr s m‖ ≤ ‖1 - s‖ * ‖s‖ * ((m : ℝ) + 1) ^ (-s.re - 1) := by
+  set n : ℝ := (m : ℝ) + 1 with hn_def
+  have hn : 1 ≤ n := by simp [hn_def]
+  have hn0 : 0 &lt; n := by linarith
+  set h : ℝ → ℂ := fun t =&gt; (t : ℂ) ^ (1 - s) - (1 - s) * ((n + 1 : ℝ) : ℂ) ^ (-s) * t
+  have key : ‖h (n + 1) - h n‖ ≤ ‖1 - s‖ * ‖s‖ * n ^ (-s.re - 1) * (n + 1 - n) := by
+    refine norm_image_sub_le_of_norm_deriv_le_segment' (f := h)
+      (f' := fun t =&gt; (1 - s) * (t : ℂ) ^ (-s) - (1 - s) * ((n + 1 : ℝ) : ℂ) ^ (-s))
+      (fun t ht =&gt; ?_) (fun t ht =&gt; ?_) (n + 1) ⟨by linarith, le_rfl⟩
+    · have ht0 : 0 &lt; t := hn0.trans_le ht.1
+      have h1 := (Complex.hasStrictDerivAt_cpow_const (c := 1 - s)
+        (Complex.ofReal_mem_slitPlane.2 ht0)).hasDerivAt.comp_ofReal
+      have h2 := ((hasDerivAt_id t).ofReal_comp).const_mul ((1 - s) * ((n + 1 : ℝ) : ℂ) ^ (-s))
+      have e : (1 - s - 1 : ℂ) = -s := by ring
+      rw [e] at h1
+      convert (h1.sub h2).hasDerivWithinAt using 1
+      · funext y; simp [h]
+      · simp
+    · have ht0 : 0 &lt; t := hn0.trans_le ht.1
+      have hb := norm_cpow_sub_cpow_le hn0 ht.1 ht.2.le (w := -s) (by simp; linarith)
+      rw [← mul_sub, norm_mul, norm_sub_rev ((t : ℂ) ^ (-s))]
+      simp only [neg_re, norm_neg] at hb
+      have : ‖((n + 1 : ℝ) : ℂ) ^ (-s) - (t : ℂ) ^ (-s)‖ ≤ ‖s‖ * n ^ (-s.re - 1) := by
+        refine hb.trans ?_
+        have := ht.2
+        have : 0 ≤ ‖s‖ * n ^ (-s.re - 1) := by positivity
+        nlinarith [ht.1]
+      calc ‖1 - s‖ * ‖((n + 1 : ℝ) : ℂ) ^ (-s) - (t : ℂ) ^ (-s)‖
+          ≤ ‖1 - s‖ * (‖s‖ * n ^ (-s.re - 1)) := mul_le_mul_of_nonneg_left this (norm_nonneg _)
+        _ = ‖1 - s‖ * ‖s‖ * n ^ (-s.re - 1) := by ring
+  have e : corr s m = -(h (n + 1) - h n) := by
+    simp only [corr, h, hn_def]; push_cast; ring_nf
+  rw [e, norm_neg]
+  simpa using key
+
+
+lemma <span class="nm" id="lean-summable_rpow_bound">summable_rpow_bound</span> {ε : ℝ} (hε : 0 &lt; ε) :
+    Summable fun m : ℕ =&gt; ((m : ℝ) + 1) ^ (-ε - 1) := by
+  have h := (summable_nat_add_iff 1).mpr (Real.summable_nat_rpow.mpr (by linarith : -ε - 1 &lt; -1))
+  simpa using h
+
+lemma <span class="nm" id="lean-summable_corr">summable_corr</span> {s : ℂ} (hs : 0 &lt; s.re) : Summable (corr s) :=
+  Summable.of_norm_bounded ((summable_rpow_bound hs).mul_left (‖1 - s‖ * ‖s‖))
+    (norm_corr_le hs)
+
+lemma <span class="nm" id="lean-differentiable_corr">differentiable_corr</span> (m : ℕ) : Differentiable ℂ fun s =&gt; corr s m := by
+  have h1 : ((m : ℂ) + 2) ≠ 0 := by norm_cast
+  have h2 : ((m : ℂ) + 1) ≠ 0 := by norm_cast
+  unfold corr
+  fun_prop (disch := simp [h1, h2])
+
+/-- `∑_{m ≥ 0} (m+2)^{-s} = ζ(s) - 1` for `Re s &gt; 1`. -/
+lemma <span class="nm" id="lean-hasSum_cpow_add_two">hasSum_cpow_add_two</span> {s : ℂ} (hs : 1 &lt; s.re) :
+    HasSum (fun m : ℕ =&gt; ((m : ℂ) + 2) ^ (-s)) (riemannZeta s - 1) := by
+  have hsum : Summable fun n : ℕ =&gt; 1 / ((n : ℂ) + 1) ^ s := by
+    have := (summable_nat_add_iff 1).mpr (Complex.summable_one_div_nat_cpow.mpr hs)
+    simpa using this
+  have h := (hasSum_nat_add_iff' 1).mpr (zeta_eq_tsum_one_div_nat_add_one_cpow hs ▸ hsum.hasSum)
+  have e1 : (fun n : ℕ =&gt; 1 / (((n + 1 : ℕ) : ℂ) + 1) ^ s) = fun m : ℕ =&gt; ((m : ℂ) + 2) ^ (-s) := by
+    funext m; rw [cpow_neg, one_div]; push_cast; ring_nf
+  rw [e1, Finset.sum_range_one] at h
+  simpa using h
+
+/-- Telescoping: `∑_{m ≥ 0} ((m+2)^{1-s} - (m+1)^{1-s}) = -1` for `Re s &gt; 1`. -/
+lemma <span class="nm" id="lean-hasSum_telescope">hasSum_telescope</span> {s : ℂ} (hs : 1 &lt; s.re) :
+    HasSum (fun m : ℕ =&gt; ((m : ℂ) + 2) ^ (1 - s) - ((m : ℂ) + 1) ^ (1 - s)) (-1) := by
+  have hsum : Summable fun m : ℕ =&gt; ((m : ℂ) + 2) ^ (1 - s) - ((m : ℂ) + 1) ^ (1 - s) := by
+    refine (((hasSum_cpow_add_two hs).summable.mul_left (1 - s)).sub
+      (summable_corr (by linarith))).congr fun m =&gt; ?_
+    simp [corr]
+  have hpart : ∀ N : ℕ, ∑ m ∈ Finset.range N, (((m : ℂ) + 2) ^ (1 - s) - ((m : ℂ) + 1) ^ (1 - s))
+      = ((N : ℂ) + 1) ^ (1 - s) - 1 := by
+    intro N
+    have := Finset.sum_range_sub (fun k : ℕ =&gt; ((k : ℂ) + 1) ^ (1 - s)) N
+    simp only [Nat.cast_add, Nat.cast_one, Nat.cast_zero, zero_add, one_cpow] at this
+    rw [← this]
+    refine Finset.sum_congr rfl fun m _ =&gt; ?_
+    ring_nf
+  have hlim : Tendsto (fun N : ℕ =&gt; ((N : ℂ) + 1) ^ (1 - s)) atTop (𝓝 0) := by
+    rw [tendsto_zero_iff_norm_tendsto_zero]
+    have e : ∀ N : ℕ, ‖((N : ℂ) + 1) ^ (1 - s)‖ = ((N : ℝ) + 1) ^ (-(s.re - 1)) := by
+      intro N
+      have : ((N : ℂ) + 1) = (((N : ℝ) + 1 : ℝ) : ℂ) := by push_cast; ring
+      rw [this, Complex.norm_cpow_eq_rpow_re_of_pos (by positivity)]
+      simp
+    simp only [e]
+    exact (tendsto_rpow_neg_atTop (by linarith)).comp
+      (tendsto_atTop_add_const_right _ 1 tendsto_natCast_atTop_atTop)
+  have h1 := hsum.hasSum.tendsto_sum_nat
+  simp only [hpart] at h1
+  have h2 : Tendsto (fun N : ℕ =&gt; ((N : ℂ) + 1) ^ (1 - s) - 1) atTop (𝓝 (0 - 1)) :=
+    hlim.sub tendsto_const_nhds
+  rw [zero_sub] at h2
+  rw [← tendsto_nhds_unique h1 h2]
+  exact hsum.hasSum
+
+/-- For `Re s &gt; 1`: `∑ c_m(s) = (1 - s)(ζ(s) - 1) + 1`, i.e. `(s - 1) ζ(s) = s - ∑ c_m(s)`. -/
+lemma <span class="nm" id="lean-tsum_corr_of_one_lt_re">tsum_corr_of_one_lt_re</span> {s : ℂ} (hs : 1 &lt; s.re) :
+    ∑' m, corr s m = (1 - s) * (riemannZeta s - 1) + 1 := by
+  have h := ((hasSum_cpow_add_two hs).mul_left (1 - s)).sub (hasSum_telescope hs)
+  rw [sub_neg_eq_add] at h
+  exact h.tsum_eq
+
+
+/-- **Analytic continuation.** For `Re s &gt; 0`: `(s - 1) ζ(s) = s - ∑ₘ c_m(s)`
+(stated with Mathlib's entire function `riemannZeta₁ s = (s - 1) ζ(s)`). -/
+theorem <span class="nm" id="lean-riemannZeta₁_eq_sub_tsum_corr">riemannZeta₁_eq_sub_tsum_corr</span> {s : ℂ} (hs : 0 &lt; s.re) :
+    riemannZeta₁ s = s - ∑' m, corr s m := by
+  set ε := s.re / 2 with hε_def
+  have hε : 0 &lt; ε := by positivity
+  set R := ‖s‖ + 3 with hR_def
+  set V : Set ℂ := {z | ε &lt; z.re} ∩ Metric.ball 0 R with hV_def
+  have hVo : IsOpen V := (isOpen_lt continuous_const continuous_re).inter Metric.isOpen_ball
+  have hVc : Convex ℝ V := (convex_halfSpace_re_gt ε).inter (convex_ball 0 R)
+  have hsV : s ∈ V := ⟨by simp only [mem_ofPred_eq]; linarith, by simp [hR_def]⟩
+  have hs2V : s + 2 ∈ V := by
+    refine ⟨by simp only [mem_ofPred_eq, add_re]; norm_num; linarith, ?_⟩
+    rw [mem_ball_zero_iff]
+    calc ‖s + 2‖ ≤ ‖s‖ + ‖(2 : ℂ)‖ := norm_add_le _ _
+      _ &lt; R := by simp [hR_def]; norm_num
+  have hF : AnalyticOnNhd ℂ riemannZeta₁ V :=
+    differentiable_riemannZeta₁.differentiableOn.analyticOnNhd hVo
+  have hbound : ∀ (m : ℕ) (z : ℂ), z ∈ V →
+      ‖corr z m‖ ≤ (R + 1) * R * ((m : ℝ) + 1) ^ (-ε - 1) := by
+    intro m z hz
+    have hzr : ε &lt; z.re := hz.1
+    have hzR : ‖z‖ &lt; R := mem_ball_zero_iff.mp hz.2
+    have h1z : ‖1 - z‖ ≤ R + 1 := by
+      calc ‖1 - z‖ ≤ ‖(1 : ℂ)‖ + ‖z‖ := norm_sub_le _ _
+        _ ≤ R + 1 := by simp; linarith
+    have hpow : ((m : ℝ) + 1) ^ (-z.re - 1) ≤ ((m : ℝ) + 1) ^ (-ε - 1) :=
+      Real.rpow_le_rpow_of_exponent_le (by simp) (by linarith)
+    refine (norm_corr_le (hε.trans hzr) m).trans ?_
+    gcongr
+  have hG : AnalyticOnNhd ℂ (fun z =&gt; z - ∑' m, corr z m) V := by
+    refine DifferentiableOn.analyticOnNhd ?_ hVo
+    exact differentiableOn_id.sub (differentiableOn_tsum_of_summable_norm
+      ((summable_rpow_bound hε).mul_left _) (fun m =&gt; (differentiable_corr m).differentiableOn)
+      hVo hbound)
+  have hEq : riemannZeta₁ =ᶠ[𝓝 (s + 2)] fun z =&gt; z - ∑' m, corr z m := by
+    have hre : 1 &lt; (s + 2).re := by simp; linarith
+    filter_upwards [(isOpen_lt continuous_const continuous_re).mem_nhds hre] with z hz
+    have hz1 : z ≠ 1 := by rintro rfl; simp at hz
+    have hzeta := riemannZeta_eq_inv_sub_mul hz1
+    have hsub : z - 1 ≠ 0 := sub_ne_zero.mpr hz1
+    rw [tsum_corr_of_one_lt_re hz, hzeta]
+    field_simp
+    ring
+  exact hF.eqOn_of_preconnected_of_eventuallyEq hG hVc.isPreconnected hs2V hEq hsV
+
+/-- The correction term at a real point, as a real number. -/
+noncomputable def <span class="nm" id="lean-realCorr">realCorr</span> (σ : ℝ) (m : ℕ) : ℝ :=
+  (1 - σ) * ((m : ℝ) + 2) ^ (-σ) - (((m : ℝ) + 2) ^ (1 - σ) - ((m : ℝ) + 1) ^ (1 - σ))
+
+lemma <span class="nm" id="lean-corr_ofReal">corr_ofReal</span> (σ : ℝ) (m : ℕ) : corr σ m = realCorr σ m := by
+  have h2 : (0 : ℝ) ≤ (m : ℝ) + 2 := by positivity
+  have h1 : (0 : ℝ) ≤ (m : ℝ) + 1 := by positivity
+  simp only [corr, realCorr]
+  push_cast [Complex.ofReal_cpow h2, Complex.ofReal_cpow h1]
+  rfl
+
+/-- **Concavity.** For `0 &lt; σ &lt; 1` each correction term is negative:
+`(n+1)^{1-σ} - n^{1-σ} &gt; (1-σ)(n+1)^{-σ}` since `x ↦ x^{1-σ}` is strictly concave. -/
+lemma <span class="nm" id="lean-realCorr_neg">realCorr_neg</span> {σ : ℝ} (h0 : 0 &lt; σ) (h1 : σ &lt; 1) (m : ℕ) : realCorr σ m &lt; 0 := by
+  set p := 1 - σ with hp
+  set N : ℝ := (m : ℝ) + 2 with hN_def
+  have hN : 2 ≤ N := by simp [hN_def]
+  have hN0 : 0 &lt; N := by linarith
+  have hb := rpow_one_add_lt_one_add_mul_self (s := -1 / N)
+    (by rw [neg_div, neg_le_neg_iff, div_le_one hN0]; linarith)
+    (by simp; linarith) (p := p) (by linarith) (by linarith)
+  have e1 : 1 + -1 / N = ((m : ℝ) + 1) / N := by field_simp; simp [hN_def]; ring
+  rw [e1, Real.div_rpow (by positivity) hN0.le] at hb
+  have hNp : 0 &lt; N ^ p := by positivity
+  rw [div_lt_iff₀ hNp] at hb
+  have e2 : N ^ (-σ) = N ^ p / N := by
+    rw [show -σ = p - 1 by rw [hp]; ring, Real.rpow_sub_one hN0.ne']
+  have e3 : (1 + p * (-1 / N)) * N ^ p = N ^ p - p * (N ^ p / N) := by field_simp; ring
+  simp only [realCorr]
+  rw [← hN_def, ← hp, e2]
+  linarith
+
+/-- **Main estimate.** For `0 &lt; σ &lt; 1`, `ζ(σ)` is the real number `(σ - T)/(σ - 1)` with
+`T = ∑ c_m(σ) &lt; 0`; in particular `ζ(σ) &lt; σ/(σ - 1) &lt; 0`. -/
+theorem <span class="nm" id="lean-riemannZeta_eq_ofReal_lt">riemannZeta_eq_ofReal_lt</span> {σ : ℝ} (h0 : 0 &lt; σ) (h1 : σ &lt; 1) :
+    ∃ x : ℝ, riemannZeta σ = x ∧ x &lt; σ / (σ - 1) := by
+  have hsum : Summable (realCorr σ) := by
+    have : Summable fun m =&gt; (realCorr σ m : ℂ) :=
+      (summable_corr (s := σ) (by simpa using h0)).congr fun m =&gt; corr_ofReal σ m
+    exact Complex.summable_ofReal.mp this
+  set T := ∑' m, realCorr σ m with hT
+  have hTneg : T &lt; 0 := by
+    have := hasSum_lt (f := realCorr σ) (g := fun _ =&gt; 0) (i := 0)
+      (fun m =&gt; (realCorr_neg h0 h1 m).le) (realCorr_neg h0 h1 0) hsum.hasSum hasSum_zero
+    simpa [hT] using this
+  have hs1 : (σ : ℂ) ≠ 1 := by exact_mod_cast h1.ne
+  refine ⟨(σ - T) / (σ - 1), ?_, ?_⟩
+  · rw [riemannZeta_eq_inv_sub_mul hs1, riemannZeta₁_eq_sub_tsum_corr (by simpa using h0)]
+    simp only [corr_ofReal]
+    rw [← Complex.ofReal_tsum, ← hT]
+    push_cast
+    ring
+  · have hneg : σ - 1 &lt; 0 := by linarith
+    exact (div_lt_div_right_of_neg hneg).mpr (by linarith)
+
+theorem <span class="nm" id="lean-riemannZeta_im_eq_zero_of_mem_Ioo">riemannZeta_im_eq_zero_of_mem_Ioo</span> {σ : ℝ} (h0 : 0 &lt; σ) (h1 : σ &lt; 1) :
+    (riemannZeta σ).im = 0 := by
+  obtain ⟨x, hx, -⟩ := riemannZeta_eq_ofReal_lt h0 h1
+  simp [hx]
+
+theorem <span class="nm" id="lean-riemannZeta_re_lt_of_mem_Ioo">riemannZeta_re_lt_of_mem_Ioo</span> {σ : ℝ} (h0 : 0 &lt; σ) (h1 : σ &lt; 1) :
+    (riemannZeta σ).re &lt; σ / (σ - 1) := by
+  obtain ⟨x, hx, hlt⟩ := riemannZeta_eq_ofReal_lt h0 h1
+  simpa [hx] using hlt
+
+theorem <span class="nm" id="lean-riemannZeta_re_neg_of_mem_Ioo">riemannZeta_re_neg_of_mem_Ioo</span> {σ : ℝ} (h0 : 0 &lt; σ) (h1 : σ &lt; 1) :
+    (riemannZeta σ).re &lt; 0 :=
+  (riemannZeta_re_lt_of_mem_Ioo h0 h1).trans (div_neg_of_pos_of_neg h0 (by linarith))
+
+/-- **No real zeros in the critical strip.** -/
+theorem <span class="nm" id="lean-riemannZeta_ne_zero_of_mem_Ioo">riemannZeta_ne_zero_of_mem_Ioo</span> {σ : ℝ} (h0 : 0 &lt; σ) (h1 : σ &lt; 1) :
+    riemannZeta (σ : ℂ) ≠ 0 := by
+  intro h
+  have := riemannZeta_re_neg_of_mem_Ioo h0 h1
+  rw [h, zero_re] at this
+  exact lt_irrefl 0 this
+
+end NoRealZeros
+
+end NoRealZerosSection
+
+/- ## Li's criterion, conditional (copied from `LiConditional2.lean`) -/
+
+/-
+# Li's criterion, multiplicity-weighted: both directions, conditional on Hadamard summability
+
+**Human proof sketch.**  Put `w(ρ) = 1 - 1/ρ = (ρ - 1)/ρ`, the Möbius map used by Li.
+
+* *(unconditional)* If `Re ρ = 1/2` then `|ρ - 1| = |ρ|`, so `|w(ρ)| = 1`: the critical line goes
+  to the unit circle.  For `|w| = 1` and any `n`, `Re (1 - wⁿ) = |1 - wⁿ|²/2 ≥ 0`.
+  Moreover `|1 - wⁿ| ≤ n |1 - w| = n/|ρ|`, so `Re (1 - wⁿ) ≤ n²/(2|ρ|²)`.
+* Hence under RH every term of `liCoeff n = ∑_ρ m(ρ) · 2 Re (1 - w(ρ)ⁿ)` is `≥ 0` – so
+  `0 ≤ liCoeff n` (a `tsum` of nonnegative terms).
+* For strict positivity we need (i) summability, which follows from the bound above and the
+  classical convergence of `∑ m(ρ)/|ρ|²` (part of `HadamardHypothesis`), and (ii) one zero with
+  `w(ρ)ⁿ ≠ 1`.  Since `ρ ↦ w(ρ)` is injective and there are only `n` many `n`-th roots of unity,
+  infinitely many zeros (`hinf`, a classical fact not in Mathlib) give such a zero.
+
+**Part II – the converse (Bombieri–Lagarias style), `li_converse`.**
+Assume `∑ m(ρ)/|ρ|² &lt; ∞` (`HadamardHypothesis.summable_inv_sq`) and that `0 ≤ λₙ` for all `n ≥ 1`.
+
+* *Zeros off the line can be pushed left* (`exists_posZero_re_lt_half`).  A zero violating RH lies
+  in the strip (`re_pos_of_zeta_eq_zero`: the functional equation kills `Re s ≤ 0` except at the
+  trivial zeros; `riemannZeta_ne_zero_of_one_le_re` kills `Re s ≥ 1`); it is not real
+  (`NoRealZerosInStrip`, a classical fact stated as an explicit hypothesis); after conjugation
+  (`riemannZeta_conj`) it has `Im &gt; 0`; and after the reflection `ρ ↦ 1 - ρ̄`
+  (`zeta_one_sub_conj_eq_zero`, from `Λ(1-s) = Λ(s)`) it has `Re ρ &lt; 1/2`.
+* *Left of the line means outside the circle* (`one_lt_norm_one_sub_inv`):
+  `Re ρ &lt; 1/2 ⇔ |ρ - 1| &gt; |ρ| ⇔ |w(ρ)| &gt; 1`.
+* *A dominant ring of zeros* (`exists_neg_of_large`, abstract).  Write `uᵢ = 1 - wᵢ = 1/ρᵢ`.
+  Summability of `∑ mᵢ |uᵢ|²` with `mᵢ ≥ 1` forces `|uᵢ| → 0`, so only finitely many `wᵢ` have
+  `|wᵢ| ≥ r` for any `r &gt; 1`.  Hence `R = max |wᵢ| &gt; 1` is attained on a finite set `S`, and all
+  other `wᵢ` satisfy `|wᵢ| ≤ r &lt; R`.
+* *Second-order Taylor control of the tail* (`norm_one_sub_pow_sub_le`, `abs_re_one_sub_pow_le`):
+  `|1 - wⁿ - n u| ≤ n² Mⁿ |u|²` for `|w| ≤ M`, `M ≥ 1`, and `|Re u| ≤ |u|²` (as `0 &lt; Re ρ &lt; 1`),
+  so `|Re (1 - wⁿ)| ≤ (n + n² Mⁿ) |u|²`.  The non-dominant zeros contribute at most
+  `(n + n² rⁿ) · ∑ mᵢ|uᵢ|²`, and the Li series converges absolutely for every `n` (no RH needed).
+* *Kronecker–Dirichlet return* (`exists_pow_near_one`): for finitely many unit complex numbers
+  `zᵢ = wᵢ/R` (`i ∈ S`) and any `N`, some `d ≥ N` has every `zᵢ^d` within `1/2` of `1`
+  (compactness of the torus + pigeonhole along `k ↦ (zᵢ^{Nk})`).  Then `Re wᵢ^d ≥ R^d/2` on `S`.
+* *Conclusion*: `λ_d/2 ≤ (∑_S mᵢ)(1 - R^d/2) + (d + d² r^d) ∑ mᵢ|uᵢ|² &lt; 0` for `d` large, because
+  `R^d` beats `d² r^d` (`r &lt; R`).  Contradiction with `0 ≤ λ_d`.
+
+The same engine with all weights `1` gives `li_converse_unweighted` for the upstream
+`RiemannHypothesis.lambda` (the "←" half of the upstream `li_criterion`, conditionally).
+
+Only the *summability* field of `HadamardHypothesis` is used, in both directions; the `ξ'/ξ`
+expansion would only be needed to identify `liCoeff n` with the Taylor coefficients of `log ξ`
+at `s = 1` (the "bridge"), which is still **not** done here.
+
+The main theorems take `NoRealZerosInStrip` (`ζ(σ) ≠ 0` for `0 &lt; σ &lt; 1`) as an explicit hypothesis.
+That fact is classical — via `(1 - 2^{1-σ}) ζ(σ) = η(σ) &gt; 0` — but Mathlib has no Dirichlet `η`,
+so it is not proved in this file.
+
+Nothing here assumes RH or Li's criterion except where a theorem's hypothesis says `RiemannHypothesis`.
+-/
+
+open Complex
+
+namespace LiConditional
+
+open RiemannHypothesis (nontrivialPosZeros)
+
+/- ### Definitions -/
+
+/-- All nontrivial zeros of `ζ` (both signs of the imaginary part): `0 &lt; Re ρ &lt; 1`, `ζ ρ = 0`. -/
+def <span class="nm" id="lean-nontrivialZeros">nontrivialZeros</span> : Set ℂ := {z | 0 &lt; z.re ∧ z.re &lt; 1 ∧ riemannZeta z = 0}
+
+lemma <span class="nm" id="lean-nontrivialPosZeros_subset">nontrivialPosZeros_subset</span> : nontrivialPosZeros ⊆ nontrivialZeros :=
+  fun _ h =&gt; ⟨h.1, h.2.1, h.2.2.2⟩
+
+/-- The multiplicity of `ρ` as a zero of `ζ` (analytic order at `ρ`; `ζ` is analytic away from
+`1`, and not identically zero, so for a zero this is the usual finite positive multiplicity). -/
+noncomputable def <span class="nm" id="lean-zetaMult">zetaMult</span> (ρ : ℂ) : ℕ := analyticOrderNatAt riemannZeta ρ
+
+/-- **Multiplicity-weighted Li coefficient**
+`λₙ = ∑_{ρ, Im ρ &gt; 0} m(ρ) · 2 Re (1 - (1 - 1/ρ)ⁿ)`,
+summing over nontrivial zeros with positive imaginary part, each counted with multiplicity. -/
+noncomputable def <span class="nm" id="lean-liCoeff">liCoeff</span> (n : ℕ) : ℝ :=
+  ∑' ρ : nontrivialPosZeros, (zetaMult ρ.1 : ℝ) * (2 * (1 - (1 - 1 / ρ.1) ^ n).re)
+
+/-- The completed zeta function `ξ(s) = ½ (1 + s(s-1) Λ₀(s))`, entire, equal to
+`½ s (s-1) π^{-s/2} Γ(s/2) ζ(s)` for `s ≠ 0, 1`.  (Built from Mathlib's entire `Λ₀`, so no junk
+values at `s = 0, 1`: `ξ 0 = ξ 1 = 1/2`.) -/
+noncomputable def <span class="nm" id="lean-xi">xi</span> (s : ℂ) : ℂ := (1 + s * (s - 1) * completedRiemannZeta₀ s) / 2
+
+/-- Sanity check: `xi` is the usual `½ s (s-1) Λ(s)` away from `s = 0, 1`. -/
+lemma <span class="nm" id="lean-xi_eq">xi_eq</span> {s : ℂ} (h0 : s ≠ 0) (h1 : s ≠ 1) :
+    xi s = s * (s - 1) * completedRiemannZeta s / 2 := by
+  have hs1 : s - 1 ≠ 0 := sub_ne_zero.mpr h1
+  have hs2 : 1 - s ≠ 0 := sub_ne_zero.mpr (Ne.symm h1)
+  rw [xi, completedRiemannZeta_eq]
+  field_simp
+  ring
+
+/-- **The analytic input, as an explicit assumption** (the Hadamard factorization of `ξ`,
+a classical *theorem* since 1893 that Mathlib does not have; it is true unconditionally and does
+*not* involve RH).  Two parts, both about all nontrivial zeros counted with multiplicity:
+
+1. `summable_inv_sq`: `∑ m(ρ)/|ρ|² &lt; ∞` (finite order ≤ 1 of `ξ`);
+2. `log_deriv_expansion`: for some constant `B`, for every `s` with `ξ s ≠ 0`,
+   `ξ'(s)/ξ(s) = B + ∑_ρ m(ρ) (1/(s-ρ) + 1/ρ)` (convergent sum).
+
+The easy direction of Li uses only (1).  (2) is what the bridge to `log ξ` Taylor coefficients
+would use. -/
+structure <span class="nm" id="lean-HadamardHypothesis">HadamardHypothesis</span> : Prop where
+  summable_inv_sq :
+    Summable fun ρ : nontrivialZeros =&gt; (zetaMult ρ.1 : ℝ) / ‖ρ.1‖ ^ 2
+  log_deriv_expansion :
+    ∃ B : ℂ, ∀ s : ℂ, xi s ≠ 0 →
+      HasSum (fun ρ : nontrivialZeros =&gt; (zetaMult ρ.1 : ℂ) * (1 / (s - ρ.1) + 1 / ρ.1))
+        (deriv xi s / xi s - B)
+
+/- ### Unconditional facts about the Möbius map `ρ ↦ 1 - 1/ρ` -/
+
+/-- On the critical line, `|ρ - 1| = |ρ|`. -/
+lemma <span class="nm" id="lean-norm_sub_one_eq_of_re_half">norm_sub_one_eq_of_re_half</span> {ρ : ℂ} (h : ρ.re = 1 / 2) : ‖ρ - 1‖ = ‖ρ‖ := by
+  rw [← sq_eq_sq₀ (norm_nonneg _) (norm_nonneg _), Complex.sq_norm, Complex.sq_norm,
+    Complex.normSq_apply, Complex.normSq_apply]
+  simp [h]
+  ring
+
+/-- **Möbius fact**: for `Re ρ = 1/2` (so `ρ ≠ 0`), `|1 - 1/ρ| = 1`. -/
+lemma <span class="nm" id="lean-norm_one_sub_inv_eq_one">norm_one_sub_inv_eq_one</span> {ρ : ℂ} (h : ρ.re = 1 / 2) : ‖1 - 1 / ρ‖ = 1 := by
+  have hρ : ρ ≠ 0 := by
+    intro h0; rw [h0] at h; simp at h
+  have : 1 - 1 / ρ = (ρ - 1) / ρ := by field_simp
+  rw [this, norm_div, norm_sub_one_eq_of_re_half h, div_self (norm_ne_zero_iff.mpr hρ)]
+
+/-- For `|u| = 1`, `Re (1 - u) = |1 - u|² / 2`. -/
+lemma <span class="nm" id="lean-re_one_sub_eq_norm_sq">re_one_sub_eq_norm_sq</span> {u : ℂ} (hu : ‖u‖ = 1) : (1 - u).re = ‖1 - u‖ ^ 2 / 2 := by
+  have h1 : u.re * u.re + u.im * u.im = 1 := by
+    have := Complex.sq_norm u
+    rw [hu, Complex.normSq_apply] at this
+    linarith
+  rw [Complex.sq_norm, Complex.normSq_apply]
+  simp
+  nlinarith
+
+/-- For `|w| = 1`, every `n`: `0 ≤ Re (1 - wⁿ)`. -/
+lemma <span class="nm" id="lean-re_one_sub_pow_nonneg">re_one_sub_pow_nonneg</span> {w : ℂ} (hw : ‖w‖ = 1) (n : ℕ) : 0 ≤ (1 - w ^ n).re := by
+  rw [re_one_sub_eq_norm_sq (by simp [hw])]
+  positivity
+
+/-- For `|w| = 1`: `Re (1 - wⁿ) &gt; 0` as soon as `wⁿ ≠ 1`. -/
+lemma <span class="nm" id="lean-re_one_sub_pow_pos">re_one_sub_pow_pos</span> {w : ℂ} (hw : ‖w‖ = 1) {n : ℕ} (h : w ^ n ≠ 1) :
+    0 &lt; (1 - w ^ n).re := by
+  rw [re_one_sub_eq_norm_sq (by simp [hw])]
+  have : ‖1 - w ^ n‖ ≠ 0 := norm_ne_zero_iff.mpr (sub_ne_zero.mpr (Ne.symm h))
+  positivity
+
+/-- `|1 - wⁿ| ≤ n |1 - w|` when `|w| = 1` (geometric sum). -/
+lemma <span class="nm" id="lean-norm_one_sub_pow_le">norm_one_sub_pow_le</span> {w : ℂ} (hw : ‖w‖ = 1) (n : ℕ) : ‖1 - w ^ n‖ ≤ n * ‖1 - w‖ := by
+  have h : 1 - w ^ n = (∑ i ∈ Finset.range n, w ^ i) * (1 - w) := by
+    have := geom_sum_mul w n
+    linear_combination this
+  rw [h, norm_mul]
+  gcongr
+  calc ‖∑ i ∈ Finset.range n, w ^ i‖ ≤ ∑ i ∈ Finset.range n, ‖w ^ i‖ := norm_sum_le _ _
+    _ = n := by simp [hw]
+
+/-- The quantitative bound used for summability: `Re (1 - wⁿ) ≤ n² |1 - w|² / 2`. -/
+lemma <span class="nm" id="lean-re_one_sub_pow_le">re_one_sub_pow_le</span> {w : ℂ} (hw : ‖w‖ = 1) (n : ℕ) :
+    (1 - w ^ n).re ≤ (n : ℝ) ^ 2 * ‖1 - w‖ ^ 2 / 2 := by
+  rw [re_one_sub_eq_norm_sq (by simp [hw])]
+  have := norm_one_sub_pow_le hw n
+  have h0 := norm_nonneg (1 - w ^ n)
+  have : ‖1 - w ^ n‖ ^ 2 ≤ ((n : ℝ) * ‖1 - w‖) ^ 2 := by gcongr
+  nlinarith
+
+/- ### Zeros: multiplicity and RH -/
+
+/-- Under RH a nontrivial zero lies on the critical line. -/
+lemma <span class="nm" id="lean-re_eq_half_of_RH">re_eq_half_of_RH</span> (hRH : RiemannHypothesis) {ρ : ℂ} (h : ρ ∈ nontrivialZeros) :
+    ρ.re = 1 / 2 := by
+  refine hRH ρ h.2.2 ?_ ?_
+  · rintro ⟨k, hk⟩
+    have := h.1
+    rw [hk] at this
+    simp at this
+    have : (0 : ℝ) ≤ k := Nat.cast_nonneg k
+    linarith
+  · rintro rfl
+    exact absurd h.2.1 (by simp)
+
+/-- A nontrivial zero with positive imaginary part has multiplicity `≥ 1`.
+(Needs `ζ` not identically zero near `ρ`: identity theorem on the convex set
+`{Re &gt; 0, Im &gt; 0}`, which avoids the pole at `1` and contains `2 + i`, where `ζ ≠ 0`.) -/
+lemma <span class="nm" id="lean-zetaMult_pos">zetaMult_pos</span> {ρ : ℂ} (h : ρ ∈ nontrivialPosZeros) : 0 &lt; zetaMult ρ := by
+  have hρ1 : ρ ≠ 1 := by rintro rfl; exact absurd h.2.1 (by simp)
+  have hd : DifferentiableOn ℂ riemannZeta {(1 : ℂ)}ᶜ :=
+    fun s hs =&gt; (differentiableAt_riemannZeta hs).differentiableWithinAt
+  have hall : AnalyticOnNhd ℂ riemannZeta {(1 : ℂ)}ᶜ := hd.analyticOnNhd isOpen_compl_singleton
+  have hana : AnalyticAt ℂ riemannZeta ρ := hall ρ hρ1
+  set U : Set ℂ := {s | 0 &lt; s.re ∧ 0 &lt; s.im} with hU
+  have hUc : Convex ℝ U := (convex_halfSpace_re_gt 0).inter (convex_halfSpace_im_gt 0)
+  have hUana : AnalyticOnNhd ℂ riemannZeta U := by
+    intro s hs
+    exact hall s (by rintro rfl; exact absurd hs.2 (by simp))
+  have hρU : ρ ∈ U := ⟨h.1, h.2.2.1⟩
+  have hpt : (2 + Complex.I) ∈ U := by simp [hU]
+  have hne : analyticOrderAt riemannZeta ρ ≠ ⊤ := by
+    intro htop
+    rw [analyticOrderAt_eq_top] at htop
+    have := hUana.eqOn_zero_of_preconnected_of_eventuallyEq_zero hUc.isPreconnected hρU htop hpt
+    exact riemannZeta_ne_zero_of_one_le_re (s := 2 + Complex.I) (by simp) this
+  have hpos : analyticOrderAt riemannZeta ρ ≠ 0 := by
+    rw [Ne, analyticOrderAt_eq_zero]
+    push Not
+    exact ⟨hana, h.2.2.2⟩
+  unfold zetaMult analyticOrderNatAt
+  exact ENat.toNat_pos hpos hne
+
+/- ### The easy direction -/
+
+/-- Under RH each term of the Li sum is `≥ 0`. -/
+lemma <span class="nm" id="lean-liTerm_nonneg">liTerm_nonneg</span> (hRH : RiemannHypothesis) (n : ℕ) (ρ : nontrivialPosZeros) :
+    0 ≤ (zetaMult ρ.1 : ℝ) * (2 * (1 - (1 - 1 / ρ.1) ^ n).re) := by
+  have h := norm_one_sub_inv_eq_one (re_eq_half_of_RH hRH (nontrivialPosZeros_subset ρ.2))
+  have := re_one_sub_pow_nonneg h n
+  positivity
+
+/-- **RH ⇒ `0 ≤ λₙ`** (needs no analytic hypothesis: a `tsum` of nonnegative terms). -/
+theorem <span class="nm" id="lean-liCoeff_nonneg">liCoeff_nonneg</span> (hRH : RiemannHypothesis) (n : ℕ) : 0 ≤ liCoeff n :=
+  tsum_nonneg (liTerm_nonneg hRH n)
+
+/-- Under RH and `HadamardHypothesis` the Li series converges absolutely. -/
+theorem <span class="nm" id="lean-liCoeff_summable">liCoeff_summable</span> (hRH : RiemannHypothesis) (H : HadamardHypothesis) (n : ℕ) :
+    Summable fun ρ : nontrivialPosZeros =&gt;
+      (zetaMult ρ.1 : ℝ) * (2 * (1 - (1 - 1 / ρ.1) ^ n).re) := by
+  have hsub : Summable fun ρ : nontrivialPosZeros =&gt; (zetaMult ρ.1 : ℝ) / ‖ρ.1‖ ^ 2 := by
+    have := H.summable_inv_sq.comp_injective
+      (Set.inclusion_injective nontrivialPosZeros_subset)
+    exact this
+  refine Summable.of_nonneg_of_le (liTerm_nonneg hRH n) (fun ρ =&gt; ?_) (hsub.mul_left ((n : ℝ) ^ 2))
+  have hre := re_eq_half_of_RH hRH (nontrivialPosZeros_subset ρ.2)
+  have hw := norm_one_sub_inv_eq_one hre
+  have hρ : ρ.1 ≠ 0 := by intro h0; have := ρ.2.1; rw [h0] at this; simp at this
+  have h1 : ‖1 - (1 - 1 / ρ.1)‖ = 1 / ‖ρ.1‖ := by simp
+  have := re_one_sub_pow_le hw n
+  rw [h1] at this
+  have hm : (0 : ℝ) ≤ zetaMult ρ.1 := Nat.cast_nonneg _
+  calc (zetaMult ρ.1 : ℝ) * (2 * (1 - (1 - 1 / ρ.1) ^ n).re)
+      ≤ (zetaMult ρ.1 : ℝ) * (2 * ((n : ℝ) ^ 2 * (1 / ‖ρ.1‖) ^ 2 / 2)) := by gcongr
+    _ = (n : ℝ) ^ 2 * ((zetaMult ρ.1 : ℝ) / ‖ρ.1‖ ^ 2) := by
+        field_simp
+
+/-- **RH ⇒ `0 &lt; λₙ`** for `n ≥ 1`, from RH, the Hadamard-type summability hypothesis, and
+infinitely many zeros in the upper half of the strip (`hinf`; classical, but not in Mathlib,
+so stated as an explicit hypothesis). -/
+theorem <span class="nm" id="lean-liCoeff_pos">liCoeff_pos</span> (hRH : RiemannHypothesis) (H : HadamardHypothesis)
+    (hinf : nontrivialPosZeros.Infinite) {n : ℕ} (hn : 0 &lt; n) : 0 &lt; liCoeff n := by
+  -- some zero has `w ^ n ≠ 1`
+  have hex : ∃ ρ : nontrivialPosZeros, (1 - 1 / ρ.1) ^ n ≠ 1 := by
+    by_contra hcon
+    push Not at hcon
+    have hfin : nontrivialPosZeros.Finite := by
+      refine Set.Finite.of_injOn (f := fun ρ : ℂ =&gt; 1 - 1 / ρ)
+        (t := ((Polynomial.nthRootsFinset n (1 : ℂ) : Finset ℂ) : Set ℂ)) ?_ ?_
+        (Finset.finite_toSet _)
+      · intro ρ hρ
+        simpa [Polynomial.mem_nthRootsFinset hn] using hcon ⟨ρ, hρ⟩
+      · intro ρ hρ ρ' hρ' heq
+        have a : ρ ≠ 0 := by intro h0; have := hρ.1; rw [h0] at this; simp at this
+        have b : ρ' ≠ 0 := by intro h0; have := hρ'.1; rw [h0] at this; simp at this
+        have : 1 / ρ = 1 / ρ' := by simpa using heq
+        simpa [a, b] using this
+    exact hinf hfin
+  obtain ⟨ρ₀, hρ₀⟩ := hex
+  have hw := norm_one_sub_inv_eq_one (re_eq_half_of_RH hRH (nontrivialPosZeros_subset ρ₀.2))
+  have hpos : 0 &lt; (zetaMult ρ₀.1 : ℝ) * (2 * (1 - (1 - 1 / ρ₀.1) ^ n).re) := by
+    have := re_one_sub_pow_pos hw hρ₀
+    have hm : (0 : ℝ) &lt; zetaMult ρ₀.1 := Nat.cast_pos.mpr (zetaMult_pos ρ₀.2)
+    positivity
+  exact (liCoeff_summable hRH H n).tsum_pos (liTerm_nonneg hRH n) ρ₀ hpos
+
+/- ## Part II: the converse, Li ⇒ RH -/
+
+/- ### The abstract analytic engine -/
+
+/-- **Kronecker–Dirichlet return lemma** -/
+lemma <span class="nm" id="lean-exists_pow_near_one">exists_pow_near_one</span> {κ : Type*} [Fintype κ] (z : κ → ℂ) (hz : ∀ i, ‖z i‖ = 1)
+    (N : ℕ) {ε : ℝ} (hε : 0 &lt; ε) :
+    ∃ d : ℕ, N ≤ d ∧ ∀ i, ‖z i ^ d - 1‖ &lt; ε := by
+  set v : ℕ → (κ → ℂ) := fun k i =&gt; z i ^ (N * k) with hvdef
+  have hv : ∀ k, v k ∈ Metric.closedBall (0 : κ → ℂ) 1 := by
+    intro k
+    rw [mem_closedBall_zero_iff]
+    refine (pi_norm_le_iff_of_nonneg zero_le_one).2 fun i =&gt; ?_
+    simp [v, hz]
+  obtain ⟨a, -, φ, hφ, hlim⟩ := (isCompact_closedBall (0 : κ → ℂ) 1).tendsto_subseq hv
+  obtain ⟨K, hK⟩ := Metric.cauchySeq_iff'.1 hlim.cauchySeq ε hε
+  have hlt : φ K &lt; φ (K + 1) := hφ (Nat.lt_succ_self K)
+  refine ⟨N * (φ (K + 1) - φ K), ?_, fun i =&gt; ?_⟩
+  · have : 1 ≤ φ (K + 1) - φ K := by omega
+    calc N = N * 1 := by ring
+      _ ≤ _ := Nat.mul_le_mul_left N this
+  · have h := hK (K + 1) (by omega)
+    have hi : ‖z i ^ (N * φ (K + 1)) - z i ^ (N * φ K)‖ &lt; ε := by
+      refine lt_of_le_of_lt ?_ h
+      rw [← dist_eq_norm]
+      exact dist_le_pi_dist (v (φ (K + 1))) (v (φ K)) i
+    have hsplit : z i ^ (N * φ (K + 1)) = z i ^ (N * φ K) * z i ^ (N * (φ (K + 1) - φ K)) := by
+      rw [← pow_add, ← Nat.mul_add, Nat.add_sub_cancel' hlt.le]
+    rw [hsplit, ← mul_sub_one, norm_mul, norm_pow, hz, one_pow, one_mul] at hi
+    exact hi
+
+/-- `‖wⁱ - 1‖ ≤ n Mⁿ ‖1 - w‖` for `i ≤ n`, `‖w‖ ≤ M`, `1 ≤ M`. -/
+lemma <span class="nm" id="lean-norm_pow_sub_one_le">norm_pow_sub_one_le</span> {w : ℂ} {M : ℝ} (hM : 1 ≤ M) (hw : ‖w‖ ≤ M) {i n : ℕ} (hi : i ≤ n) :
+    ‖w ^ i - 1‖ ≤ n * M ^ n * ‖1 - w‖ := by
+  have h : w ^ i - 1 = (∑ j ∈ Finset.range i, w ^ j) * (w - 1) := (geom_sum_mul w i).symm
+  rw [h, norm_mul, norm_sub_rev w 1]
+  gcongr
+  calc ‖∑ j ∈ Finset.range i, w ^ j‖ ≤ ∑ j ∈ Finset.range i, ‖w ^ j‖ := norm_sum_le _ _
+    _ ≤ ∑ j ∈ Finset.range i, M ^ n := by
+        gcongr with j hj
+        rw [norm_pow]
+        calc ‖w‖ ^ j ≤ M ^ j := pow_le_pow_left₀ (norm_nonneg _) hw j
+          _ ≤ M ^ n := pow_le_pow_right₀ hM (by simp at hj; omega)
+    _ = i * M ^ n := by simp
+    _ ≤ n * M ^ n := by gcongr
+
+/-- Second-order Taylor bound: `‖1 - wⁿ - n(1-w)‖ ≤ n² Mⁿ ‖1-w‖²`. -/
+lemma <span class="nm" id="lean-norm_one_sub_pow_sub_le">norm_one_sub_pow_sub_le</span> {w : ℂ} {M : ℝ} (hM : 1 ≤ M) (hw : ‖w‖ ≤ M) (n : ℕ) :
+    ‖1 - w ^ n - n * (1 - w)‖ ≤ (n : ℝ) ^ 2 * M ^ n * ‖1 - w‖ ^ 2 := by
+  have h : 1 - w ^ n - n * (1 - w) = (1 - w) * ∑ i ∈ Finset.range n, (w ^ i - 1) := by
+    have := geom_sum_mul w n
+    rw [Finset.sum_sub_distrib]
+    simp only [Finset.sum_const, Finset.card_range, nsmul_eq_mul, mul_one]
+    linear_combination this
+  rw [h, norm_mul]
+  have hs : ‖∑ i ∈ Finset.range n, (w ^ i - 1)‖ ≤ n * (n * M ^ n * ‖1 - w‖) := by
+    calc _ ≤ ∑ i ∈ Finset.range n, ‖w ^ i - 1‖ := norm_sum_le _ _
+      _ ≤ ∑ i ∈ Finset.range n, (n * M ^ n * ‖1 - w‖) := by
+          gcongr with i hi
+          exact norm_pow_sub_one_le hM hw (by simp at hi; omega)
+      _ = _ := by simp
+  calc ‖1 - w‖ * ‖∑ i ∈ Finset.range n, (w ^ i - 1)‖ ≤ ‖1 - w‖ * (n * (n * M ^ n * ‖1 - w‖)) := by
+        gcongr
+    _ = _ := by ring
+
+/-- Real-part bound used for the tail. -/
+lemma <span class="nm" id="lean-abs_re_one_sub_pow_le">abs_re_one_sub_pow_le</span> {w : ℂ} {M : ℝ} (hM : 1 ≤ M) (hw : ‖w‖ ≤ M)
+    (hre : |(1 - w).re| ≤ ‖1 - w‖ ^ 2) (n : ℕ) :
+    |(1 - w ^ n).re| ≤ (n + (n : ℝ) ^ 2 * M ^ n) * ‖1 - w‖ ^ 2 := by
+  have h1 := norm_one_sub_pow_sub_le hM hw n
+  have h2 : |(1 - w ^ n - n * (1 - w)).re| ≤ ‖1 - w ^ n - n * (1 - w)‖ := abs_re_le_norm _
+  have h3 : (1 - w ^ n).re = (1 - w ^ n - n * (1 - w)).re + n * (1 - w).re := by
+    simp [Complex.sub_re, Complex.mul_re]
+  rw [h3]
+  have hn : (0 : ℝ) ≤ n := Nat.cast_nonneg n
+  calc _ ≤ |(1 - w ^ n - n * (1 - w)).re| + |(n : ℝ) * (1 - w).re| := abs_add_le _ _
+    _ ≤ (n : ℝ) ^ 2 * M ^ n * ‖1 - w‖ ^ 2 + n * ‖1 - w‖ ^ 2 := by
+        rw [abs_mul, abs_of_nonneg hn]
+        gcongr
+        linarith
+    _ = _ := by ring
+
+/-- **The abstract Bombieri–Lagarias lemma.** -/
+theorem <span class="nm" id="lean-exists_neg_of_large">exists_neg_of_large</span> {ι : Type*} (a : ι → ℝ) (w : ι → ℂ) (ha : ∀ i, 1 ≤ a i)
+    (hsum : Summable fun i =&gt; a i * ‖1 - w i‖ ^ 2)
+    (hre : ∀ i, |(1 - w i).re| ≤ ‖1 - w i‖ ^ 2)
+    (hbig : ∃ i, 1 &lt; ‖w i‖) :
+    ∃ n : ℕ, 0 &lt; n ∧ Summable (fun i =&gt; a i * (1 - w i ^ n).re) ∧
+      ∑' i, a i * (1 - w i ^ n).re &lt; 0 := by
+  classical
+  obtain ⟨i0, hi0⟩ := hbig
+  have ha0 : ∀ i, 0 ≤ a i := fun i =&gt; by linarith [ha i]
+  -- Step 1: only finitely many `w i` outside any disc of radius `r &gt; 1`.
+  have hfin : ∀ r : ℝ, 1 &lt; r → {i | r ≤ ‖w i‖}.Finite := by
+    intro r hr
+    have hev : ∀ᶠ i in Filter.cofinite, a i * ‖1 - w i‖ ^ 2 &lt; (r - 1) ^ 2 :=
+      (tendsto_order.1 hsum.tendsto_cofinite_zero).2 _ (by nlinarith)
+    refine (Filter.eventually_cofinite.1 hev).subset fun i hi =&gt; ?_
+    simp only [Set.mem_ofPred_eq, not_lt] at hi ⊢
+    have h1 : ‖w i‖ ≤ 1 + ‖1 - w i‖ := by
+      calc ‖w i‖ = ‖1 - (1 - w i)‖ := by rw [sub_sub_cancel]
+        _ ≤ ‖(1 : ℂ)‖ + ‖1 - w i‖ := norm_sub_le _ _
+        _ = _ := by simp
+    have h3 : (r - 1) ^ 2 ≤ ‖1 - w i‖ ^ 2 := by gcongr; linarith
+    nlinarith [ha i, sq_nonneg ‖1 - w i‖]
+  -- Step 2: the maximal modulus `R &gt; 1`, attained on a finite set `S`; the rest is `≤ r &lt; R`.
+  set r0 : ℝ := (1 + ‖w i0‖) / 2 with hr0
+  have hr0gt : 1 &lt; r0 := by linarith
+  have hr0lt : r0 &lt; ‖w i0‖ := by linarith
+  set F := (hfin r0 hr0gt).toFinset with hF
+  have hmemF : ∀ i, i ∈ F ↔ r0 ≤ ‖w i‖ := fun i =&gt; by simp [F]
+  have hi0F : i0 ∈ F := (hmemF i0).2 hr0lt.le
+  obtain ⟨i1, hi1F, hi1max⟩ := F.exists_max_image (fun i =&gt; ‖w i‖) ⟨i0, hi0F⟩
+  set R := ‖w i1‖ with hRdef
+  have hR1 : r0 &lt; R := lt_of_lt_of_le hr0lt (hi1max i0 hi0F)
+  have hR : ∀ i, ‖w i‖ ≤ R := by
+    intro i
+    by_cases hi : i ∈ F
+    · exact hi1max i hi
+    · rw [hmemF] at hi; linarith
+  set S := F.filter (fun i =&gt; ‖w i‖ = R) with hS
+  set G := F.filter (fun i =&gt; ‖w i‖ &lt; R) with hG
+  obtain ⟨r, hr0r, hrR, hrG⟩ : ∃ r, r0 ≤ r ∧ r &lt; R ∧ ∀ i ∈ G, ‖w i‖ ≤ r := by
+    rcases G.eq_empty_or_nonempty with hG0 | hG0
+    · exact ⟨r0, le_rfl, hR1, by simp [hG0]⟩
+    · obtain ⟨i2, hi2G, hi2⟩ := G.exists_max_image (fun i =&gt; ‖w i‖) hG0
+      exact ⟨max r0 ‖w i2‖, le_max_left _ _, max_lt hR1 (Finset.mem_filter.1 hi2G).2,
+        fun i hi =&gt; le_max_of_le_right (hi2 i hi)⟩
+  have hnotS : ∀ i, i ∉ S → ‖w i‖ ≤ r := by
+    intro i hi
+    by_cases hiF : i ∈ F
+    · have : ‖w i‖ ≠ R := fun h =&gt; hi (Finset.mem_filter.2 ⟨hiF, h⟩)
+      exact hrG i (Finset.mem_filter.2 ⟨hiF, lt_of_le_of_ne (hR i) this⟩)
+    · rw [hmemF] at hiF; linarith
+  have hi1S : i1 ∈ S := Finset.mem_filter.2 ⟨hi1F, rfl⟩
+  have hr1 : 1 ≤ r := by linarith
+  have hRone : 1 ≤ R := by linarith
+  have hRpos : 0 &lt; R := by linarith
+  -- Step 3: the dominant term `Rⁿ` beats `n² rⁿ` eventually.
+  set T := ∑' i, a i * ‖1 - w i‖ ^ 2 with hTdef
+  have hq1 : |1 / R| &lt; 1 := by
+    rw [abs_of_pos (by positivity), div_lt_one hRpos]; linarith
+  have hq2 : |r / R| &lt; 1 := by
+    rw [abs_of_pos (by positivity), div_lt_one hRpos]; linarith
+  have hlim : Filter.Tendsto (fun n : ℕ =&gt; (1 / R) ^ n + T * ((n : ℝ) ^ 1 * (1 / R) ^ n) +
+      T * ((n : ℝ) ^ 2 * (r / R) ^ n)) Filter.atTop (nhds 0) := by
+    have h1 := tendsto_pow_atTop_nhds_zero_of_abs_lt_one hq1
+    have h2 := tendsto_pow_const_mul_const_pow_of_abs_lt_one 1 hq1
+    have h3 := tendsto_pow_const_mul_const_pow_of_abs_lt_one 2 hq2
+    simpa using (h1.add (h2.const_mul T)).add (h3.const_mul T)
+  obtain ⟨N0, hN0⟩ := Filter.eventually_atTop.1 ((tendsto_order.1 hlim).2 (1 / 2) (by norm_num))
+  -- Step 4: Kronecker–Dirichlet return: all `(w i / R)^d` near `1` for some `d ≥ N0 + 1`.
+  have hzS : ∀ i : S, ‖w i.1 / (R : ℂ)‖ = 1 := by
+    intro i
+    rw [norm_div, Complex.norm_real, Real.norm_of_nonneg hRpos.le,
+      (Finset.mem_filter.1 i.2).2, div_self hRpos.ne']
+  obtain ⟨d, hd, hdS⟩ := exists_pow_near_one (fun i : S =&gt; w i.1 / (R : ℂ)) hzS (N0 + 1)
+    (by norm_num : (0 : ℝ) &lt; 1 / 2)
+  have hdpos : 0 &lt; d := by omega
+  have hreS : ∀ i ∈ S, R ^ d / 2 ≤ (w i ^ d).re := by
+    intro i hi
+    have h := hdS ⟨i, hi⟩
+    simp only at h
+    set z := (w i / (R : ℂ)) ^ d
+    have hz : 1 / 2 ≤ z.re := by
+      have := abs_re_le_norm (z - 1)
+      rw [Complex.sub_re, Complex.one_re] at this
+      have := neg_abs_le (z.re - 1)
+      linarith
+    have hw : w i ^ d = ((R ^ d : ℝ) : ℂ) * z := by
+      have hR0 : (R : ℂ) ≠ 0 := by exact_mod_cast hRpos.ne'
+      simp only [z, div_pow, Complex.ofReal_pow]
+      field_simp
+    rw [hw, Complex.re_ofReal_mul]
+    have : 0 &lt; R ^ d := by positivity
+    nlinarith
+  -- Step 5: summability and the final estimate.
+  have hsumd : Summable (fun i =&gt; a i * (1 - w i ^ d).re) := by
+    refine Summable.of_norm_bounded (hsum.mul_left ((d : ℝ) + (d : ℝ) ^ 2 * R ^ d)) fun i =&gt; ?_
+    rw [Real.norm_eq_abs, abs_mul, abs_of_nonneg (ha0 i)]
+    have := abs_re_one_sub_pow_le hRone (hR i) (hre i) d
+    calc a i * |(1 - w i ^ d).re| ≤ a i * (((d : ℝ) + (d : ℝ) ^ 2 * R ^ d) * ‖1 - w i‖ ^ 2) := by
+          gcongr; exact ha0 i
+      _ = _ := by ring
+  refine ⟨d, hdpos, hsumd, ?_⟩
+  set e : ι → ℝ := fun i =&gt; if i ∈ S then a i * (1 - R ^ d / 2) else 0 with he_def
+  set C : ℝ := (d : ℝ) + (d : ℝ) ^ 2 * r ^ d with hC
+  have hC0 : 0 ≤ C := by positivity
+  have hle : ∀ i, a i * (1 - w i ^ d).re ≤ e i + C * (a i * ‖1 - w i‖ ^ 2) := by
+    intro i
+    by_cases hiS : i ∈ S
+    · have h := hreS i hiS
+      simp only [e, if_pos hiS]
+      have h' : (1 - w i ^ d).re = 1 - (w i ^ d).re := by simp
+      rw [h']
+      have : 0 ≤ C * (a i * ‖1 - w i‖ ^ 2) := by have := ha0 i; positivity
+      nlinarith [ha0 i]
+    · simp only [e, if_neg hiS, zero_add]
+      have := abs_re_one_sub_pow_le hr1 (hnotS i hiS) (hre i) d
+      calc a i * (1 - w i ^ d).re ≤ a i * |(1 - w i ^ d).re| := by
+            gcongr; exacts [ha0 i, le_abs_self _]
+        _ ≤ a i * (C * ‖1 - w i‖ ^ 2) := by gcongr; exact ha0 i
+        _ = _ := by ring
+  have he : Summable e := summable_of_ne_finset_zero (s := S) (fun i hi =&gt; by simp [e, hi])
+  have htsum_e : ∑' i, e i = (∑ i ∈ S, a i) * (1 - R ^ d / 2) := by
+    rw [tsum_eq_sum (s := S) (fun i hi =&gt; by simp [e, hi]), Finset.sum_mul]
+    exact Finset.sum_congr rfl fun i hi =&gt; by simp [e, hi]
+  have hmain := hsumd.tsum_le_tsum hle (he.add (hsum.mul_left C))
+  rw [he.tsum_add (hsum.mul_left C), tsum_mul_left, htsum_e] at hmain
+  -- numerics
+  have hA : 1 ≤ ∑ i ∈ S, a i :=
+    le_trans (ha i1) (Finset.single_le_sum (fun i _ =&gt; ha0 i) hi1S)
+  have hRd : 0 &lt; R ^ d := by positivity
+  have key : 1 + T * d + T * ((d : ℝ) ^ 2 * r ^ d) &lt; R ^ d / 2 := by
+    have h := mul_lt_mul_of_pos_right (hN0 d (by omega)) hRd
+    have e1 : (1 / R) ^ d * R ^ d = 1 := by
+      rw [div_pow, one_pow, div_mul_cancel₀ _ hRd.ne']
+    have e2 : (r / R) ^ d * R ^ d = r ^ d := by
+      rw [div_pow, div_mul_cancel₀ _ hRd.ne']
+    have : ((1 / R) ^ d + T * ((d : ℝ) ^ 1 * (1 / R) ^ d) + T * ((d : ℝ) ^ 2 * (r / R) ^ d)) * R ^ d
+        = (1 / R) ^ d * R ^ d + T * d * ((1 / R) ^ d * R ^ d) + T * d ^ 2 * ((r / R) ^ d * R ^ d) := by
+      ring
+    rw [this, e1, e2] at h
+    linarith
+  have hneg : (∑ i ∈ S, a i) * (1 - R ^ d / 2) ≤ 1 - R ^ d / 2 := by
+    have hT0 : 0 ≤ T := tsum_nonneg fun i =&gt; mul_nonneg (ha0 i) (sq_nonneg _)
+    have h1 : 0 ≤ T * d := by positivity
+    have h2 : 0 ≤ T * ((d : ℝ) ^ 2 * r ^ d) := by have := hr1; positivity
+    have : 1 - R ^ d / 2 ≤ 0 := by linarith
+    nlinarith
+  have : C * T = T * d + T * ((d : ℝ) ^ 2 * r ^ d) := by rw [hC]; ring
+  linarith
+
+/- ### Zeta-specific input: where the zeros can be -/
+
+/-- No zeros of `ζ` in `Re s ≤ 0` apart from the trivial zeros (from the functional equation). -/
+lemma <span class="nm" id="lean-re_pos_of_zeta_eq_zero">re_pos_of_zeta_eq_zero</span> {s : ℂ} (hz : riemannZeta s = 0)
+    (htriv : ¬∃ n : ℕ, s = -2 * (n + 1)) : 0 &lt; s.re := by
+  by_contra hle
+  push Not at hle
+  have hs0 : s ≠ 0 := by
+    rintro rfl; rw [riemannZeta_zero] at hz; norm_num at hz
+  set t := 1 - s with ht
+  have hst : s = 1 - t := by rw [ht]; ring
+  have htre : 1 ≤ t.re := by simp [ht]; linarith
+  have htn : ∀ n : ℕ, t ≠ -n := by
+    intro n h
+    have := congrArg Complex.re h
+    simp at this
+    have : (0 : ℝ) ≤ n := Nat.cast_nonneg n
+    linarith
+  have ht1 : t ≠ 1 := by intro h; apply hs0; rw [hst, h]; ring
+  have hfe := riemannZeta_one_sub htn ht1
+  rw [← hst, hz] at hfe
+  have h2pi : (2 * (Real.pi : ℂ)) ≠ 0 := by
+    have : (Real.pi : ℂ) ≠ 0 := ofReal_ne_zero.2 Real.pi_ne_zero
+    exact mul_ne_zero two_ne_zero this
+  have hcpow : (2 * (Real.pi : ℂ)) ^ (-t) ≠ 0 := by
+    rw [Complex.cpow_def_of_ne_zero h2pi]; exact Complex.exp_ne_zero _
+  have hG : Gamma t ≠ 0 := Complex.Gamma_ne_zero htn
+  have hzt : riemannZeta t ≠ 0 := riemannZeta_ne_zero_of_one_le_re htre
+  have hcos : cos ((Real.pi : ℂ) * t / 2) ≠ 0 := by
+    intro hc
+    obtain ⟨k, hk⟩ := Complex.cos_eq_zero_iff.1 hc
+    have hpi : (Real.pi : ℂ) ≠ 0 := ofReal_ne_zero.2 Real.pi_ne_zero
+    have htk : t = 2 * k + 1 := by
+      apply mul_left_cancel₀ hpi
+      linear_combination 2 * hk
+    have hsk : s = -2 * k := by rw [hst, htk]; ring
+    obtain ⟨m, rfl | rfl⟩ := Int.eq_nat_or_neg k
+    · rcases m with _ | n
+      · apply hs0; rw [hsk]; simp
+      · exact htriv ⟨n, by rw [hsk]; push_cast; ring⟩
+    · have := congrArg Complex.re hsk
+      simp at this
+      rcases m with _ | n
+      · apply hs0; rw [hsk]; simp
+      · have : (0 : ℝ) ≤ n := Nat.cast_nonneg n
+        push_cast at *
+        linarith
+  have : (2 : ℂ) * (2 * (Real.pi : ℂ)) ^ (-t) * Gamma t * cos ((Real.pi : ℂ) * t / 2) * riemannZeta t ≠ 0 := by
+    exact mul_ne_zero (mul_ne_zero (mul_ne_zero (mul_ne_zero two_ne_zero hcpow) hG) hcos) hzt
+  exact this hfe.symm
+
+/-- In the critical strip, `ζ s = 0 ↔ Λ s = 0`. -/
+lemma <span class="nm" id="lean-zeta_eq_zero_iff_completed">zeta_eq_zero_iff_completed</span> {s : ℂ} (hs : 0 &lt; s.re) :
+    riemannZeta s = 0 ↔ completedRiemannZeta s = 0 := by
+  have hs0 : s ≠ 0 := by rintro rfl; simp at hs
+  rw [riemannZeta_def_of_ne_zero hs0, div_eq_zero_iff]
+  have := Gammaℝ_ne_zero_of_re_pos hs
+  tauto
+
+/-- **Reflection symmetry of the zero set** `ρ ↦ 1 - ρ̄` (functional equation + conjugation). -/
+lemma <span class="nm" id="lean-zeta_one_sub_conj_eq_zero">zeta_one_sub_conj_eq_zero</span> {s : ℂ} (h0 : 0 &lt; s.re) (h1 : s.re &lt; 1)
+    (hz : riemannZeta s = 0) : riemannZeta (1 - (starRingEnd ℂ) s) = 0 := by
+  have hc : riemannZeta ((starRingEnd ℂ) s) = 0 := by rw [riemannZeta_conj, hz, map_zero]
+  have hre1 : 0 &lt; (1 - (starRingEnd ℂ) s).re := by simp; linarith
+  have hre2 : 0 &lt; ((starRingEnd ℂ) s).re := by simpa using h0
+  rw [zeta_eq_zero_iff_completed hre1, completedRiemannZeta_one_sub,
+    ← zeta_eq_zero_iff_completed hre2]
+  exact hc
+
+/-- **Classical fact, stated as an explicit hypothesis:** `ζ` has no real zeros in `(0, 1)`.
+(Proof: `(1 - 2^{1-σ}) ζ(σ) = η(σ) = ∑ (-1)^{n-1} n^{-σ} &gt; 0` by the alternating series test,
+while `1 - 2^{1-σ} &lt; 0`.)  This has nothing to do with RH: it is a statement about the real axis. -/
+def <span class="nm" id="lean-NoRealZerosInStrip">NoRealZerosInStrip</span> : Prop := ∀ σ : ℝ, 0 &lt; σ → σ &lt; 1 → riemannZeta σ ≠ 0
+
+/-- If RH fails (and `ζ` has no real zeros in the strip) there is a zero with `Im ρ &gt; 0` and
+`Re ρ &lt; 1/2`. -/
+lemma <span class="nm" id="lean-exists_posZero_re_lt_half">exists_posZero_re_lt_half</span> (hreal : NoRealZerosInStrip) (hRH : ¬ RiemannHypothesis) :
+    ∃ ρ ∈ nontrivialPosZeros, ρ.re &lt; 1 / 2 := by
+  simp only [RiemannHypothesis, not_forall] at hRH
+  obtain ⟨s, hz, htriv, -, hre⟩ := hRH
+  have h0 := re_pos_of_zeta_eq_zero hz htriv
+  have h1 : s.re &lt; 1 := by
+    by_contra h
+    push Not at h
+    exact riemannZeta_ne_zero_of_one_le_re h hz
+  have him : s.im ≠ 0 := by
+    intro him
+    have hs : s = (s.re : ℂ) := Complex.ext (by simp) (by simp [him])
+    exact hreal s.re h0 h1 (hs ▸ hz)
+  obtain ⟨s', hz', h0', h1', him', hre'⟩ : ∃ s' : ℂ, riemannZeta s' = 0 ∧ 0 &lt; s'.re ∧
+      s'.re &lt; 1 ∧ 0 &lt; s'.im ∧ s'.re ≠ 1 / 2 := by
+    rcases lt_or_gt_of_ne him with h | h
+    · exact ⟨starRingEnd ℂ s, by rw [riemannZeta_conj, hz, map_zero], by simpa, by simpa,
+        by simp; linarith, by simpa using hre⟩
+    · exact ⟨s, hz, h0, h1, h, hre⟩
+  rcases lt_or_gt_of_ne hre' with h | h
+  · exact ⟨s', ⟨h0', h1', him', hz'⟩, h⟩
+  · exact ⟨1 - starRingEnd ℂ s', ⟨by simp; linarith, by simp; linarith, by simpa using him',
+      zeta_one_sub_conj_eq_zero h0' h1' hz'⟩, by simp; linarith⟩
+
+/-- **Left of the line ⇔ outside the unit circle**: `Re ρ &lt; 1/2 ⇒ |1 - 1/ρ| &gt; 1`. -/
+lemma <span class="nm" id="lean-one_lt_norm_one_sub_inv">one_lt_norm_one_sub_inv</span> {ρ : ℂ} (h0 : 0 &lt; ρ.re) (h : ρ.re &lt; 1 / 2) :
+    1 &lt; ‖1 - 1 / ρ‖ := by
+  have hρ : ρ ≠ 0 := by rintro rfl; simp at h0
+  have e : 1 - 1 / ρ = (ρ - 1) / ρ := by field_simp
+  rw [e, norm_div, one_lt_div (norm_pos_iff.2 hρ),
+    ← sq_lt_sq₀ (norm_nonneg _) (norm_nonneg _), Complex.sq_norm, Complex.sq_norm,
+    Complex.normSq_apply, Complex.normSq_apply]
+  simp
+  nlinarith
+
+/-- In the strip, `|Re (1/ρ)| ≤ |1/ρ|²` (as `Re (1/ρ) = Re ρ / |ρ|²` and `0 &lt; Re ρ &lt; 1`). -/
+lemma <span class="nm" id="lean-abs_re_inv_le">abs_re_inv_le</span> {ρ : ℂ} (h0 : 0 &lt; ρ.re) (h1 : ρ.re &lt; 1) : |(1 / ρ).re| ≤ ‖1 / ρ‖ ^ 2 := by
+  have hn : 0 &lt; Complex.normSq ρ := Complex.normSq_pos.2 (by rintro rfl; simp at h0)
+  rw [one_div, Complex.inv_re, norm_inv, inv_pow, Complex.sq_norm, abs_div, abs_of_pos h0,
+    abs_of_pos hn, div_le_iff₀ hn, inv_mul_cancel₀ hn.ne']
+  linarith
+
+/- ### The converse -/
+
+/-- **Li ⇒ RH** (multiplicity-weighted, Bombieri–Lagarias argument), conditional only on the
+Hadamard summability `∑ m(ρ)/|ρ|² &lt; ∞` and the classical absence of real zeros in `(0,1)`. -/
+theorem <span class="nm" id="lean-li_converse">li_converse</span> (H : HadamardHypothesis) (hreal : NoRealZerosInStrip)
+    (hLi : ∀ n : ℕ, 0 &lt; n → 0 ≤ liCoeff n) : RiemannHypothesis := by
+  by_contra hRH
+  obtain ⟨ρ0, hρ0, hlt⟩ := exists_posZero_re_lt_half hreal hRH
+  have hsum : Summable fun ρ : nontrivialPosZeros =&gt;
+      (zetaMult ρ.1 : ℝ) * ‖1 - (1 - 1 / ρ.1)‖ ^ 2 := by
+    have := H.summable_inv_sq.comp_injective (Set.inclusion_injective nontrivialPosZeros_subset)
+    refine this.congr fun ρ =&gt; ?_
+    simp [div_eq_mul_inv]
+  obtain ⟨n, hn, -, hneg⟩ := exists_neg_of_large (fun ρ : nontrivialPosZeros =&gt; (zetaMult ρ.1 : ℝ))
+    (fun ρ =&gt; 1 - 1 / ρ.1) (fun ρ =&gt; Nat.one_le_cast.2 (zetaMult_pos ρ.2)) hsum
+    (fun ρ =&gt; by rw [sub_sub_cancel]; exact abs_re_inv_le ρ.2.1 ρ.2.2.1)
+    ⟨⟨ρ0, hρ0⟩, one_lt_norm_one_sub_inv hρ0.1 hlt⟩
+  have h := hLi n hn
+  have heq : liCoeff n =
+      2 * ∑' ρ : nontrivialPosZeros, (zetaMult ρ.1 : ℝ) * (1 - (1 - 1 / ρ.1) ^ n).re := by
+    rw [liCoeff, ← tsum_mul_left]
+    congr 1; ext ρ; ring
+  rw [heq] at h
+  linarith
+
+/-- **Weighted Li criterion**, both directions, conditional on Hadamard summability and on the
+absence of real zeros in `(0,1)`. -/
+theorem <span class="nm" id="lean-li_criterion_weighted">li_criterion_weighted</span> (H : HadamardHypothesis) (hreal : NoRealZerosInStrip) :
+    RiemannHypothesis ↔ ∀ n : ℕ, 0 &lt; n → 0 ≤ liCoeff n :=
+  ⟨fun hRH n _ =&gt; liCoeff_nonneg hRH n, li_converse H hreal⟩
+
+/-- **Bonus: the converse for the upstream (unweighted) `RiemannHypothesis.lambda`.**  The same
+engine with all weights `= 1`; summability of `∑ 1/|ρ|²` follows from the weighted one since
+`m(ρ) ≥ 1`.  Together with this, the "←" half of the upstream `li_criterion` holds conditionally. -/
+theorem <span class="nm" id="lean-li_converse_unweighted">li_converse_unweighted</span> (H : HadamardHypothesis) (hreal : NoRealZerosInStrip)
+    (hLi : ∀ n : ℕ, 0 &lt; n → 0 ≤ RiemannHypothesis.lambda n) : RiemannHypothesis := by
+  by_contra hRH
+  obtain ⟨ρ0, hρ0, hlt⟩ := exists_posZero_re_lt_half hreal hRH
+  have hw : Summable fun ρ : nontrivialPosZeros =&gt;
+      (zetaMult ρ.1 : ℝ) * ‖1 - (1 - 1 / ρ.1)‖ ^ 2 := by
+    have := H.summable_inv_sq.comp_injective (Set.inclusion_injective nontrivialPosZeros_subset)
+    refine this.congr fun ρ =&gt; ?_
+    simp [div_eq_mul_inv]
+  have hsum : Summable fun ρ : nontrivialPosZeros =&gt; (1 : ℝ) * ‖1 - (1 - 1 / ρ.1)‖ ^ 2 := by
+    refine Summable.of_nonneg_of_le (fun ρ =&gt; by positivity) (fun ρ =&gt; ?_) hw
+    have := Nat.one_le_cast (α := ℝ).2 (zetaMult_pos ρ.2)
+    have := sq_nonneg ‖1 - (1 - 1 / ρ.1)‖
+    nlinarith
+  obtain ⟨n, hn, -, hneg⟩ := exists_neg_of_large (fun _ : nontrivialPosZeros =&gt; (1 : ℝ))
+    (fun ρ =&gt; 1 - 1 / ρ.1) (fun _ =&gt; le_rfl) hsum
+    (fun ρ =&gt; by rw [sub_sub_cancel]; exact abs_re_inv_le ρ.2.1 ρ.2.2.1)
+    ⟨⟨ρ0, hρ0⟩, one_lt_norm_one_sub_inv hρ0.1 hlt⟩
+  have h := hLi n hn
+  have heq : RiemannHypothesis.lambda n =
+      2 * ∑' ρ : nontrivialPosZeros, (1 : ℝ) * (1 - (1 - 1 / ρ.1) ^ n).re := by
+    rw [RiemannHypothesis.lambda, ← tsum_mul_left]
+    congr 1; ext ρ; ring
+  rw [heq] at h
+  linarith
+
+end LiConditional
+
+
+/- ## Discharging `NoRealZerosInStrip` -/
+
+namespace LiConditional
+
+open RiemannHypothesis (nontrivialPosZeros)
+
+/-- `ζ` has no real zeros in `(0,1)` — now a theorem (`NoRealZeros.lean`), not a hypothesis. -/
+theorem <span class="nm" id="lean-noRealZerosInStrip_holds">noRealZerosInStrip_holds</span> : NoRealZerosInStrip :=
+  fun _ h0 h1 =&gt; NoRealZeros.riemannZeta_ne_zero_of_mem_Ioo h0 h1
+
+/-- **Li ⇒ RH** (weighted), conditional only on Hadamard summability. -/
+theorem <span class="nm" id="lean-li_converse_of_hadamard">li_converse_of_hadamard</span> (H : HadamardHypothesis)
+    (hLi : ∀ n : ℕ, 0 &lt; n → 0 ≤ liCoeff n) : RiemannHypothesis :=
+  li_converse H noRealZerosInStrip_holds hLi
+
+/-- **Weighted Li criterion**, `RH ⇔ ∀ n ≥ 1, λₙ ≥ 0`, conditional only on Hadamard
+summability `∑ m(ρ)/|ρ|² &lt; ∞`. -/
+theorem <span class="nm" id="lean-li_criterion_weighted'">li_criterion_weighted'</span> (H : HadamardHypothesis) :
+    RiemannHypothesis ↔ ∀ n : ℕ, 0 &lt; n → 0 ≤ liCoeff n :=
+  li_criterion_weighted H noRealZerosInStrip_holds
+
+/-- The converse for the upstream unweighted `RiemannHypothesis.lambda`, conditional only on
+Hadamard summability. -/
+theorem <span class="nm" id="lean-li_converse_unweighted_of_hadamard">li_converse_unweighted_of_hadamard</span> (H : HadamardHypothesis)
+    (hLi : ∀ n : ℕ, 0 &lt; n → 0 ≤ RiemannHypothesis.lambda n) : RiemannHypothesis :=
+  li_converse_unweighted H noRealZerosInStrip_holds hLi
+
+end LiConditional
+
+#print axioms NoRealZeros.riemannZeta_ne_zero_of_mem_Ioo
+#print axioms NoRealZeros.riemannZeta_re_lt_of_mem_Ioo
+#print axioms LiConditional.noRealZerosInStrip_holds
+#print axioms LiConditional.li_criterion_weighted'
+#print axioms LiConditional.li_converse_of_hadamard
+#print axioms LiConditional.li_converse_unweighted_of_hadamard
+#print axioms LiConditional.liCoeff_pos
+</pre>
+
+<h2>Honesty checklist</h2>
+<ul class="check">
+<li>Compiles on Lean/Mathlib v4.33.1 against formal-conjectures at 9097e2f. <code>NoRealZeros.lean</code> and <code>LiCriterion.lean</code> were written and compiled by Kumi-San. Alo independently rebuilt both (about 6s and 13s) and checked that the zeros are Mathlib's <code>riemannZeta</code> and that nothing shadows <code>RiemannHypothesis</code>.</li>
+<li>No <code>sorry</code>, <code>native_decide</code> or new <code>axiom</code>. <code>#print axioms</code> of <code>riemannZeta_ne_zero_of_mem_Ioo</code>, <code>noRealZerosInStrip_holds</code>, <code>li_criterion_weighted'</code>, <code>li_converse_of_hadamard</code>, <code>li_converse_unweighted_of_hadamard</code> and <code>liCoeff_pos</code>: propext, Classical.choice, Quot.sound only.</li>
+<li>The equivalence \(\mathrm{RH}\iff\lambda_n\ge 0\) is conditional on one named hypothesis: the multiplicity-weighted Hadamard summability \(\sum m(\rho)/|\rho|^2&lt;\infty\). No real zeros in \((0,1)\) is now a theorem. <code>hinf</code> is used only for the strict inequality in <code>liCoeff_pos</code>.</li>
+<li>Only the summability field of <code>HadamardHypothesis</code> is used. The <code>log_deriv_expansion</code> field is stated but unused.</li>
+<li><code>liCoeff_nonneg</code> is meaningful only paired with <code>liCoeff_summable</code>. Multiplicity differs from upstream; <code>li_converse_unweighted_of_hadamard</code> treats the unweighted sum on its own terms, with no identification proved.</li>
+<li>The figure is an illustration. It proves nothing and the dashed quartet is schematic.</li>
+<li>Not proved: the identification of \(\lambda_n\) with the Taylor coefficients of \(\log\xi\) at \(s=1\), and the upstream statement <code>li_criterion</code> (strict inequality, both directions, no hypotheses). Status: partial: both directions, one hypothesis.</li>
+</ul>
+<footer>Fang &amp; Fox Lemma Office · ShadowAlzazel steers the ideas · Kumi-San drafted and compiled · Alo independently rebuilt both files.</footer>
+</main></body></html>

@@ -1,5 +1,5 @@
 """Figure: w = 1 - 1/rho for the first 100 zeta zeros (and conjugates). Run in the mpmath venv:
-   python figures/make_figure.py   (from problems/li-criterion/)"""
+   python figures/make_figure.py   (from results/li-criterion/)"""
 from mpmath import mp, zetazero, mpc
 import csv
 mp.dps = 20
