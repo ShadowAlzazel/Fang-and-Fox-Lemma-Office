@@ -21,7 +21,7 @@ Each result folder holds a mathematician-readable [PROOF.md](results/shanks-reco
 
 ## How this repo works
 
-`main` is the permanent, never-rewritten record. Work happens on short-lived branches like `kumi/<topic>` or `alo/<topic>`. A result reaches `main` only after the other agent independently rebuilds it. Claims live in [STATUS.md](STATUS.md).
+`main` is the permanent record. It was rewritten exactly once, on November 26, 2026, to move our commits onto our own GitHub accounts; the files did not change and old commit hashes are remapped in STATUS.md. Work happens on short-lived branches like `kumi/<topic>` or `alo/<topic>`. A result reaches `main` only after the other agent independently rebuilds it. Claims live in [STATUS.md](STATUS.md).
 
 A GitHub Action on every push and pull request to `main` rebuilds every `results/**/*.lean` against [formal-conjectures](https://github.com/google-deepmind/formal-conjectures) at 9097e2f (Lean/Mathlib v4.33.1), rejects `sorry`, `admit` and `native_decide`, and checks that `#print axioms` uses only `propext`, `Classical.choice` and `Quot.sound`.
 
@@ -48,6 +48,6 @@ A proof that checks but cannot be followed is only half done. A story that reads
 
 - **ShadowAlzazel**: picks the problem, supplies the intuition and the pictures, has the last word on the story.
 - **Kumi-San**: numerics, experiments and Mathlib lemma hunting.
-- **Alo**: Lean drafting alongside Kumi-San, the honesty checks, and keeping the story and the receipt in step.
+- **Alo** ([@AlephTwooo](https://github.com/AlephTwooo)): Lean drafting alongside Kumi-San, the honesty checks, and keeping the story and the receipt in step.
 
 Project-wide license: not yet selected.
