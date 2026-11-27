@@ -31,19 +31,96 @@ jobs:
         working-directory: formal-conjectures
         run: lake exe cache get
 
-      - name: Forbid sorry, admit, native_decide
+      - name: Build FormalConjectures modules
+        working-directory: formal-conjectures
+        run: lake build FormalConjectures.Paper.RiemannHypothesisEquivalents FormalConjectures.Wikipedia.MaximalPrimeGap
+
+      - name: Forbid sorry, admit, native_decide, axiom, unsafe, implemented_by
         working-directory: office
         run: |
-          if grep -rnE 'sorry|admit|native_decide' results --include='*.lean'; then
-            echo "forbidden tactic or keyword found in results/**/*.lean"
-            exit 1
-          fi
-          echo "no sorry, admit, or native_decide"
+          python3 << 'PY'
+          import re
+          import sys
+          from pathlib import Path
+
+          FORBIDDEN = re.compile(r"\b(?:sorry|admit|native_decide|axiom|unsafe|implemented_by)\b")
+
+          def strip_comments_and_strings(src: str) -> str:
+              """Replace Lean comments and string literals with spaces, keeping newlines."""
+              out = []
+              i = 0
+              n = len(src)
+              nest = 0
+              in_string = False
+              while i < n:
+                  if nest:
+                      if src.startswith("/-", i):
+                          nest += 1
+                          out.append("  ")
+                          i += 2
+                          continue
+                      if src.startswith("-/", i):
+                          nest -= 1
+                          out.append("  ")
+                          i += 2
+                          continue
+                      out.append("\n" if src[i] == "\n" else " ")
+                      i += 1
+                      continue
+                  if in_string:
+                      if src[i] == "\\" and i + 1 < n:
+                          out.append("  ")
+                          i += 2
+                          continue
+                      if src[i] == '"':
+                          in_string = False
+                          out.append(" ")
+                          i += 1
+                          continue
+                      out.append("\n" if src[i] == "\n" else " ")
+                      i += 1
+                      continue
+                  if src.startswith("/-", i):
+                      nest = 1
+                      out.append("  ")
+                      i += 2
+                      continue
+                  if src.startswith("--", i):
+                      while i < n and src[i] != "\n":
+                          out.append(" ")
+                          i += 1
+                      continue
+                  if src[i] == '"':
+                      in_string = True
+                      out.append(" ")
+                      i += 1
+                      continue
+                  out.append(src[i])
+                  i += 1
+              return "".join(out)
+
+          failed = False
+          files = sorted(Path("results").rglob("*.lean"))
+          if not files:
+              print("no Lean files under results/", file=sys.stderr)
+              sys.exit(1)
+          for path in files:
+              raw = path.read_text()
+              # #print axioms and the word "axioms" are not in FORBIDDEN (\baxiom\b).
+              # Comments and strings are stripped so 'axiom'/'sorry' in prose cannot trigger.
+              cleaned = strip_comments_and_strings(raw)
+              for lineno, line in enumerate(cleaned.splitlines(), 1):
+                  for m in FORBIDDEN.finditer(line):
+                      print(f"{path}:{lineno}: forbidden token {m.group(0)!r}", file=sys.stderr)
+                      failed = True
+          if failed:
+              sys.exit(1)
+          print("no sorry, admit, native_decide, axiom, unsafe, or implemented_by")
+          PY
 
       - name: Build every Lean file and check axioms
         run: |
           set -euo pipefail
-          shopt -s globstar nullglob
           python3 << 'PY'
           import re
           import subprocess
@@ -51,6 +128,48 @@ jobs:
           from pathlib import Path
 
           allowed = {"propext", "Classical.choice", "Quot.sound"}
+          expected = {
+              "Proof.lean": [
+                  "ShanksWarmup.gap_unbounded",
+                  "ShanksWarmup.first_exceeder_is_record",
+                  "ShanksWarmup.infinite_maximalPrimeGapIndex",
+              ],
+              "A127752.lean": [
+                  "A127752.a127752_mod_two",
+                  "A127752.a127752_eq_r",
+                  "A127752.r_mod_two",
+              ],
+              "NoRealZeros.lean": [
+                  "NoRealZeros.riemannZeta_ne_zero_of_mem_Ioo",
+                  "NoRealZeros.riemannZeta_re_lt_of_mem_Ioo",
+                  "NoRealZeros.riemannZeta_im_eq_zero_of_mem_Ioo",
+              ],
+              "LiCriterion.lean": [
+                  "NoRealZeros.riemannZeta_ne_zero_of_mem_Ioo",
+                  "NoRealZeros.riemannZeta_re_lt_of_mem_Ioo",
+                  "LiConditional.noRealZerosInStrip_holds",
+                  "LiConditional.li_criterion_weighted'",
+                  "LiConditional.li_converse_of_hadamard",
+                  "LiConditional.li_converse_unweighted_of_hadamard",
+                  "LiConditional.liCoeff_pos",
+              ],
+              "LiConditional.lean": [
+                  "LiConditional.liCoeff_nonneg",
+                  "LiConditional.liCoeff_summable",
+                  "LiConditional.liCoeff_pos",
+              ],
+          }
+
+          def printed_theorems(out: str):
+              names = set()
+              for pat in (
+                  r"'((?:[^']|'')+)' depends on axioms:",
+                  r"'((?:[^']|'')+)' does not depend on any axioms",
+              ):
+                  for m in re.finditer(pat, out):
+                      names.add(m.group(1).replace("''", "'"))
+              return names
+
           office = Path("office")
           files = sorted(office.glob("results/**/*.lean"))
           if not files:
@@ -76,15 +195,28 @@ jobs:
               if "sorryAx" in out:
                   print(f"ERROR: {src} #print axioms mentions sorryAx", file=sys.stderr)
                   failed = True
+              printed = printed_theorems(out)
               for m in re.finditer(r"depends on axioms:\s*\[([^\]]*)\]", out):
                   axioms = [a.strip() for a in m.group(1).split(",") if a.strip()]
                   bad = [a for a in axioms if a not in allowed]
                   if bad:
                       print(f"ERROR: {src} unexpected axioms: {bad}", file=sys.stderr)
                       failed = True
+              want = expected.get(src.name)
+              if not want:
+                  print(f"ERROR: {src} has no expected headline theorems configured", file=sys.stderr)
+                  failed = True
+              else:
+                  missing = [name for name in want if name not in printed]
+                  if missing:
+                      print(
+                          f"ERROR: {src} missing #print axioms output for {missing}",
+                          file=sys.stderr,
+                      )
+                      failed = True
               dest.unlink(missing_ok=True)
 
           if failed:
               sys.exit(1)
-          print("all Lean files compiled; axioms within {propext, Classical.choice, Quot.sound}")
+          print("all Lean files compiled; expected #print axioms present; axioms within {propext, Classical.choice, Quot.sound}")
           PY

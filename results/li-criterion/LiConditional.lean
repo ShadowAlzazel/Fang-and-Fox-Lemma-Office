@@ -243,3 +243,7 @@ theorem liCoeff_pos (hRH : RiemannHypothesis) (H : HadamardHypothesis)
   exact (liCoeff_summable hRH H n).tsum_pos (liTerm_nonneg hRH n) ρ₀ hpos
 
 end LiConditional
+
+#print axioms LiConditional.liCoeff_nonneg
+#print axioms LiConditional.liCoeff_summable
+#print axioms LiConditional.liCoeff_pos
