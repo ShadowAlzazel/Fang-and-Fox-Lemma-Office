@@ -1,9 +1,11 @@
 # How to claim A127752 on Left to Solve (for ShadowAlzazel)
 
+The general, faster playbook — Kumi prepares a branch on the existing fork, Arbiter opens the pull request from a compare URL — is in [CLAIMING.md](../../../CLAIMING.md). This file is the A127752-specific kit.
+
 Everything in this folder is a **draft**. The Lean drafts are stored as `*.lean.txt`, because our own CI
 (`.github/workflows/lean.yml`) compiles every `results/**/*.lean` and rejects `sorry`, and a statement file must
 contain exactly one. When you create the file upstream, name it **without** the `.txt` (for example
-`statements/oeis-a127752.lean`) and paste the contents unchanged. Nothing has been opened, posted or submitted. Every step below
+`statements/oeis-a127752.lean`) and paste the contents unchanged. PR 1 was opened by ShadowAlzazel from the compare URL as [open-math-agents#4276](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4276); wait for that to merge before PR 2. Every remaining step below
 happens from **your own** accounts, because Left to Solve credits the GitHub account that authored the
 merged pull request (README, "Credit policy"), and the OEIS only accepts edits from a registered person.
 
@@ -38,6 +40,9 @@ Save the `lease` value from the reply for the PR body. Send a beat every 5 minut
 (`POST .../api/desk/release?lease=<lease>&reason=submitted`). If you skip leasing, leave the Lease line out.
 
 ## Step 1: PR 1 (statement), in the GitHub web UI
+
+Prefer the [fast path in CLAIMING.md](../../../CLAIMING.md#fast-path-this-is-what-worked): the fork already exists, Kumi pushes a one-file branch, and you open the pull request from the compare URL. The manual steps below remain as a fallback. PR 1 is [#4276](https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4276).
+
 
 1. Open https://github.com/GuillaumeBAUD-coder/open-math-agents and click **Fork**, signed in as ShadowAlzazel.
 2. In your fork, click **Add file → Create new file** and name it `statements/oeis-a127752.lean`.
