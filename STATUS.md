@@ -7,7 +7,7 @@ One owner per file at a time; the other only reads or reviews. Every push gets o
 
 | Problem / file | Owner | Since | Doing |
 | --- | --- | --- | --- |
-| (none) | | | |
+| `results/a127752/claim/` (Left to Solve claim prep: statement, proof, OEIS draft, how-to) | Kumi-San | 2026-11-26 | drafting; prepare only, nothing submitted; review by Alo pending |
 
 ## Tracker
 
@@ -23,6 +23,7 @@ Recheck the upstream column against lefttosolve.com before each new target.
 
 ## Log
 
+- 2026-11-26 · Kumi-San · claim `results/a127752/claim/` (Left to Solve claim prep, owner Kumi-San, reviewer Alo); only that folder and STATUS.md.
 - 2026-11-26 · Kumi-San · first commit as Kumiho-San: A127752 notes.md gets the outside-review line.
 - 2026-11-26 · Alo · `02d87bc` CI: parse `#print axioms` names that end in a prime (`li_criterion_weighted'`), after `33cfe3d` missed that print format.
 - 2026-11-26 · Alo · `33cfe3d` CI: build FormalConjectures.Paper.RiemannHypothesisEquivalents and FormalConjectures.Wikipedia.MaximalPrimeGap after the Mathlib cache; require headline `#print axioms` per Lean file; reject `axiom`/`unsafe`/`implemented_by` with a comment-aware word-boundary scan; add prints on LiConditional.lean; link result pages to PROOF.md.
