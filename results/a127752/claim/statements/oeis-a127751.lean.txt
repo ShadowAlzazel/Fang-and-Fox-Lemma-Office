@@ -19,8 +19,8 @@ Formalization.
   truncation N > n, so it does not depend on a choice of truncation size.
 * `(triangle N)⁻¹` is (the truncation of) the triangle A127751; `a N n` is its n-th row sum,
   which is A127752(n).
-* `A035263 n` = A000035(A001511(n)): the parity of the ruler function A001511(n), the exponent of
-  the highest power of 2 dividing 2n (formula given in OEIS A035263, offset 1).
+* `A035263 n` = A000035(A001511(n)): the parity of the 2-adic valuation of 2n, from the
+  Formula section of OEIS A035263 (its name is the equivalent morphism 0 → 11, 1 → 10; offset 1).
 * `a(n) mod 2` presupposes that a(n) is an integer, so `main` states that the row sum is an
   integer m with m mod 2 = A035263(n+1).
 -/
@@ -36,7 +36,7 @@ def triangle (N : ℕ) : Matrix (Fin N) (Fin N) ℚ :=
 /-- Row `n` sum of the inverse of the truncation `triangle N` (for `n < N`): the OEIS `a(n)`. -/
 noncomputable def a (N : ℕ) (n : Fin N) : ℚ := ∑ k, (triangle N)⁻¹ n k
 
-/-- A035263 (offset 1): `A000035(A001511(n))`, the parity of the exponent of 2 in `2n`. -/
+/-- A035263 (offset 1), from the Formula section of OEIS A035263: `A000035(A001511(n))`, the parity of the 2-adic valuation of `2n`. -/
 def A035263 (n : ℕ) : ℕ := padicValNat 2 (2 * n) % 2
 
 /-- A127751 conjecture: the row sums of the inverse triangle, taken mod 2, are A035263
