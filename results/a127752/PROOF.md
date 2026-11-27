@@ -37,6 +37,10 @@ Proven for all \(n\), Lean-verified; Left to Solve lists [oeis-a127752](https://
 
 Alo, independent rebuild. Alo also checked the definitions against OEIS and checked the doubling step by hand.
 
+## Outside review
+
+An independent referee, who did not take part in the Lean work, recomputed the inverse triangle exactly up to \(N = 200\), checked the written argument and the Lean statement, and found the proof correct and the formalization faithful to the OEIS definition. Their suggestions on presentation (the window table, explicit uniqueness, the induction for parity) are what this version implements.
+
 ## Caveats
 
 - (a) A035263 is defined via \(\nu_2\) from its OEIS name (“parity of 2-adic valuation of 2n”), not via the morphism \(0 \to 11\), \(1 \to 10\). The equivalence of the two descriptions is classical but not formalized here; the 34-term guard only checks they agree at the start.
@@ -55,43 +59,73 @@ Invert a sparse triangle of fractions, add up each row, and read the answers mod
 
 ## Proof
 
-Write \(A\) for the lower-triangular matrix with \(A(n,k) = \frac{1}{3n+1}\) when \(k \le n \le 2k\), \(B = A^{-1}\), and \(a = B\mathbf{1}\) for its row sums.
+Write \(A\) for the lower-triangular matrix with \(A(n,k) = \frac{1}{3n+1}\) when \(k \le n \le 2k\) (equivalently \(\lceil n/2\rceil \le k \le n\)) and \(0\) otherwise, \(B = A^{-1}\), and \(a = B\mathbf{1}\) for the row sums of \(B\). The proof never inverts anything: it only uses the row equations of \(A a = \mathbf{1}\).
 
 ### 1. Every window sums to \(3n+1\)
 
 Since \(AB = I\), we get \(Aa = AB\mathbf{1} = \mathbf{1}\). Row \(n\) of \(A\) is the constant \(\frac{1}{3n+1}\) on the window \(\lceil n/2\rceil \le k \le n\) and zero elsewhere, so row \(n\) of \(Aa = \mathbf{1}\) says
 
 \[
-\sum_{\lceil n/2\rceil \le k \le n} a(k) = 3n+1.
+S(n) := \sum_{\lceil n/2\rceil \le k \le n} a(k) = 3n+1 \qquad (n \ge 0).
 \]
 
-This is `tri_mulVec_r` and `blockSum_r`.
+This is `tri_mulVec_r` and `blockSum_r`. The window depends on the parity of \(n\):
 
-### 2. Slide the window: a doubling recursion
+| \(n\) | \(\lceil n/2\rceil\) | window | \(S(n)\) |
+| --- | --- | --- | --- |
+| \(2m\) | \(m\) | \([m,\,2m]\) | \(6m+1\) |
+| \(2m+1\) | \(m+1\) | \([m+1,\,2m+1]\) | \(6m+4\) |
+| \(2m+2\) | \(m+1\) | \([m+1,\,2m+2]\) | \(6m+7\) |
 
-Going from row \(n-1\) to row \(n\), the window always gains its new top entry \(a(n)\), and loses its bottom entry \(a(\lceil (n-1)/2\rceil)\) only when \(n\) is odd. The right side grows by exactly 3. So
+### 2. Compare neighbouring windows: a doubling recursion
+
+First, \(S(0) = a(0) = 1\), since the window of row 0 is \([0,0]\). Now compare windows from the table, for every \(m \ge 0\) (the case \(m = 0\) compares \([1,1]\) with \([0,0]\), and \([1,2]\) with \([1,1]\)):
+
+- \([m+1,2m+1]\) is \([m,2m]\) with \(a(m)\) removed and \(a(2m+1)\) added, so
+  \(S(2m+1) - S(2m) = a(2m+1) - a(m) = (6m+4) - (6m+1) = 3\).
+- \([m+1,2m+2]\) is \([m+1,2m+1]\) with \(a(2m+2)\) added and nothing removed, so
+  \(S(2m+2) - S(2m+1) = a(2m+2) = (6m+7) - (6m+4) = 3\).
+
+Hence
 
 \[
-a(0) = 1, \qquad a(2m+2) = 3, \qquad a(2m+1) = a(m) + 3.
+a(0) = 1, \qquad a(2m+1) = a(m) + 3, \qquad a(2m+2) = 3 \qquad (m \ge 0).
 \]
 
-That is the Lean function `r`, and `blockSum_r` proves it satisfies every window equation.
+Every index \(n \ge 1\) is exactly one of \(2m+1\) or \(2m+2\), so these equations define \(a\) completely, by recursion on \(n\). That is the Lean function `r`, with `r_zero`, `r_odd`, `r_even`; `blockSum_r` proves that `r` satisfies every window equation.
 
-### 3. Triangularity makes the solution unique
+### 3. Uniqueness: the recursion is the row sum of the inverse
 
-Each truncation of \(A\) is lower triangular with diagonal \(\frac{1}{3n+1} \ne 0\), so its determinant is a unit and \(Aa = \mathbf{1}\) has exactly one solution. Hence \(a = r\), for every truncation size that contains row \(n\). In particular every \(a(n)\) is a positive integer, which is not obvious from a matrix of fractions.
+Each truncation of \(A\) is lower triangular with nonzero diagonal \(A(n,n) = \frac{1}{3n+1}\), so its determinant is nonzero (a unit in \(\mathbb{Q}\)) and \(A\,x = \mathbf{1}\) has exactly one solution. The function \(r\) of step 2 solves it, and so does \(a = B\mathbf{1}\). Hence \(a = r\), for every truncation size that contains row \(n\). In particular every \(a(n)\) is a positive integer, which is not obvious from a matrix of fractions.
 
-This is `tri_lower`, `tri_det_isUnit`, `rowSum_inv_tri`, `a127752_eq_r`.
+This is `tri_lower`, `tri_det_isUnit`, `rowSum_inv_tri`, `a127752_eq_r`. The determinant being a unit is also what guarantees Mathlib's convention (a singular matrix has inverse \(0\)) never applies.
 
-### 4. Mod 2 it is copy-and-flip
+### 4. Parity, by strong induction
 
-Mod 2 the recursion reads \(a(2m) \equiv 1\) and \(a(2m+1) \equiv 1 + a(m)\). Each step of \(m \mapsto 2m+1\), which is \(n+1 \mapsto 2(n+1)\), flips the bit; an odd \(n+1\) resets it to 1. Counting the flips is counting factors of 2:
+Claim: \(a(n) \equiv 1 + \nu_2(n+1) \pmod 2\) for all \(n \ge 0\). Assume it for all smaller indices.
+
+- \(n = 0\): \(a(0) = 1\) and \(\nu_2(1) = 0\), so both sides are \(1\). (Here \(a(0) = 1\), not \(3\) as in the even case below, but \(1 \equiv 3\) mod 2, so the parity pattern is the same.)
+- \(n = 2m+2\), even and positive: \(a(n) = 3 \equiv 1\), and \(n+1\) is odd, so \(\nu_2(n+1) = 0\).
+- \(n = 2m+1\), odd: \(n+1 = 2(m+1)\) has exactly one more factor of 2 than \(m+1\), so \(1 + \nu_2(n+1) = 2 + \nu_2(m+1)\). On the other side, \(a(n) = a(m) + 3 \equiv a(m) + 1 \equiv (1 + \nu_2(m+1)) + 1\) by the induction hypothesis, since \(m < n\). The two sides agree.
+
+So
 
 \[
-a(n) \equiv 1 + \nu_2(n+1) = \nu_2\bigl(2(n+1)\bigr) \pmod{2}.
+a(n) \equiv 1 + \nu_2(n+1) \equiv \nu_2\bigl(2(n+1)\bigr) \pmod{2}.
 \]
 
-This is Cloitre's rule for the period-doubling sequence, “concatenate, then change the last term”, read backwards. This is `r_mod_two`, and the headline `a127752_mod_two`.
+Each step \(n+1 \mapsto 2(n+1)\) adds a factor of 2 and one odd 3, so it flips the bit; an odd \(n+1\) resets it to 1. This is Cloitre's rule for the period-doubling sequence, "concatenate, then change the last term", read backwards. It is `r_mod_two`, and the headline `a127752_mod_two`.
+
+### Remark: the rows of \(B\) (not in Lean)
+
+The same window comparison, done on whole rows instead of row sums, gives \(B\) explicitly. Row \(n\) of \(AB = I\) says \(\sum_{\lceil n/2\rceil \le k \le n} B_k = (3n+1)\,e_n\), where \(B_k\) is row \(k\) of \(B\) and \(e_n\) the \(n\)-th unit vector. Comparing neighbouring windows as in step 2 gives
+
+\[
+B_{2m+2} = (6m+7)\,e_{2m+2} - (6m+4)\,e_{2m+1}, \qquad
+B_{2m+1} = B_m + (6m+4)\,e_{2m+1} - (6m+1)\,e_{2m}.
+\]
+
+For example \(B_2 = (0,-4,7)\) and \(B_3 = (0,4,-7,10)\), matching the triangle in [A127751](https://oeis.org/A127751). Summing entries recovers \(a(2m+2) = 3\) and \(a(2m+1) = a(m)+3\). These two formulas were verified with exact rational arithmetic for every row below \(N = 200\) (computed independently of `check.py` and not part of the repository); they are not stated in Lean.
 
 ## Closed form, not in Lean
 
@@ -105,7 +139,7 @@ a(n) =
 \end{cases}
 \]
 
-Checked numerically for \(n < 10^6\) in `check.py`. Not stated in Lean, since the parity theorem does not need it.
+This is numerics plus paper, not Lean: unwinding the recursion by hand gives the formula, and `check.py` confirms it for all \(n < 10^6\) (an exact inverse for \(N = 200\) also agrees). It is not stated or proved in Lean, since the parity theorem does not need it.
 
 ## The Black Swan link
 
