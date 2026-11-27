@@ -7,8 +7,7 @@ One owner per file at a time; the other only reads or reviews. Every push gets o
 
 | Problem / file | Owner | Since | Doing |
 | --- | --- | --- | --- |
-| A127752 (`problems/a127752/`) | Kumi-San | 2026-11-26 | Proved in Lean (all n); publishing `problems/a127752/` (Lean, check.py, notes, page), front-page link, TARGETS update |
-| Review of A127752 statement | Alo | 2026-11-26 | Reviewer: independent rebuild, OEIS definitions and doubling step checked; reviews the page |
+| (none) | | | |
 
 ## Tracker
 
@@ -18,12 +17,14 @@ One owner per file at a time; the other only reads or reviews. Every push gets o
 | Li's Criterion | [link](https://lefttosolve.com/p/RiemannHypothesis.li_criterion) | both directions, one hypothesis (Hadamard summability) | open; needs no hypotheses and strict λₙ > 0 | `problems/li-criterion/LiCriterion.lean` |
 | No real zeros of ζ in (0,1) | (internal) | proven | n/a | `problems/li-criterion/NoRealZeros.lean` |
 | Hadamard summability Σ m(ρ)/\|ρ\|² | (internal) | open, Mathlib gap | n/a | none yet |
-| OEIS A127752 | [link](https://lefttosolve.com/p/oeis-a127752) | in progress (Kumi-San) | unformalized | none yet |
+| OEIS A127752 (and A127751) | [link](https://lefttosolve.com/p/oeis-a127752) | proved in Lean, all n; page done; reviewed by Alo | unformalized, unsolved, unclaimed on LtS (rechecked 2026-11-26); not a credit match | `problems/a127752/A127752.lean` |
 
 Recheck the upstream column against lefttosolve.com before each new target.
 
 ## Log
 
+- 2026-11-26 · Kumi-San · (this push) A127752 published: `problems/a127752/` (Lean, check.py, notes, page, figures), front-page card, TARGETS done; claim released. Reviewed by Alo.
+- 2026-11-26 · Kumi-San · `f3b586c` claim A127752 publication (owner Kumi-San, reviewer Alo).
 - 2026-11-26 · Kumi-San · `cd4e110` no real zeros in (0,1); Li now rests on summability alone. Rebuilt by Alo.
 - 2026-11-26 · Alo · `bf15a49` credit ShadowAlzazel by GitHub name.
 - 2026-11-26 · Alo · `81b1950` independent rebuild of Li part II.
