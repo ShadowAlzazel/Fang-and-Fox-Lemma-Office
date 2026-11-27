@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Li's Criterion, the Flower on the Circle · Fang &amp; Fox Lemma Office</title>
-<meta name="description" content="Li's criterion, both directions, conditional: RH is equivalent to nonnegativity of the multiplicity-weighted Li coefficients, given Hadamard summability Σ m(ρ)/|ρ|² &lt; ∞ and no real zeros in (0,1).">
+<meta name="description" content="RH ⇔ λₙ ≥ 0 for all n, proven in Lean assuming only the multiplicity-weighted Hadamard summability Σ m(ρ)/|ρ|² &lt; ∞. The theorem is li_criterion_weighted'."
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@500;600;700&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
@@ -27,11 +27,11 @@ pre{background:var(--surface);border:1px solid var(--rule);border-radius:10px;pa
 </style></head><body><main>
 <div class="crumb"><a href="../../">Fang &amp; Fox Lemma Office</a> · Problem 1 · Li's criterion</div>
 <h1>The flower on the circle</h1>
-<p><span class="tag open">partial: both directions, conditional</span><span class="tag" style="background:none;border:1px solid var(--rule);color:var(--muted)">Lean 4 · conditional · kernel-checked</span></p>
-<p class="lede">Bend the critical line into a circle. Under the Riemann Hypothesis every zero of \(\zeta\) lands on that circle, and Li's coefficients become sums of squares. Conversely, a zero off the line lands outside the circle and, by a Kronecker return, forces some coefficient negative. Both directions are proved in Lean, conditional on two named hypotheses: the multiplicity-weighted Hadamard summability \(\sum m(\rho)/|\rho|^2&lt;\infty\), and the absence of real zeros in \((0,1)\).</p>
+<p><span class="tag open">partial: both directions, one hypothesis</span><span class="tag" style="background:none;border:1px solid var(--rule);color:var(--muted)">Lean 4 · conditional · kernel-checked</span></p>
+<p class="lede"><strong>\(\mathrm{RH}\iff\lambda_n\ge 0\) for all \(n\ge 1\)</strong>, proven in Lean assuming only the multiplicity-weighted Hadamard summability \(\sum m(\rho)/|\rho|^2&lt;\infty\). That is the theorem <a class="nmref" href="#lean-li_criterion_weighted'">li_criterion_weighted'</a>. The Möbius map \(w=1-1/\rho\) sends the critical line to the unit circle, so under RH every term is a square, and an off-line zero would force some coefficient negative.</p>
 
 <div class="warn"><h3>Read this first</h3>
-<p><strong>This does not solve Li's Criterion on Left to Solve.</strong> Upstream wants both directions, with strict inequality \(\lambda_n&gt;0\), and no extra hypotheses. What is here is the conditional equivalence \(\mathrm{RH}\iff\lambda_n\ge 0\), given Hadamard summability and no real zeros in the strip. Every caveat is in <a href="#honesty">the honesty section</a>.</p></div>
+<p><strong>This does not solve Li's Criterion on Left to Solve.</strong> Upstream wants both directions, with the strict inequality \(\lambda_n&gt;0\), and no extra hypotheses. What is here is the equivalence \(\mathrm{RH}\iff\lambda_n\ge 0\), still assuming Hadamard summability. The absence of real zeros in \((0,1)\) is now a theorem, not a hypothesis. Every caveat is in <a href="#honesty">the honesty section</a>.</p></div>
 
 <h2>The statement</h2>
 <p>Let \(\rho\) run over the nontrivial zeros of \(\zeta\), counted with multiplicity. Li's coefficients are
@@ -62,10 +62,10 @@ summed in conjugate pairs so that the series converges. <strong>Li's criterion</
 
 <p>Now the payoff. For \(|w|=1\) and \(u=w^n\), also on the circle,
 $$2\operatorname{Re}(1-u)=|1-u|^2\ \ge 0 .$$
-So under RH every term of \(\lambda_n\) is a square, and the sum cannot be negative. If a zero is off the line, \(|w|\ne1\), and a Kronecker return sends the dominant powers near the positive axis, that term grows like \(-R^n\) and drives some coefficient negative. That is the converse, now formalized as Part II, still conditional on the two named hypotheses.</p>
+So under RH every term of \(\lambda_n\) is a square, and the sum cannot be negative. If a zero is off the line, \(|w|\ne1\), and a Kronecker return sends the dominant powers near the positive axis, that term grows like \(-R^n\) and drives some coefficient negative. That is the converse, formalized as Part II, now conditional only on the multiplicity-weighted Hadamard summability.</p>
 
 <h2>Part I · the easy direction</h2>
-<p>Each step is a lemma in <code>LiCriterion.lean</code> (and in the earlier Part I file <code>LiConditional.lean</code>), in the order below. Names link to the code.</p>
+<p>Each step is a lemma in <code>LiCriterion.lean</code> (and in the earlier Part I file <code>LiConditional.lean</code>), in the order below. Names link to the code. The standalone file <a href="NoRealZeros.lean"><code>NoRealZeros.lean</code></a> is Part III.</p>
 <div class="step"><h3>1 · The critical line goes to the circle <a class="nmref" href="#lean-norm_sub_one_eq_of_re_half">norm_sub_one_eq_of_re_half</a> <a class="nmref" href="#lean-norm_one_sub_inv_eq_one">norm_one_sub_inv_eq_one</a></h3>
 <p>If \(\operatorname{Re}\rho=\tfrac12\) then \(|\rho-1|=|\rho|\), hence \(|1-1/\rho|=1\). Unconditional.</p></div>
 <div class="step"><h3>2 · Terms on the circle are squares <a class="nmref" href="#lean-re_one_sub_pow_nonneg">re_one_sub_pow_nonneg</a> <a class="nmref" href="#lean-re_one_sub_pow_pos">re_one_sub_pow_pos</a> <a class="nmref" href="#lean-re_one_sub_pow_le">re_one_sub_pow_le</a></h3>
@@ -77,18 +77,16 @@ So under RH every term of \(\lambda_n\) is a square, and the sum cannot be negat
 <div class="step"><h3>5 · RH gives \(\lambda_n\ge0\), and, with the hypotheses, convergence and \(\lambda_n&gt;0\) <a class="nmref" href="#lean-liCoeff_nonneg">liCoeff_nonneg</a> <a class="nmref" href="#lean-liCoeff_summable">liCoeff_summable</a> <a class="nmref" href="#lean-liCoeff_pos">liCoeff_pos</a></h3>
 <p><code>liCoeff_nonneg</code>: under RH every term is \(\ge0\), so \(\lambda_n\ge0\). <code>liCoeff_summable</code>: under RH and <code>HadamardHypothesis</code>, comparison with \(n^2\sum m(\rho)/|\rho|^2\) shows the series converges absolutely. <code>liCoeff_pos</code>: add <code>hinf</code>, infinitely many zeros. Only finitely many points of the circle satisfy \(w^n=1\), and \(\rho\mapsto w(\rho)\) is injective, so some zero has \(w^n\ne1\), and its term is strictly positive. A convergent sum of nonnegative terms with one positive term is positive.</p></div>
 
-<h2>The named assumptions</h2>
+<h2>The named assumption</h2>
 <div class="step"><h3><a class="nmref" href="#lean-HadamardHypothesis">HadamardHypothesis</a>: the Hadamard product for \(\xi\)</h3>
 <p>Mathlib does not yet have the Hadamard factorization of \(\xi\). We state its consequences as a structure with two fields: (1) the multiplicity-weighted summability \(\sum_\rho m(\rho)/|\rho|^2&lt;\infty\), and (2) \(\xi'/\xi(s)=B+\sum_\rho m(\rho)\bigl(\tfrac1{s-\rho}+\tfrac1\rho\bigr)\) for a constant \(B\). <strong>Why this is honest:</strong> this is the classical factorization of an entire function of order 1, proved unconditionally by Hadamard in 1893. It does not mention RH, and nothing in it is Li's criterion in disguise. We also ran a coarse numerical sanity check (<code>check_xi.py</code>, mpmath): the constant \(B\) computed from \(\xi'/\xi\) near \(s=1\) came out as \(-0.0230957089661\), equal to \(-\lambda_1=-(1+\tfrac\gamma2-\tfrac12\log4\pi)\) to about 10 digits or better. The zero sum itself, truncated at 300 conjugate pairs, gave \(0.1048\) at \(s=3\) against the true \(0.1144\). That gap is the slowly decaying tail, about \(0.012\) by a density estimate, so this part of the check is only consistent with the expansion, not a precise confirmation. <strong>Both directions use only field (1)</strong>, the multiplicity-weighted bound \(\sum m(\rho)/|\rho|^2&lt;\infty\). Field (2) is stated for the bridge to the Taylor coefficients of \(\log\xi\), which is not proved here, and is unused.</p></div>
-<div class="step"><h3><a class="nmref" href="#lean-NoRealZerosInStrip">NoRealZerosInStrip</a>: no real zeros in \((0,1)\)</h3>
-<p>The converse needs to know that a zero off the critical line is not real, so that conjugation and the reflection \(\rho\mapsto 1-\bar\rho\) can push it to the left half of the strip. That \(\zeta(\sigma)\ne 0\) for \(0&lt;\sigma&lt;1\) is classical: \((1-2^{1-\sigma})\zeta(\sigma)=\eta(\sigma)&gt;0\), with \(\eta\) the Dirichlet eta function. Mathlib does not have \(\eta\), so the main theorems take this as an explicit hypothesis. It is a statement about the real axis, not a disguised form of RH. Formalizing it is an open target on the office list.</p></div>
 <div class="step"><h3><code>hinf</code>: infinitely many zeros</h3>
 <p><code>nontrivialPosZeros.Infinite</code> is a classical fact (for instance from the zero-counting formula \(N(T)\sim\frac T{2\pi}\log\frac T{2\pi e}\)) that Mathlib does not have, so <code>liCoeff_pos</code> takes it as a hypothesis. It is needed only for the strict inequality \(\lambda_n&gt;0\), not for the equivalence with \(\ge 0\).</p></div>
 
 <h2>Part II · the converse</h2>
-<p>Now suppose some zero is off the line, and assume the two named hypotheses. We show that some Li coefficient is negative. Names again link to the Lean.</p>
+<p>Now suppose some zero is off the line, and assume only the multiplicity-weighted Hadamard summability. We show that some Li coefficient is negative. The fact that the off-line zero is not real is the theorem of Part III, not an extra hypothesis. Names again link to the Lean.</p>
 <div class="step"><h3>1 · An off-line zero can be pushed left <a class="nmref" href="#lean-exists_posZero_re_lt_half">exists_posZero_re_lt_half</a> <a class="nmref" href="#lean-zeta_one_sub_conj_eq_zero">zeta_one_sub_conj_eq_zero</a></h3>
-<p>If RH fails, some zero sits in the strip: the functional equation kills zeros with \(\operatorname{Re}s\le 0\) except the trivial ones (<a class="nmref" href="#lean-re_pos_of_zeta_eq_zero">re_pos_of_zeta_eq_zero</a>), and \(\zeta\) has no zeros with \(\operatorname{Re}s\ge 1\). By <code>NoRealZerosInStrip</code> it is not real. Conjugation (<code>riemannZeta_conj</code>) puts it in the upper half-plane, and the proved symmetry \(\rho\mapsto 1-\bar\rho\) — functional equation plus conjugation — then yields a zero with \(\operatorname{Im}\rho&gt;0\) and \(\operatorname{Re}\rho&lt;\tfrac12\).</p></div>
+<p>If RH fails, some zero sits in the strip: the functional equation kills zeros with \(\operatorname{Re}s\le 0\) except the trivial ones (<a class="nmref" href="#lean-re_pos_of_zeta_eq_zero">re_pos_of_zeta_eq_zero</a>), and \(\zeta\) has no zeros with \(\operatorname{Re}s\ge 1\). By the theorem <a class="nmref" href="#lean-noRealZerosInStrip_holds">noRealZerosInStrip_holds</a> (Part III) it is not real. Conjugation (<code>riemannZeta_conj</code>) puts it in the upper half-plane, and the proved symmetry \(\rho\mapsto 1-\bar\rho\) — functional equation plus conjugation — then yields a zero with \(\operatorname{Im}\rho&gt;0\) and \(\operatorname{Re}\rho&lt;\tfrac12\).</p></div>
 <div class="step"><h3>2 · Left of the line means outside the circle <a class="nmref" href="#lean-one_lt_norm_one_sub_inv">one_lt_norm_one_sub_inv</a></h3>
 <p>\(\operatorname{Re}\rho&lt;\tfrac12\) if and only if \(|\rho-1|&gt;|\rho|\), if and only if \(|w(\rho)|&gt;1\). So that zero lands strictly outside the unit circle.</p></div>
 <div class="step"><h3>3 · Only finitely many zeros can sit near the largest radius <a class="nmref" href="#lean-exists_neg_of_large">exists_neg_of_large</a></h3>
@@ -100,16 +98,33 @@ So under RH every term of \(\lambda_n\) is a square, and the sum cannot be negat
 <div class="step"><h3>6 · \(R^d\) beats the tail, so some coefficient is negative <a class="nmref" href="#lean-li_converse">li_converse</a> <a class="nmref" href="#lean-li_criterion_weighted">li_criterion_weighted</a></h3>
 <p>Putting the pieces together,
 $$\frac{\lambda_d}{2}\ \le\ \Bigl(\sum_{i\in S}m_i\Bigr)\Bigl(1-\frac{R^d}{2}\Bigr)+(d+d^2 r^d)\sum_i m_i|u_i|^2.$$
-Because \(r&lt;R\), the geometric \(R^d\) beats the \(d^2 r^d\) tail for large \(d\), and \(\lambda_d&lt;0\). This contradicts the assumption that every coefficient is nonnegative. Hence RH holds. Together with Part I, that is the equivalence <code>li_criterion_weighted</code>.</p></div>
+Because \(r&lt;R\), the geometric \(R^d\) beats the \(d^2 r^d\) tail for large \(d\), and \(\lambda_d&lt;0\). This contradicts the assumption that every coefficient is nonnegative. Hence RH holds. Together with Part I, and with Part III discharging the real-zero hypothesis, that is the equivalence <a class="nmref" href="#lean-li_criterion_weighted'">li_criterion_weighted'</a>, whose only remaining assumption is Hadamard summability.</p></div>
 <div class="step"><h3>Bonus · the same converse for upstream's unweighted \(\lambda\) <a class="nmref" href="#lean-li_converse_unweighted">li_converse_unweighted</a></h3>
-<p>Run the same engine with every weight equal to \(1\). Summability of \(\sum 1/|\rho|^2\) follows from the multiplicity-weighted bound \(\sum m(\rho)/|\rho|^2&lt;\infty\), because \(m(\rho)\ge 1\). So the “\(\Leftarrow\)” half of the upstream statement, about formal-conjectures' unweighted <code>lambda</code>, also holds conditionally. The “\(\Rightarrow\)” half for that unweighted sum, and the strict inequality, are not proved.</p></div>
+<p>Run the same engine with every weight equal to \(1\). Summability of \(\sum 1/|\rho|^2\) follows from the multiplicity-weighted bound \(\sum m(\rho)/|\rho|^2&lt;\infty\), because \(m(\rho)\ge 1\). So the “\(\Leftarrow\)” half of the upstream statement, about formal-conjectures' unweighted <code>lambda</code>, also holds conditionally on Hadamard summability alone (<a class="nmref" href="#lean-li_converse_unweighted_of_hadamard">li_converse_unweighted_of_hadamard</a>). The “\(\Rightarrow\)” half for that unweighted sum, and the strict inequality, are not proved.</p></div>
 
 <div class="synth"><h3>A synthesis</h3>
-<p>Given the multiplicity-weighted Hadamard summability \(\sum m(\rho)/|\rho|^2&lt;\infty\) — and the named hypothesis that \(\zeta\) has no real zeros in \((0,1)\) — nonnegativity of the zero-sum \(\lambda_n\) is equivalent to RH. The engine behind the converse, <a class="nmref" href="#lean-exists_neg_of_large">exists_neg_of_large</a>, is more general still: it applies to any weighted point set whose weights \(a_i\ge 1\) make \(\sum a_i|1-w_i|^2\) summable, once at least one point lies outside the unit circle. The zeta-specific work is only to produce such a point from a failure of RH.</p></div>
+<p>Given only the multiplicity-weighted Hadamard summability \(\sum m(\rho)/|\rho|^2&lt;\infty\), nonnegativity of the zero-sum \(\lambda_n\) is equivalent to RH. That is <a class="nmref" href="#lean-li_criterion_weighted'">li_criterion_weighted'</a>. The engine behind the converse, <a class="nmref" href="#lean-exists_neg_of_large">exists_neg_of_large</a>, is more general still: it applies to any weighted point set whose weights \(a_i\ge 1\) make \(\sum a_i|1-w_i|^2\) summable, once at least one point lies outside the unit circle. The zeta-specific work is only to produce such a point from a failure of RH, and to know — now as a theorem — that the point is not real.</p></div>
+
+<h2>Part III · no real zeros in (0,1)</h2>
+<p>The converse used to take “no real zeros of \(\zeta\) in \((0,1)\)” as a named hypothesis. It is now a theorem. The route is a comparison of the sum with the integral, not the Dirichlet eta function. The standalone file is <a href="NoRealZeros.lean"><code>NoRealZeros.lean</code></a>; the same lemmas are included in <code>LiCriterion.lean</code>.</p>
+<p>For \(n\ge 1\), write
+$$c_m(s)=(1-s)(n+1)^{-s}-\bigl((n+1)^{1-s}-n^{1-s}\bigr),\qquad n=m+1.$$
+Equivalently, \(c_m(s)=(1-s)\int_n^{n+1}\bigl((n+1)^{-s}-x^{-s}\bigr)\,dx\). The definition in Lean is <a class="nmref" href="#lean-corr">corr</a>.</p>
+<div class="step"><h3>1 · A mean-value bound makes \(\sum c_m\) holomorphic on \(\operatorname{Re}s&gt;0\) <a class="nmref" href="#lean-norm_corr_le">norm_corr_le</a> <a class="nmref" href="#lean-summable_corr">summable_corr</a></h3>
+<p>By the mean-value inequality, twice (<a class="nmref" href="#lean-norm_cpow_sub_cpow_le">norm_cpow_sub_cpow_le</a>), \(|c_m(s)|\le|1-s|\,|s|\,n^{-\operatorname{Re}s-1}\). So \(\sum c_m(s)\) converges locally uniformly on \(\operatorname{Re}s&gt;0\), and the sum is holomorphic there.</p></div>
+<div class="step"><h3>2 · For \(\operatorname{Re}s&gt;1\) the identity is elementary <a class="nmref" href="#lean-tsum_corr_of_one_lt_re">tsum_corr_of_one_lt_re</a> <a class="nmref" href="#lean-hasSum_telescope">hasSum_telescope</a></h3>
+<p>Here \(\sum(n+1)^{-s}=\zeta(s)-1\), and \(\sum\bigl((n+1)^{1-s}-n^{1-s}\bigr)=-1\) telescopes, so
+$$(s-1)\zeta(s)=s-\sum_m c_m(s).$$</p></div>
+<div class="step"><h3>3 · The identity theorem extends it to \(\operatorname{Re}s&gt;0\) <a class="nmref" href="#lean-riemannZeta₁_eq_sub_tsum_corr">riemannZeta₁_eq_sub_tsum_corr</a></h3>
+<p>Both sides are holomorphic on a convex open set containing \(s\) and \(s+2\) — the left-hand side is Mathlib’s entire function \(\texttt{riemannZeta}_1=(s-1)\zeta(s)\) — and they agree near \(s+2\). By the identity theorem they agree for every \(\operatorname{Re}s&gt;0\).</p></div>
+<div class="step"><h3>4 · Bernoulli’s inequality makes each \(c_m(\sigma)&lt;0\) <a class="nmref" href="#lean-realCorr_neg">realCorr_neg</a> <a class="nmref" href="#lean-riemannZeta_re_lt_of_mem_Ioo">riemannZeta_re_lt_of_mem_Ioo</a> <a class="nmref" href="#lean-riemannZeta_ne_zero_of_mem_Ioo">riemannZeta_ne_zero_of_mem_Ioo</a></h3>
+<p>For real \(0&lt;\sigma&lt;1\), \(x\mapsto x^{1-\sigma}\) is strictly concave, so its increment over \([n,n+1]\) exceeds its slope at the right end: \((n+1)^{1-\sigma}-n^{1-\sigma}&gt;(1-\sigma)(n+1)^{-\sigma}\). That is Bernoulli’s inequality \((1+x)^p&lt;1+px\), and it says \(c_m(\sigma)&lt;0\). Hence \((\sigma-1)\zeta(\sigma)=\sigma-\sum c_m(\sigma)&gt;\sigma\), and dividing by \(\sigma-1&lt;0\) yields
+$$\zeta(\sigma)&lt;\frac{\sigma}{\sigma-1}&lt;0.$$
+In particular \(\zeta(\sigma)\ne 0\). This is <a class="nmref" href="#lean-noRealZerosInStrip_holds">noRealZerosInStrip_holds</a>, and it is what discharges the last hypothesis besides Hadamard summability.</p></div>
 
 <h2 id="honesty">Honesty notes</h2>
-<div class="warn"><h3>(a) The equivalence is conditional</h3>
-<p><strong>\(\mathrm{RH}\iff\lambda_n\ge 0\) is proved given two named hypotheses:</strong> the multiplicity-weighted Hadamard summability \(\sum m(\rho)/|\rho|^2&lt;\infty\), and <code>NoRealZerosInStrip</code>. Neither is an axiom, and neither is RH or Li in disguise, but both are assumptions in the Lean, because Mathlib does not yet have them.</p></div>
+<div class="warn"><h3>(a) One hypothesis remains</h3>
+<p><strong>\(\mathrm{RH}\iff\lambda_n\ge 0\) for all \(n\) is proved assuming only the multiplicity-weighted Hadamard summability \(\sum m(\rho)/|\rho|^2&lt;\infty\).</strong> That hypothesis is a classical, unconditional theorem, stated as an assumption because Mathlib does not have it. It is not RH or Li in disguise.</p></div>
 <div class="warn"><h3>(b) The deep half of Li is not formalized</h3>
 <p>Li's original criterion identifies \(\lambda_n\) with the Taylor coefficients of \(\log\xi\) at \(s=1\), which can be computed without knowing the zeros. <strong>That identification is not formalized here.</strong> What is proved is an equivalence between RH and the nonnegativity of a sum written directly over the zeros.</p></div>
 <div class="warn"><h3>(c) This is not a credit solve of upstream <code>li_criterion</code></h3>
@@ -118,14 +133,322 @@ Because \(r&lt;R\), the geometric \(R^d\) beats the \(d^2 r^d\) tail for large \
 <p>The <code>log_deriv_expansion</code> field of <code>HadamardHypothesis</code> is stated and then never used. Both directions use only the multiplicity-weighted summability \(\sum m(\rho)/|\rho|^2&lt;\infty\).</p></div>
 <div class="warn"><h3>Notes that still apply</h3>
 <p><code>liCoeff_nonneg</code> alone is nearly empty, because Lean's <code>tsum</code> returns \(0\) when a family is not summable. Read it only together with <code>liCoeff_summable</code>. (Alo)</p>
-<p>The sum itself runs over zeros with \(\operatorname{Im}\rho&gt;0\), doubled, so a real zero in \((0,1)\) would be missed by the setup. The converse now takes <code>NoRealZerosInStrip</code> as a named hypothesis rather than leaving this implicit; the fact is still not proved in the file. (Alo)</p>
-<p><code>liCoeff</code> counts multiplicity; upstream <code>lambda</code> counts each zero once. They agree only if all zeros are simple, which is not known. No identification between them is proved, though <code>li_converse_unweighted</code> gives the converse for the unweighted sum on its own terms.</p></div>
+<p>The sum itself runs over zeros with \(\operatorname{Im}\rho&gt;0\), doubled, so a real zero in \((0,1)\) would be missed by the setup. Part III now proves there are none, so this is no longer an extra hypothesis.</p>
+<p><code>liCoeff</code> counts multiplicity; upstream <code>lambda</code> counts each zero once. They agree only if all zeros are simple, which is not known. No identification between them is proved, though <code>li_converse_unweighted_of_hadamard</code> gives the converse for the unweighted sum on its own terms, still assuming only Hadamard summability.</p></div>
 
 <h2>The Lean half</h2>
-<p>The complete development is <a href="LiCriterion.lean"><code>LiCriterion.lean</code></a>, both directions, compiled against <a href="https://github.com/google-deepmind/formal-conjectures/tree/9097e2f90e66d2f6244209cb1c07f7120d17ec53">formal-conjectures at 9097e2f</a> on Lean and Mathlib v4.33.1. It imports <code>FormalConjectures.Paper.RiemannHypothesisEquivalents</code> for Mathlib's <code>RiemannHypothesis</code> and <code>nontrivialPosZeros</code>. The earlier Part I file, <a href="LiConditional.lean"><code>LiConditional.lean</code></a>, is kept for the record; every Part I lemma still appears, under the same name, in <code>LiCriterion.lean</code>.</p>
-<pre>import FormalConjectures.Paper.RiemannHypothesisEquivalents
+<p>The complete development is <a href="LiCriterion.lean"><code>LiCriterion.lean</code></a>: Part III (no real zeros) concatenated with both directions of the weighted Li criterion, compiled against <a href="https://github.com/google-deepmind/formal-conjectures/tree/9097e2f90e66d2f6244209cb1c07f7120d17ec53">formal-conjectures at 9097e2f</a> on Lean and Mathlib v4.33.1. The standalone Part III file is <a href="NoRealZeros.lean"><code>NoRealZeros.lean</code></a>. The earlier Part I file, <a href="LiConditional.lean"><code>LiConditional.lean</code></a>, is kept for the record; every Part I lemma still appears, under the same name, in <code>LiCriterion.lean</code>.</p>
+<pre>import Mathlib
+import FormalConjectures.Paper.RiemannHypothesisEquivalents
 
 /-!
+# Li's criterion (multiplicity-weighted), conditional only on Hadamard summability
+
+This file is a self-contained concatenation of
+* `NoRealZeros.lean` — an unconditional proof that `ζ(σ) ≠ 0` (indeed `ζ(σ) &lt; σ/(σ-1) &lt; 0`)
+  for real `0 &lt; σ &lt; 1`; and
+* `LiConditional2.lean` — both directions of the weighted Li criterion, conditional on
+  `HadamardHypothesis` (only its summability field `∑ m(ρ)/|ρ|² &lt; ∞` is used) and on
+  `NoRealZerosInStrip`;
+
+(copied verbatim, since the office files are standalone, not a Lake library), followed by the
+discharge `noRealZerosInStrip_holds : NoRealZerosInStrip` and the corollaries
+`li_criterion_weighted'`, `li_converse_of_hadamard`, `li_converse_unweighted_of_hadamard`, whose
+only remaining hypothesis is `HadamardHypothesis`.
+
+Not formalized here: the deep half of Li (that `λₙ` are the Taylor coefficients of `log ξ`), and
+Hadamard summability itself.  So this is **not** a solve of the upstream `li_criterion`.
+-/
+
+section NoRealZerosSection
+
+/-
+# `ζ` has no zeros on the real segment `(0, 1)`
+
+**Main results** (namespace `NoRealZeros`):
+* `riemannZeta_ne_zero_of_mem_Ioo : 0 &lt; σ → σ &lt; 1 → riemannZeta σ ≠ 0`;
+* the sharper `riemannZeta_re_lt_of_mem_Ioo : (riemannZeta σ).re &lt; σ / (σ - 1)` (hence `&lt; 0`,
+  `riemannZeta_re_neg_of_mem_Ioo`) and `riemannZeta_im_eq_zero_of_mem_Ioo : (riemannZeta σ).im = 0`.
+
+**Human proof sketch** (Euler–Maclaurin / "compare the sum with the integral", route B).
+
+For `n ≥ 1` put
+  `c_n(s) = (1 - s)(n+1)^{-s} - ((n+1)^{1-s} - n^{1-s}) = (1 - s) ∫ₙⁿ⁺¹ ((n+1)^{-s} - x^{-s}) dx`.
+1. *Second-order cancellation* (`norm_corr_le`).  By the mean value inequality, twice,
+   `|c_n(s)| ≤ |1 - s| |s| n^{-Re s - 1}`.  So `∑ c_n(s)` converges locally uniformly on
+   `Re s &gt; 0`, and its sum is holomorphic there (`differentiableOn_tsum_of_summable_norm`).
+2. *The identity for `Re s &gt; 1`* (`tsum_corr_of_one_lt_re`).  Here `∑ (n+1)^{-s} = ζ(s) - 1` and
+   `∑ ((n+1)^{1-s} - n^{1-s}) = -1` telescopes, so `(s - 1) ζ(s) = s - ∑ c_n(s)`.
+3. *Analytic continuation* (`riemannZeta₁_eq_sub_tsum_corr`).  Both sides are holomorphic on a
+   convex open set containing `s` and `s + 2` (Mathlib's entire `riemannZeta₁ = (s - 1) ζ(s)` on the
+   left), and agree near `s + 2`; by the identity theorem they agree for every `Re s &gt; 0`.
+4. *Sign on the real axis* (`realCorr_neg`).  For real `0 &lt; σ &lt; 1`, `x ↦ x^{1-σ}` is strictly
+   concave, so its increment over `[n, n+1]` exceeds its slope at the right end:
+   `(n+1)^{1-σ} - n^{1-σ} &gt; (1-σ)(n+1)^{-σ}`, i.e. `c_n(σ) &lt; 0` (Bernoulli's inequality
+   `(1+x)^p &lt; 1 + p x`).  Hence `(σ - 1) ζ(σ) = σ - ∑ c_n(σ) &gt; σ`, and dividing by `σ - 1 &lt; 0`:
+   `ζ(σ) &lt; σ / (σ - 1) &lt; 0`.
+-/
+
+open Complex Filter Topology Set
+
+namespace NoRealZeros
+
+/-- Mean value bound for `t ↦ t ^ w` on the positive reals. -/
+lemma <span class="nm" id="lean-norm_cpow_sub_cpow_le">norm_cpow_sub_cpow_le</span> {a x y : ℝ} (ha : 0 &lt; a) (hax : a ≤ x) (hxy : x ≤ y) {w : ℂ}
+    (hw : w.re ≤ 1) :
+    ‖(y : ℂ) ^ w - (x : ℂ) ^ w‖ ≤ ‖w‖ * a ^ (w.re - 1) * (y - x) := by
+  refine norm_image_sub_le_of_norm_deriv_le_segment' (f := fun t : ℝ =&gt; (t : ℂ) ^ w)
+    (f' := fun t : ℝ =&gt; w * (t : ℂ) ^ (w - 1)) (fun t ht =&gt; ?_) (fun t ht =&gt; ?_) y ⟨hxy, le_rfl⟩
+  · have ht0 : 0 &lt; t := ha.trans_le (hax.trans ht.1)
+    exact ((Complex.hasStrictDerivAt_cpow_const (c := w)
+      (Complex.ofReal_mem_slitPlane.2 ht0)).hasDerivAt.comp_ofReal).hasDerivWithinAt
+  · have ht0 : 0 &lt; t := ha.trans_le (hax.trans ht.1)
+    rw [norm_mul, Complex.norm_cpow_eq_rpow_re_of_pos ht0, sub_re, one_re]
+    exact mul_le_mul_of_nonneg_left
+      (Real.rpow_le_rpow_of_nonpos ha (hax.trans ht.1) (by linarith)) (norm_nonneg w)
+
+
+/-- The `m`-th correction term (with `n = m + 1`):
+`c_m(s) = (1 - s) (n+1)^{-s} - ((n+1)^{1-s} - n^{1-s}) = (1 - s) ∫ₙⁿ⁺¹ ((n+1)^{-s} - x^{-s}) dx`. -/
+noncomputable def <span class="nm" id="lean-corr">corr</span> (s : ℂ) (m : ℕ) : ℂ :=
+  (1 - s) * ((m : ℂ) + 2) ^ (-s) - (((m : ℂ) + 2) ^ (1 - s) - ((m : ℂ) + 1) ^ (1 - s))
+
+/-- Second-order cancellation: `‖c_m(s)‖ ≤ ‖1 - s‖ ‖s‖ n^{-Re s - 1}`. -/
+lemma <span class="nm" id="lean-norm_corr_le">norm_corr_le</span> {s : ℂ} (hs : 0 &lt; s.re) (m : ℕ) :
+    ‖corr s m‖ ≤ ‖1 - s‖ * ‖s‖ * ((m : ℝ) + 1) ^ (-s.re - 1) := by
+  set n : ℝ := (m : ℝ) + 1 with hn_def
+  have hn : 1 ≤ n := by simp [hn_def]
+  have hn0 : 0 &lt; n := by linarith
+  set h : ℝ → ℂ := fun t =&gt; (t : ℂ) ^ (1 - s) - (1 - s) * ((n + 1 : ℝ) : ℂ) ^ (-s) * t
+  have key : ‖h (n + 1) - h n‖ ≤ ‖1 - s‖ * ‖s‖ * n ^ (-s.re - 1) * (n + 1 - n) := by
+    refine norm_image_sub_le_of_norm_deriv_le_segment' (f := h)
+      (f' := fun t =&gt; (1 - s) * (t : ℂ) ^ (-s) - (1 - s) * ((n + 1 : ℝ) : ℂ) ^ (-s))
+      (fun t ht =&gt; ?_) (fun t ht =&gt; ?_) (n + 1) ⟨by linarith, le_rfl⟩
+    · have ht0 : 0 &lt; t := hn0.trans_le ht.1
+      have h1 := (Complex.hasStrictDerivAt_cpow_const (c := 1 - s)
+        (Complex.ofReal_mem_slitPlane.2 ht0)).hasDerivAt.comp_ofReal
+      have h2 := ((hasDerivAt_id t).ofReal_comp).const_mul ((1 - s) * ((n + 1 : ℝ) : ℂ) ^ (-s))
+      have e : (1 - s - 1 : ℂ) = -s := by ring
+      rw [e] at h1
+      convert (h1.sub h2).hasDerivWithinAt using 1
+      · funext y; simp [h]
+      · simp
+    · have ht0 : 0 &lt; t := hn0.trans_le ht.1
+      have hb := norm_cpow_sub_cpow_le hn0 ht.1 ht.2.le (w := -s) (by simp; linarith)
+      rw [← mul_sub, norm_mul, norm_sub_rev ((t : ℂ) ^ (-s))]
+      simp only [neg_re, norm_neg] at hb
+      have : ‖((n + 1 : ℝ) : ℂ) ^ (-s) - (t : ℂ) ^ (-s)‖ ≤ ‖s‖ * n ^ (-s.re - 1) := by
+        refine hb.trans ?_
+        have := ht.2
+        have : 0 ≤ ‖s‖ * n ^ (-s.re - 1) := by positivity
+        nlinarith [ht.1]
+      calc ‖1 - s‖ * ‖((n + 1 : ℝ) : ℂ) ^ (-s) - (t : ℂ) ^ (-s)‖
+          ≤ ‖1 - s‖ * (‖s‖ * n ^ (-s.re - 1)) := mul_le_mul_of_nonneg_left this (norm_nonneg _)
+        _ = ‖1 - s‖ * ‖s‖ * n ^ (-s.re - 1) := by ring
+  have e : corr s m = -(h (n + 1) - h n) := by
+    simp only [corr, h, hn_def]; push_cast; ring_nf
+  rw [e, norm_neg]
+  simpa using key
+
+
+lemma <span class="nm" id="lean-summable_rpow_bound">summable_rpow_bound</span> {ε : ℝ} (hε : 0 &lt; ε) :
+    Summable fun m : ℕ =&gt; ((m : ℝ) + 1) ^ (-ε - 1) := by
+  have h := (summable_nat_add_iff 1).mpr (Real.summable_nat_rpow.mpr (by linarith : -ε - 1 &lt; -1))
+  simpa using h
+
+lemma <span class="nm" id="lean-summable_corr">summable_corr</span> {s : ℂ} (hs : 0 &lt; s.re) : Summable (corr s) :=
+  Summable.of_norm_bounded ((summable_rpow_bound hs).mul_left (‖1 - s‖ * ‖s‖))
+    (norm_corr_le hs)
+
+lemma <span class="nm" id="lean-differentiable_corr">differentiable_corr</span> (m : ℕ) : Differentiable ℂ fun s =&gt; corr s m := by
+  have h1 : ((m : ℂ) + 2) ≠ 0 := by norm_cast
+  have h2 : ((m : ℂ) + 1) ≠ 0 := by norm_cast
+  unfold corr
+  fun_prop (disch := simp [h1, h2])
+
+/-- `∑_{m ≥ 0} (m+2)^{-s} = ζ(s) - 1` for `Re s &gt; 1`. -/
+lemma <span class="nm" id="lean-hasSum_cpow_add_two">hasSum_cpow_add_two</span> {s : ℂ} (hs : 1 &lt; s.re) :
+    HasSum (fun m : ℕ =&gt; ((m : ℂ) + 2) ^ (-s)) (riemannZeta s - 1) := by
+  have hsum : Summable fun n : ℕ =&gt; 1 / ((n : ℂ) + 1) ^ s := by
+    have := (summable_nat_add_iff 1).mpr (Complex.summable_one_div_nat_cpow.mpr hs)
+    simpa using this
+  have h := (hasSum_nat_add_iff' 1).mpr (zeta_eq_tsum_one_div_nat_add_one_cpow hs ▸ hsum.hasSum)
+  have e1 : (fun n : ℕ =&gt; 1 / (((n + 1 : ℕ) : ℂ) + 1) ^ s) = fun m : ℕ =&gt; ((m : ℂ) + 2) ^ (-s) := by
+    funext m; rw [cpow_neg, one_div]; push_cast; ring_nf
+  rw [e1, Finset.sum_range_one] at h
+  simpa using h
+
+/-- Telescoping: `∑_{m ≥ 0} ((m+2)^{1-s} - (m+1)^{1-s}) = -1` for `Re s &gt; 1`. -/
+lemma <span class="nm" id="lean-hasSum_telescope">hasSum_telescope</span> {s : ℂ} (hs : 1 &lt; s.re) :
+    HasSum (fun m : ℕ =&gt; ((m : ℂ) + 2) ^ (1 - s) - ((m : ℂ) + 1) ^ (1 - s)) (-1) := by
+  have hsum : Summable fun m : ℕ =&gt; ((m : ℂ) + 2) ^ (1 - s) - ((m : ℂ) + 1) ^ (1 - s) := by
+    refine (((hasSum_cpow_add_two hs).summable.mul_left (1 - s)).sub
+      (summable_corr (by linarith))).congr fun m =&gt; ?_
+    simp [corr]
+  have hpart : ∀ N : ℕ, ∑ m ∈ Finset.range N, (((m : ℂ) + 2) ^ (1 - s) - ((m : ℂ) + 1) ^ (1 - s))
+      = ((N : ℂ) + 1) ^ (1 - s) - 1 := by
+    intro N
+    have := Finset.sum_range_sub (fun k : ℕ =&gt; ((k : ℂ) + 1) ^ (1 - s)) N
+    simp only [Nat.cast_add, Nat.cast_one, Nat.cast_zero, zero_add, one_cpow] at this
+    rw [← this]
+    refine Finset.sum_congr rfl fun m _ =&gt; ?_
+    ring_nf
+  have hlim : Tendsto (fun N : ℕ =&gt; ((N : ℂ) + 1) ^ (1 - s)) atTop (𝓝 0) := by
+    rw [tendsto_zero_iff_norm_tendsto_zero]
+    have e : ∀ N : ℕ, ‖((N : ℂ) + 1) ^ (1 - s)‖ = ((N : ℝ) + 1) ^ (-(s.re - 1)) := by
+      intro N
+      have : ((N : ℂ) + 1) = (((N : ℝ) + 1 : ℝ) : ℂ) := by push_cast; ring
+      rw [this, Complex.norm_cpow_eq_rpow_re_of_pos (by positivity)]
+      simp
+    simp only [e]
+    exact (tendsto_rpow_neg_atTop (by linarith)).comp
+      (tendsto_atTop_add_const_right _ 1 tendsto_natCast_atTop_atTop)
+  have h1 := hsum.hasSum.tendsto_sum_nat
+  simp only [hpart] at h1
+  have h2 : Tendsto (fun N : ℕ =&gt; ((N : ℂ) + 1) ^ (1 - s) - 1) atTop (𝓝 (0 - 1)) :=
+    hlim.sub tendsto_const_nhds
+  rw [zero_sub] at h2
+  rw [← tendsto_nhds_unique h1 h2]
+  exact hsum.hasSum
+
+/-- For `Re s &gt; 1`: `∑ c_m(s) = (1 - s)(ζ(s) - 1) + 1`, i.e. `(s - 1) ζ(s) = s - ∑ c_m(s)`. -/
+lemma <span class="nm" id="lean-tsum_corr_of_one_lt_re">tsum_corr_of_one_lt_re</span> {s : ℂ} (hs : 1 &lt; s.re) :
+    ∑' m, corr s m = (1 - s) * (riemannZeta s - 1) + 1 := by
+  have h := ((hasSum_cpow_add_two hs).mul_left (1 - s)).sub (hasSum_telescope hs)
+  rw [sub_neg_eq_add] at h
+  exact h.tsum_eq
+
+
+/-- **Analytic continuation.** For `Re s &gt; 0`: `(s - 1) ζ(s) = s - ∑ₘ c_m(s)`
+(stated with Mathlib's entire function `riemannZeta₁ s = (s - 1) ζ(s)`). -/
+theorem <span class="nm" id="lean-riemannZeta₁_eq_sub_tsum_corr">riemannZeta₁_eq_sub_tsum_corr</span> {s : ℂ} (hs : 0 &lt; s.re) :
+    riemannZeta₁ s = s - ∑' m, corr s m := by
+  set ε := s.re / 2 with hε_def
+  have hε : 0 &lt; ε := by positivity
+  set R := ‖s‖ + 3 with hR_def
+  set V : Set ℂ := {z | ε &lt; z.re} ∩ Metric.ball 0 R with hV_def
+  have hVo : IsOpen V := (isOpen_lt continuous_const continuous_re).inter Metric.isOpen_ball
+  have hVc : Convex ℝ V := (convex_halfSpace_re_gt ε).inter (convex_ball 0 R)
+  have hsV : s ∈ V := ⟨by simp only [mem_ofPred_eq]; linarith, by simp [hR_def]⟩
+  have hs2V : s + 2 ∈ V := by
+    refine ⟨by simp only [mem_ofPred_eq, add_re]; norm_num; linarith, ?_⟩
+    rw [mem_ball_zero_iff]
+    calc ‖s + 2‖ ≤ ‖s‖ + ‖(2 : ℂ)‖ := norm_add_le _ _
+      _ &lt; R := by simp [hR_def]; norm_num
+  have hF : AnalyticOnNhd ℂ riemannZeta₁ V :=
+    differentiable_riemannZeta₁.differentiableOn.analyticOnNhd hVo
+  have hbound : ∀ (m : ℕ) (z : ℂ), z ∈ V →
+      ‖corr z m‖ ≤ (R + 1) * R * ((m : ℝ) + 1) ^ (-ε - 1) := by
+    intro m z hz
+    have hzr : ε &lt; z.re := hz.1
+    have hzR : ‖z‖ &lt; R := mem_ball_zero_iff.mp hz.2
+    have h1z : ‖1 - z‖ ≤ R + 1 := by
+      calc ‖1 - z‖ ≤ ‖(1 : ℂ)‖ + ‖z‖ := norm_sub_le _ _
+        _ ≤ R + 1 := by simp; linarith
+    have hpow : ((m : ℝ) + 1) ^ (-z.re - 1) ≤ ((m : ℝ) + 1) ^ (-ε - 1) :=
+      Real.rpow_le_rpow_of_exponent_le (by simp) (by linarith)
+    refine (norm_corr_le (hε.trans hzr) m).trans ?_
+    gcongr
+  have hG : AnalyticOnNhd ℂ (fun z =&gt; z - ∑' m, corr z m) V := by
+    refine DifferentiableOn.analyticOnNhd ?_ hVo
+    exact differentiableOn_id.sub (differentiableOn_tsum_of_summable_norm
+      ((summable_rpow_bound hε).mul_left _) (fun m =&gt; (differentiable_corr m).differentiableOn)
+      hVo hbound)
+  have hEq : riemannZeta₁ =ᶠ[𝓝 (s + 2)] fun z =&gt; z - ∑' m, corr z m := by
+    have hre : 1 &lt; (s + 2).re := by simp; linarith
+    filter_upwards [(isOpen_lt continuous_const continuous_re).mem_nhds hre] with z hz
+    have hz1 : z ≠ 1 := by rintro rfl; simp at hz
+    have hzeta := riemannZeta_eq_inv_sub_mul hz1
+    have hsub : z - 1 ≠ 0 := sub_ne_zero.mpr hz1
+    rw [tsum_corr_of_one_lt_re hz, hzeta]
+    field_simp
+    ring
+  exact hF.eqOn_of_preconnected_of_eventuallyEq hG hVc.isPreconnected hs2V hEq hsV
+
+/-- The correction term at a real point, as a real number. -/
+noncomputable def <span class="nm" id="lean-realCorr">realCorr</span> (σ : ℝ) (m : ℕ) : ℝ :=
+  (1 - σ) * ((m : ℝ) + 2) ^ (-σ) - (((m : ℝ) + 2) ^ (1 - σ) - ((m : ℝ) + 1) ^ (1 - σ))
+
+lemma <span class="nm" id="lean-corr_ofReal">corr_ofReal</span> (σ : ℝ) (m : ℕ) : corr σ m = realCorr σ m := by
+  have h2 : (0 : ℝ) ≤ (m : ℝ) + 2 := by positivity
+  have h1 : (0 : ℝ) ≤ (m : ℝ) + 1 := by positivity
+  simp only [corr, realCorr]
+  push_cast [Complex.ofReal_cpow h2, Complex.ofReal_cpow h1]
+  rfl
+
+/-- **Concavity.** For `0 &lt; σ &lt; 1` each correction term is negative:
+`(n+1)^{1-σ} - n^{1-σ} &gt; (1-σ)(n+1)^{-σ}` since `x ↦ x^{1-σ}` is strictly concave. -/
+lemma <span class="nm" id="lean-realCorr_neg">realCorr_neg</span> {σ : ℝ} (h0 : 0 &lt; σ) (h1 : σ &lt; 1) (m : ℕ) : realCorr σ m &lt; 0 := by
+  set p := 1 - σ with hp
+  set N : ℝ := (m : ℝ) + 2 with hN_def
+  have hN : 2 ≤ N := by simp [hN_def]
+  have hN0 : 0 &lt; N := by linarith
+  have hb := rpow_one_add_lt_one_add_mul_self (s := -1 / N)
+    (by rw [neg_div, neg_le_neg_iff, div_le_one hN0]; linarith)
+    (by simp; linarith) (p := p) (by linarith) (by linarith)
+  have e1 : 1 + -1 / N = ((m : ℝ) + 1) / N := by field_simp; simp [hN_def]; ring
+  rw [e1, Real.div_rpow (by positivity) hN0.le] at hb
+  have hNp : 0 &lt; N ^ p := by positivity
+  rw [div_lt_iff₀ hNp] at hb
+  have e2 : N ^ (-σ) = N ^ p / N := by
+    rw [show -σ = p - 1 by rw [hp]; ring, Real.rpow_sub_one hN0.ne']
+  have e3 : (1 + p * (-1 / N)) * N ^ p = N ^ p - p * (N ^ p / N) := by field_simp; ring
+  simp only [realCorr]
+  rw [← hN_def, ← hp, e2]
+  linarith
+
+/-- **Main estimate.** For `0 &lt; σ &lt; 1`, `ζ(σ)` is the real number `(σ - T)/(σ - 1)` with
+`T = ∑ c_m(σ) &lt; 0`; in particular `ζ(σ) &lt; σ/(σ - 1) &lt; 0`. -/
+theorem <span class="nm" id="lean-riemannZeta_eq_ofReal_lt">riemannZeta_eq_ofReal_lt</span> {σ : ℝ} (h0 : 0 &lt; σ) (h1 : σ &lt; 1) :
+    ∃ x : ℝ, riemannZeta σ = x ∧ x &lt; σ / (σ - 1) := by
+  have hsum : Summable (realCorr σ) := by
+    have : Summable fun m =&gt; (realCorr σ m : ℂ) :=
+      (summable_corr (s := σ) (by simpa using h0)).congr fun m =&gt; corr_ofReal σ m
+    exact Complex.summable_ofReal.mp this
+  set T := ∑' m, realCorr σ m with hT
+  have hTneg : T &lt; 0 := by
+    have := hasSum_lt (f := realCorr σ) (g := fun _ =&gt; 0) (i := 0)
+      (fun m =&gt; (realCorr_neg h0 h1 m).le) (realCorr_neg h0 h1 0) hsum.hasSum hasSum_zero
+    simpa [hT] using this
+  have hs1 : (σ : ℂ) ≠ 1 := by exact_mod_cast h1.ne
+  refine ⟨(σ - T) / (σ - 1), ?_, ?_⟩
+  · rw [riemannZeta_eq_inv_sub_mul hs1, riemannZeta₁_eq_sub_tsum_corr (by simpa using h0)]
+    simp only [corr_ofReal]
+    rw [← Complex.ofReal_tsum, ← hT]
+    push_cast
+    ring
+  · have hneg : σ - 1 &lt; 0 := by linarith
+    exact (div_lt_div_right_of_neg hneg).mpr (by linarith)
+
+theorem <span class="nm" id="lean-riemannZeta_im_eq_zero_of_mem_Ioo">riemannZeta_im_eq_zero_of_mem_Ioo</span> {σ : ℝ} (h0 : 0 &lt; σ) (h1 : σ &lt; 1) :
+    (riemannZeta σ).im = 0 := by
+  obtain ⟨x, hx, -⟩ := riemannZeta_eq_ofReal_lt h0 h1
+  simp [hx]
+
+theorem <span class="nm" id="lean-riemannZeta_re_lt_of_mem_Ioo">riemannZeta_re_lt_of_mem_Ioo</span> {σ : ℝ} (h0 : 0 &lt; σ) (h1 : σ &lt; 1) :
+    (riemannZeta σ).re &lt; σ / (σ - 1) := by
+  obtain ⟨x, hx, hlt⟩ := riemannZeta_eq_ofReal_lt h0 h1
+  simpa [hx] using hlt
+
+theorem <span class="nm" id="lean-riemannZeta_re_neg_of_mem_Ioo">riemannZeta_re_neg_of_mem_Ioo</span> {σ : ℝ} (h0 : 0 &lt; σ) (h1 : σ &lt; 1) :
+    (riemannZeta σ).re &lt; 0 :=
+  (riemannZeta_re_lt_of_mem_Ioo h0 h1).trans (div_neg_of_pos_of_neg h0 (by linarith))
+
+/-- **No real zeros in the critical strip.** -/
+theorem <span class="nm" id="lean-riemannZeta_ne_zero_of_mem_Ioo">riemannZeta_ne_zero_of_mem_Ioo</span> {σ : ℝ} (h0 : 0 &lt; σ) (h1 : σ &lt; 1) :
+    riemannZeta (σ : ℂ) ≠ 0 := by
+  intro h
+  have := riemannZeta_re_neg_of_mem_Ioo h0 h1
+  rw [h, zero_re] at this
+  exact lt_irrefl 0 this
+
+end NoRealZeros
+
+end NoRealZerosSection
+
+/- ## Li's criterion, conditional (copied from `LiConditional2.lean`) -/
+
+/-
 # Li's criterion, multiplicity-weighted: both directions, conditional on Hadamard summability
 
 **Human proof sketch.**  Put `w(ρ) = 1 - 1/ρ = (ρ - 1)/ρ`, the Möbius map used by Li.
@@ -811,22 +1134,54 @@ theorem <span class="nm" id="lean-li_converse_unweighted">li_converse_unweighted
 
 end LiConditional
 
-#print axioms LiConditional.li_converse
-#print axioms LiConditional.li_criterion_weighted
-#print axioms LiConditional.li_converse_unweighted
-#print axioms LiConditional.exists_neg_of_large
+
+/- ## Discharging `NoRealZerosInStrip` -/
+
+namespace LiConditional
+
+open RiemannHypothesis (nontrivialPosZeros)
+
+/-- `ζ` has no real zeros in `(0,1)` — now a theorem (`NoRealZeros.lean`), not a hypothesis. -/
+theorem <span class="nm" id="lean-noRealZerosInStrip_holds">noRealZerosInStrip_holds</span> : NoRealZerosInStrip :=
+  fun _ h0 h1 =&gt; NoRealZeros.riemannZeta_ne_zero_of_mem_Ioo h0 h1
+
+/-- **Li ⇒ RH** (weighted), conditional only on Hadamard summability. -/
+theorem <span class="nm" id="lean-li_converse_of_hadamard">li_converse_of_hadamard</span> (H : HadamardHypothesis)
+    (hLi : ∀ n : ℕ, 0 &lt; n → 0 ≤ liCoeff n) : RiemannHypothesis :=
+  li_converse H noRealZerosInStrip_holds hLi
+
+/-- **Weighted Li criterion**, `RH ⇔ ∀ n ≥ 1, λₙ ≥ 0`, conditional only on Hadamard
+summability `∑ m(ρ)/|ρ|² &lt; ∞`. -/
+theorem <span class="nm" id="lean-li_criterion_weighted'">li_criterion_weighted'</span> (H : HadamardHypothesis) :
+    RiemannHypothesis ↔ ∀ n : ℕ, 0 &lt; n → 0 ≤ liCoeff n :=
+  li_criterion_weighted H noRealZerosInStrip_holds
+
+/-- The converse for the upstream unweighted `RiemannHypothesis.lambda`, conditional only on
+Hadamard summability. -/
+theorem <span class="nm" id="lean-li_converse_unweighted_of_hadamard">li_converse_unweighted_of_hadamard</span> (H : HadamardHypothesis)
+    (hLi : ∀ n : ℕ, 0 &lt; n → 0 ≤ RiemannHypothesis.lambda n) : RiemannHypothesis :=
+  li_converse_unweighted H noRealZerosInStrip_holds hLi
+
+end LiConditional
+
+#print axioms NoRealZeros.riemannZeta_ne_zero_of_mem_Ioo
+#print axioms NoRealZeros.riemannZeta_re_lt_of_mem_Ioo
+#print axioms LiConditional.noRealZerosInStrip_holds
+#print axioms LiConditional.li_criterion_weighted'
+#print axioms LiConditional.li_converse_of_hadamard
+#print axioms LiConditional.li_converse_unweighted_of_hadamard
 #print axioms LiConditional.liCoeff_pos
 </pre>
 
 <h2>Honesty checklist</h2>
 <ul class="check">
-<li>Compiles on Lean/Mathlib v4.33.1 against formal-conjectures at 9097e2f. <code>LiCriterion.lean</code> was written and compiled by Kumi-San. Alo independently rebuilt the earlier Part I file; Part II is offered for the same check.</li>
-<li>No <code>sorry</code>, <code>native_decide</code> or new <code>axiom</code>. <code>#print axioms</code> of <code>li_converse</code>, <code>li_criterion_weighted</code>, <code>li_converse_unweighted</code>, <code>exists_neg_of_large</code> and <code>liCoeff_pos</code>: propext, Classical.choice, Quot.sound only. The hypotheses are theorem arguments, not axioms.</li>
-<li>The equivalence \(\mathrm{RH}\iff\lambda_n\ge 0\) is conditional on two named hypotheses: the multiplicity-weighted Hadamard summability \(\sum m(\rho)/|\rho|^2&lt;\infty\), and <code>NoRealZerosInStrip</code>. <code>hinf</code> is used only for the strict inequality in <code>liCoeff_pos</code>.</li>
+<li>Compiles on Lean/Mathlib v4.33.1 against formal-conjectures at 9097e2f. <code>NoRealZeros.lean</code> and <code>LiCriterion.lean</code> were written and compiled by Kumi-San. Alo independently rebuilt both (about 6s and 13s) and checked that the zeros are Mathlib's <code>riemannZeta</code> and that nothing shadows <code>RiemannHypothesis</code>.</li>
+<li>No <code>sorry</code>, <code>native_decide</code> or new <code>axiom</code>. <code>#print axioms</code> of <code>riemannZeta_ne_zero_of_mem_Ioo</code>, <code>noRealZerosInStrip_holds</code>, <code>li_criterion_weighted'</code>, <code>li_converse_of_hadamard</code>, <code>li_converse_unweighted_of_hadamard</code> and <code>liCoeff_pos</code>: propext, Classical.choice, Quot.sound only.</li>
+<li>The equivalence \(\mathrm{RH}\iff\lambda_n\ge 0\) is conditional on one named hypothesis: the multiplicity-weighted Hadamard summability \(\sum m(\rho)/|\rho|^2&lt;\infty\). No real zeros in \((0,1)\) is now a theorem. <code>hinf</code> is used only for the strict inequality in <code>liCoeff_pos</code>.</li>
 <li>Only the summability field of <code>HadamardHypothesis</code> is used. The <code>log_deriv_expansion</code> field is stated but unused.</li>
-<li><code>liCoeff_nonneg</code> is meaningful only paired with <code>liCoeff_summable</code>. Real zeros in \((0,1)\) are excluded by the setup of the sum and, for the converse, by the named hypothesis <code>NoRealZerosInStrip</code> (not proved here). Multiplicity differs from upstream; <code>li_converse_unweighted</code> treats the unweighted sum on its own terms, with no identification proved.</li>
+<li><code>liCoeff_nonneg</code> is meaningful only paired with <code>liCoeff_summable</code>. Multiplicity differs from upstream; <code>li_converse_unweighted_of_hadamard</code> treats the unweighted sum on its own terms, with no identification proved.</li>
 <li>The figure is an illustration. It proves nothing and the dashed quartet is schematic.</li>
-<li>Not proved: the identification of \(\lambda_n\) with the Taylor coefficients of \(\log\xi\) at \(s=1\), and the upstream statement <code>li_criterion</code> (strict inequality, both directions, no hypotheses). Status: partial: both directions, conditional.</li>
+<li>Not proved: the identification of \(\lambda_n\) with the Taylor coefficients of \(\log\xi\) at \(s=1\), and the upstream statement <code>li_criterion</code> (strict inequality, both directions, no hypotheses). Status: partial: both directions, one hypothesis.</li>
 </ul>
-<footer>Fang &amp; Fox Lemma Office · ShadowAlzazel steers the ideas · Kumi-San drafted and compiled both halves · Alo reviewed and independently rebuilt both parts.</footer>
+<footer>Fang &amp; Fox Lemma Office · ShadowAlzazel steers the ideas · Kumi-San drafted and compiled · Alo independently rebuilt both files.</footer>
 </main></body></html>

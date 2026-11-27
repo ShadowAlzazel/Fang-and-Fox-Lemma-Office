@@ -36,7 +36,7 @@ Picked from [Left to Solve](https://lefttosolve.com) on 2026-11-26. Difficulty i
 | Problem | Kind | Diff. | Fits | Why |
 | --- | --- | ---: | --- | --- |
 | [Zeros around the midpoints of Gram intervals](https://lefttosolve.com/p/mo-366237) | unformalized | 55 | Fleurdelys Gram-law counts, `near_misses.py` | A MathOverflow question about where each zero sits inside the Gram interval it maps to. This is petal counting in its rawest form, and our zero tables up to height 30,000 can test it right away. It needs a precise statement first. |
-| No real zeros of ζ in (0,1) via the Dirichlet η function | Mathlib gap | — | Li page | Classical: (1−2^{1−σ})ζ(σ)=η(σ)>0. Mathlib lacks η. Proving this would remove the `NoRealZerosInStrip` hypothesis from the Li page. |
+| [No real zeros of ζ in (0,1)](problems/li-criterion/) | DONE | — | Li page | Proved via a sum-versus-integral bound, not the Dirichlet η function. See Part III of the Li page and `NoRealZeros.lean`. This removes the `NoRealZerosInStrip` hypothesis. |
 | Hadamard summability Σ m(ρ)/|ρ|² < ∞ for the zeros of ζ | Mathlib gap | — | Li page | The multiplicity-weighted bound, classical and unconditional. Mathlib lacks it. This is the analytic input of both directions on the Li page. |
 
 ## Reading, not targets
