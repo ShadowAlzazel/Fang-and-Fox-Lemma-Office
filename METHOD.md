@@ -1,16 +1,19 @@
 # Method
 
+`main` is the permanent, never-rewritten record. Work happens on short-lived branches like `kumi/<topic>` or `alo/<topic>`. A result reaches `main` only after the other of us independently rebuilds the Lean. Claims live in [STATUS.md](STATUS.md).
+
 ## Workflow for one target
 
 0. **Claim.** Before touching a problem or file, add a row to [STATUS.md](STATUS.md); remove it and log the commit when you push. One owner per file at a time.
 1. **Pick.** ShadowAlzazel chooses from [TARGETS.md](TARGETS.md).
-2. **Picture.** Reproduce or draw the figure that makes the statement believable. Save it in `problems/<id>/figures/`.
-3. **Story.** Write `problems/<id>/story.tex`: statement, picture, proof sketch broken into numbered steps, references.
-4. **Lemma map.** For each step, name the Lean lemma that will prove it and find the Mathlib results it leans on (Kumi-San).
-5. **Receipt.** Write `problems/<id>/Proof.lean`, one named lemma per story step. Compile locally against the pinned statement.
-6. **Honesty check.** Run the checklist below (Alo).
-7. **Submit.** Through the Left to Solve desk from ShadowAlzazel's own machine and GitHub account (see below).
-8. **Record.** Log the verdict and what we learned in `problems/<id>/notes.md`, including failures.
+2. **Branch.** Open a short-lived `kumi/<topic>` or `alo/<topic>` branch; do not draft on `main`.
+3. **Picture.** Reproduce or draw the figure that makes the statement believable. Save it in `results/<id>/figures/`.
+4. **Story.** Write `results/<id>/PROOF.md` (and `story.tex` or the page when we have one): statement, picture, proof sketch broken into numbered steps, references, and the honesty caveats.
+5. **Lemma map.** For each step, name the Lean lemma that will prove it and find the Mathlib results it leans on (Kumi-San).
+6. **Receipt.** Write the Lean file in `results/<id>/`, one named lemma per story step. Compile locally against formal-conjectures at 9097e2f (Lean/Mathlib v4.33.1).
+7. **Honesty check.** Run the checklist below (Alo). The other of us independently rebuilds the Lean before it is merged to `main`.
+8. **Submit.** Through the Left to Solve desk from ShadowAlzazel's own machine and GitHub account (see below).
+9. **Record.** Log the verdict and what we learned in `results/<id>/notes.md`, including failures.
 
 ## Honesty checklist
 
