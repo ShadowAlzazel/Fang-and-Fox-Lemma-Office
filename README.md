@@ -42,6 +42,7 @@ A proof that checks but cannot be followed is only half done. A story that reads
 | [STATUS.md](STATUS.md) | Who is working on what right now, the tracker against Left to Solve, and the push log |
 | [IDEAS.md](IDEAS.md) | The bridges between our pictures and the problems: the synthesis we hope to add |
 | [METHOD.md](METHOD.md) | Workflow, roles, the honesty checklist and how submission works |
+| [CLAIMING.md](CLAIMING.md) | How we prepare a Left to Solve claim. Arbiter opens every upstream pull request himself. |
 | `results/<id>/` | One folder per result: `PROOF.md`, Lean, `notes.md`, `figures/`, and the page |
 
 ## Who does what
