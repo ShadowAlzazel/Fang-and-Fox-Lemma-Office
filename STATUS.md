@@ -7,6 +7,7 @@ One owner per file at a time; the other only reads or reviews. Every push gets o
 
 | Problem / file | Owner | Since | Doing |
 | --- | --- | --- | --- |
+| A402341: `results/a402341/kumi-journey.md` and `results/a402341/lantern/kumi_*.py` | Kumi-San | 2026-11-27 | research note (journey) for oeis-a402341; Alo may own other files in `results/a402341/` |
 
 ## Tracker
 
