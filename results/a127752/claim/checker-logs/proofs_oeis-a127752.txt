@@ -1,0 +1,5 @@
+verdict: accepted
+reason: kernel accepted; axioms within propext, Classical.choice, Quot.sound
+lint: {"file": "proofs/oeis-a127752.lean", "type": "proof", "problem": "oeis-a127752", "ok": true, "errors": []}
+--- log tail ---
+'OMA.solution' depends on axioms: [propext, Classical.choice, Quot.sound]
