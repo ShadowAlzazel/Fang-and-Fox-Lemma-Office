@@ -42,13 +42,13 @@ svg = f'''<svg viewBox="0 0 720 470" xmlns="http://www.w3.org/2000/svg" role="im
 <text x="20" y="58" class="lg"><tspan fill="var(--muted,#586275)">&#9675;</tspan> dashed: where a schematic off-line zero (0.85 + 2.5i, not a real zero) would land: w, conj(w), 1/w, 1/conj(w)</text>
 <line x1="40" x2="390" y1="{cy}" y2="{cy}" class="ax"/><line x1="{cx}" x2="{cx}" y1="75" y2="430" class="ax"/>
 <circle cx="{cx}" cy="{cy}" r="{R}" class="ci"/>
-<text x="{cx+R+4}" y="{cy+14}" class="tk">1</text><text x="{cx-R-14}" y="{cy+14}" class="tk">-1</text><text x="{cx+6}" y="{cy-R-6}" class="tk">i</text><text x="{cx+6}" y="{cy+R+16}" class="tk">-i</text>
+<text x="{cx+R+16}" y="{cy+36}" class="tk">1</text><text x="{cx-R-14}" y="{cy+14}" class="tk">-1</text><text x="{cx+6}" y="{cy-R-6}" class="tk">i</text><text x="{cx+6}" y="{cy+R+16}" class="tk">-i</text>
 {dots}{gh}
 <rect x="{bx0:.1f}" y="{by0:.1f}" width="{bx1-bx0:.1f}" height="{by1-by0:.1f}" class="bx"/>
 <text x="{cx}" y="452" class="tk" text-anchor="middle">the whole circle</text>
 <polyline points="{arc}" class="ci"/>
 {zdots}
-<text x="{zx-70}" y="{zy-S*th*1.1-10:.0f}" class="tk">zoom &#215;2000 at w = 1</text>
+<text x="{zx-70}" y="{zy-S*th*1.1-10:.0f}" class="tk">zoom &#215;2000, both axes, at w = 1</text>
 <text x="{zx}" y="452" class="tk" text-anchor="middle">all 200 points sit on the arc (|&#952;| &lt; 0.075)</text>
 </svg>'''
 open('figures/unit_circle.svg', 'w').write(svg)
