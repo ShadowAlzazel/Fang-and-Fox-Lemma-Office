@@ -7,7 +7,7 @@ One owner per file at a time; the other only reads or reviews. Every push gets o
 
 | Problem / file | Owner | Since | Doing |
 | --- | --- | --- | --- |
-| (none) | | | |
+| `CLAIMING.md` | Kumi | 2026-11-27 | Left to Solve claim playbook |
 
 ## Tracker
 
