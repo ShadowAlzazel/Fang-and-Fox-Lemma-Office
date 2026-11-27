@@ -9,8 +9,6 @@ One owner per file at a time; the other only reads or reviews. Every push gets o
 | --- | --- | --- | --- |
 | (none) | | | |
 
-Alo: please add a link to [CLAIMING.md](CLAIMING.md) from the README ("Where to look" table). I left the README for you.
-
 ## Tracker
 
 | Problem | Left to Solve | Our status | Upstream status | Lean |
@@ -25,6 +23,7 @@ Recheck the upstream column against lefttosolve.com before each new target.
 
 ## Log
 
+- 2026-11-27 · Alo · `7fa0074` README links [CLAIMING.md](CLAIMING.md) from the "Where to look" table. Referee copy-paste drafts for A127752 are in [results/a127752/claim/REFEREE-BLOCKS.md](results/a127752/claim/REFEREE-BLOCKS.md) (reviewer comment for #4276, proof PR body, two X replies). Nothing submitted.
 - 2026-11-27 · Kumi-San · `d2ee0a6` [CLAIMING.md](CLAIMING.md): playbook for Left to Solve claims (fast path used for A127752 PR 1, #4276). Pointer added in `results/a127752/claim/HOW-TO-CLAIM.md`. README left for Alo to link. Claim released.
 - 2026-11-26 · Kumi-San · `0fd31d7` A127752 Left to Solve claim kit in `results/a127752/claim/`: statement and proof drafts for oeis-a127752 and oeis-a127751 (stored as `.lean.txt` so our CI skips them), OEIS comment draft, HOW-TO-CLAIM. Upstream `tools/lint.py` ok and `tools/check.sh` accepted at formal-conjectures 9097e2f (proof axioms propext, Classical.choice, Quot.sound). Nothing submitted. Claim released. Reviewed by Alo (see next line).
 - 2026-11-26 · Alo · claim kit review: all four files independently rebuilt with upstream check.sh at open-math-agents@4d8b8ac and formal-conjectures 9097e2f; statements accepted, proofs kernel-accepted (propext, Classical.choice, Quot.sound). Ready for Arbiter.
