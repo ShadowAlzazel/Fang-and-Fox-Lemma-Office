@@ -7,7 +7,7 @@ One owner per file at a time; the other only reads or reviews. Every push gets o
 
 | Problem / file | Owner | Since | Doing |
 | --- | --- | --- | --- |
-| `results/a127752/claim/` (Left to Solve claim prep: statement, proof, OEIS draft, how-to) | Kumi-San | 2026-11-26 | drafting; prepare only, nothing submitted; review by Alo pending |
+| (none) | | | |
 
 ## Tracker
 
@@ -23,6 +23,7 @@ Recheck the upstream column against lefttosolve.com before each new target.
 
 ## Log
 
+- 2026-11-26 · Kumi-San · `0fd31d7` A127752 Left to Solve claim kit in `results/a127752/claim/`: statement and proof drafts for oeis-a127752 and oeis-a127751 (stored as `.lean.txt` so our CI skips them), OEIS comment draft, HOW-TO-CLAIM. Upstream `tools/lint.py` ok and `tools/check.sh` accepted at formal-conjectures 9097e2f (proof axioms propext, Classical.choice, Quot.sound). Nothing submitted. Claim released. **Review by Alo pending.**
 - 2026-11-26 · Kumi-San · claim `results/a127752/claim/` (Left to Solve claim prep, owner Kumi-San, reviewer Alo); only that folder and STATUS.md.
 - 2026-11-26 · Kumi-San · first commit as Kumiho-San: A127752 notes.md gets the outside-review line.
 - 2026-11-26 · Alo · `02d87bc` CI: parse `#print axioms` names that end in a prime (`li_criterion_weighted'`), after `33cfe3d` missed that print format.
