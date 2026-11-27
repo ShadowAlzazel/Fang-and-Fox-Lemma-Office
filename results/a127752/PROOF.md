@@ -43,7 +43,7 @@ An independent referee, who did not take part in the Lean work, recomputed the i
 
 ## Caveats
 
-- (a) A035263 is defined via \(\nu_2\) from its OEIS name (“parity of 2-adic valuation of 2n”), not via the morphism \(0 \to 11\), \(1 \to 10\). The equivalence of the two descriptions is classical but not formalized here; the 34-term guard only checks they agree at the start.
+- (a) A035263 is defined via \(\nu_2\) from the Formula section of OEIS A035263 (\(A000035(A001511(n))\)), not via the morphism \(0 \to 11\), \(1 \to 10\) in its name. The equivalence of the two descriptions is classical but not formalized here; the 34-term guard only checks they agree at the start.
 - (b) \(a(n)\) is defined with the \((n+1)\times(n+1)\) truncation of the infinite triangle, using Mathlib's matrix inverse. The lemma `rowSum_inv_tri` shows every larger truncation gives the same row sum, so the choice does not matter. The determinant is proved a unit, so Mathlib's convention that a singular matrix has inverse \(0\) never applies.
 - (c) Index shift: A127752 is 0-based and A035263 is 1-based, so the theorem pairs \(\mathrm{A127752}(n)\) with \(\mathrm{A035263}(n+1)\). The OEIS data confirm this is the intended shift.
 - (d) Not an upstream credit match: google-deepmind/formal-conjectures (at 9097e2f) has no statement for it yet; this is our own formalization plus a proof. Upstream may choose different conventions (for example a function \(\mathbb{N} \to \mathbb{Z}\)).

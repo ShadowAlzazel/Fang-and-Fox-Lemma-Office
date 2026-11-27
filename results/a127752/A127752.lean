@@ -52,7 +52,7 @@ def tri (N : ℕ) : Matrix (Fin N) (Fin N) ℚ :=
 containing row `n`). `⁻¹` is Mathlib's matrix inverse. -/
 noncomputable def a127752 (n : ℕ) : ℚ := ∑ k, (tri (n + 1))⁻¹ (Fin.last n) k
 
-/-- A035263 (offset 1), as in its OEIS name: parity of the 2-adic valuation of `2n`. -/
+/-- A035263 (offset 1), from the Formula section of OEIS A035263: parity of the 2-adic valuation of `2n`, i.e. `A000035(A001511(n))`. -/
 def A035263 (n : ℕ) : ℕ := padicValNat 2 (2 * n) % 2
 
 /-- The doubling recursion: `r 0 = 1`, `r (2m+1) = r m + 3`, `r (2m+2) = 3`. -/

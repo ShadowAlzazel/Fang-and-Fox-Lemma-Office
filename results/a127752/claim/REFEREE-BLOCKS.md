@@ -14,9 +14,9 @@ checked numerically for every `n < 10^6` in `check.py`.
 Paste this as a comment on https://github.com/GuillaumeBAUD-coder/open-math-agents/pull/4276 (do not treat it as already posted).
 
 ```
-Thanks for reviewing this statement.
+Thanks for reviewing this statement, and for the wording correction: A035263's name is the morphism 0 → 11, 1 → 10, and the ν₂ formula is from its Formula section. The Lean docstring already said that; the description below now matches.
 
-What is stated. `main` says: for every truncation size N and every row n < N, the n-th row sum of the inverse of the triangle A(n,k) = 1/(3n+1) when k ≤ n ≤ 2k (and 0 otherwise) is an integer m with m mod 2 = A035263(n+1). A035263 is defined as the parity of the 2-adic valuation of 2n, the formula in the OEIS name of A035263. The body of `main` is the single allowed sorry.
+What is stated. `main` says: for every truncation size N and every row n < N, the n-th row sum of the inverse of the triangle A(n,k) = 1/(3n+1) when k ≤ n ≤ 2k (and 0 otherwise) is an integer m with m mod 2 = A035263(n+1). A035263 is encoded as the parity of the 2-adic valuation of 2n, i.e. A000035(A001511(n)), from the Formula section of OEIS A035263 (its name gives the equivalent morphism 0 → 11, 1 → 10). The body of `main` is the single allowed sorry.
 
 Why this matches the OEIS comment. The A127752 entry conjectures that "a(n) mod 2 is first Feigenbaum symbolic sequence A035263", and it warns that A127752 is 0-based while A035263 is 1-based. The statement uses that shift, and it includes integrality because "a(n) mod 2" presupposes an integer. The triangle is taken from the OEIS name. The claim is quantified over every truncation that contains row n, so it does not depend on a choice of N. We did not formalize the equivalent morphism description of A035263 (0 → 11, 1 → 10); only the valuation formula.
 

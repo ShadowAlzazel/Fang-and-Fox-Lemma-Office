@@ -17,7 +17,7 @@
 - Guards (`#guard`, evaluation only, used by no proof): `r` matches all 106 terms of the OEIS data section; `A035263 (n+1)` matches the first 34 OEIS terms of A035263; a computable exact inverse of the 40×40 triangle satisfies A·B = I with row sums equal to the OEIS terms. Changing one OEIS digit makes three guards fail.
 - Numerics (`check.py`, exact fractions): inverse for N = 250 has integer row sums equal to `r`; all 2,049 b-file terms match; the conjecture, the Black Swan form 1 − (ν₂(n+1) mod 2), and the closed form hold for all n < 10⁶.
 - Honesty caveats (also on the page):
-  - (a) A035263 is defined via ν₂ from its OEIS name, not via the morphism 0 → 11, 1 → 10; their equivalence is not formalized.
+  - (a) A035263 is defined via ν₂ from the Formula section of OEIS A035263 (A000035(A001511(n))), not via the morphism 0 → 11, 1 → 10 in its name; their equivalence is not formalized.
   - (b) a(n) is defined with the (n+1)×(n+1) truncation; `rowSum_inv_tri` shows any larger truncation gives the same value. The determinant is proved a unit, so Mathlib's "singular inverse = 0" convention never applies.
   - (c) Index shift: A127752(n) ↔ A035263(n+1).
   - (d) Not an upstream credit match: no formal-conjectures statement exists yet; upstream may pick other conventions.

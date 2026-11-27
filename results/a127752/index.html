@@ -446,7 +446,7 @@ def <span class="nm">tri</span> (N : ℕ) : Matrix (Fin N) (Fin N) ℚ :=
 
 noncomputable def <span class="nm">a127752</span> (n : ℕ) : ℚ := ∑ k, (tri (n + 1))⁻¹ (Fin.last n) k
 
-/-- A035263 (offset 1), as in its OEIS name: parity of the 2-adic valuation of `2n`. -/
+/-- A035263 (offset 1), from the Formula section of OEIS A035263: parity of the 2-adic valuation of `2n`, i.e. `A000035(A001511(n))`. -/
 def <span class="nm">A035263</span> (n : ℕ) : ℕ := padicValNat 2 (2 * n) % 2
 
 /-- **OEIS A127752 conjecture.** `a(n)` is an integer and `a(n) mod 2 = A035263(n+1)`
@@ -460,7 +460,7 @@ theorem <span class="nm">a127752_mod_two</span> (n : ℕ) :
 
 <h2>Honest caveats</h2>
 <div class="warn"><h3>What exactly is proved</h3>
-<p><b>A035263 is defined via ν₂, from its OEIS name</b> (“parity of 2-adic valuation of 2n”), not via the morphism 0 → 11, 1 → 10. The equivalence of the two descriptions is classical but <b>not formalized</b> here; the 34-term guard only checks they agree at the start.</p>
+<p><b>A035263 is defined via ν₂, from the Formula section of OEIS A035263</b> (A000035(A001511(n))), not via the morphism 0 → 11, 1 → 10 in its name. The equivalence of the two descriptions is classical but <b>not formalized</b> here; the 34-term guard only checks they agree at the start.</p>
 <p><b>a(n) uses the (n+1)×(n+1) truncation</b> of the infinite triangle, with Mathlib's matrix inverse. The lemma <code>rowSum_inv_tri</code> shows every larger truncation gives the same row sum, so the choice does not matter. We proved the determinant is a unit, so Mathlib's convention that a singular matrix has inverse 0 never applies.</p>
 <p><b>Index shift:</b> A127752 is 0-based and A035263 is 1-based, so the theorem pairs A127752(n) with A035263(n+1). The OEIS data confirm this is the intended shift.</p>
 <p><b>Not an upstream credit match.</b> The Left to Solve entry is “unformalized”: google-deepmind/formal-conjectures (at 9097e2f) has no Lean statement for A127752 yet, so this is our own formalization plus a proof, not a solve of an existing statement. Upstream may choose different conventions (for example a function ℕ → ℤ).</p>
