@@ -111,4 +111,4 @@ the triangle's entry."
   - The statements are "accepted - the statement compiles; it now needs a human review". Their axioms are
     `[propext, sorryAx, Classical.choice, Quot.sound]`, where sorryAx is the one allowed sorry.
   - The proofs are "accepted - kernel accepted". Their axioms are `[propext, Classical.choice, Quot.sound]`.
-- Alo's independent review and rebuild is pending; see STATUS.md.
+- Alo reviewed and independently rebuilt all four on 2026-11-26 with a fresh checkout of open-math-agents@4d8b8ac (newer than the 33bf6f4 used above) and her own formal-conjectures copy at 9097e2f: both statements accepted (compile, one sorry) and both proofs kernel-accepted with axioms propext, Classical.choice, Quot.sound. Statements read faithfully against the OEIS entries, including the 0-based/1-based offset. The closed form in the OEIS draft matches the recursion for n < 5000 (paper fact, not Lean).
