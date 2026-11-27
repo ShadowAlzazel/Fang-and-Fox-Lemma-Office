@@ -34,3 +34,15 @@ Each entry is a picture from our earlier work and the problem it might illuminat
 
 - *Picture (Black Swan, Fleurdelys `star_rotation.py`):* prime progressions, Mandelbrot orbits and runners on a track all turn by a fixed angle.
 - *Bridge:* one Lean file of rotation and equidistribution lemmas, reused across Tao 2017, Koksma, and our reading on Littlewood.
+
+## 7. The valley along the line (Newton for ξ)
+
+- *Statement (proven equivalence, Lagarias 1999; Sondow–Dumitrescu 2010):* RH ⇔ Re(ξ′/ξ) > 0 to the right of the line ⇔ |ξ(σ + it)| strictly increases away from σ = ½.
+- *Picture (observed, Fleurdelys `davenport_heilbronn.py`, `xi_pull.py`):* every Newton step for ξ points back toward the line; for Davenport–Heilbronn, 50 grid points near its off-line pair move the wrong way.
+- *Bridge:* a second picture-first equivalence write-up after Li, and a visual companion to the Li story, with the same "everything flows to the circle or line" theme.
+
+## 8. The positivity trick (how the primes enter)
+
+- *Statement (proven, Mertens; de la Vallée Poussin):* 3 + 4 cos a + cos 2a = 2(1 + cos a)² ≥ 0, applied prime by prime to log|ζ³(σ)ζ⁴(σ+it)ζ(σ+2it)|, shows ζ has no zeros on Re s = 1.
+- *Why it's here:* it is the model of a geometric argument that uses the Euler product, which the Davenport–Heilbronn test says any RH-adjacent proof must do. Black Swan already uses the same identity as its boost field.
+- *Use:* the honesty filter in METHOD.md step 5, and a template for the "where do the primes enter" step in every write-up.

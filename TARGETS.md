@@ -31,6 +31,12 @@ Picked from [Left to Solve](https://lefttosolve.com) on 2026-11-26. Difficulty i
 | [Shanks: record indices](https://lefttosolve.com/p/MaximalPrimeGap.shanks_maximal_prime_gap_conjecture.variants.record_indices) | open | 47 | `near_misses.py` | Natural sequel to the Tier 0 warmup. |
 | [Montgomery pair correlation, general interval](https://lefttosolve.com/p/MontgomeryPairCorrelationConjecture.montgomery_pair_correlation_conjecture.variants.general_interval) | open | 48 | `pair_spacing.py` | Our pictures already show it. The dream target; treat as a moonshot. |
 
+## Added by Kumi-San
+
+| Problem | Kind | Diff. | Fits | Why |
+| --- | --- | ---: | --- | --- |
+| [Zeros around the midpoints of Gram intervals](https://lefttosolve.com/p/mo-366237) | unformalized | 55 | Fleurdelys Gram-law counts, `near_misses.py` | A MathOverflow question about where each zero sits inside the Gram interval it maps to. This is petal counting in its rawest form, and our zero tables up to height 30,000 can test it right away. It needs a precise statement first. |
+
 ## Reading, not targets
 
 - [3/2 powers equidistributed mod 1](https://lefttosolve.com/p/Equidistribution.isEquidistributedModuloOne_three_halves_pow) (open, 59)
