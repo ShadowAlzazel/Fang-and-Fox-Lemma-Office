@@ -161,13 +161,15 @@ jobs:
           }
 
           def printed_theorems(out: str):
+              # Lean prints 'name' before "depends on axioms"; a trailing prime
+              # in the name sits next to the closing quote: ...'weighted'' depends...
               names = set()
               for pat in (
-                  r"'((?:[^']|'')+)' depends on axioms:",
-                  r"'((?:[^']|'')+)' does not depend on any axioms",
+                  r"'(.+)' depends on axioms:",
+                  r"'(.+)' does not depend on any axioms",
               ):
                   for m in re.finditer(pat, out):
-                      names.add(m.group(1).replace("''", "'"))
+                      names.add(m.group(1))
               return names
 
           office = Path("office")
