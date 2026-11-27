@@ -7,7 +7,6 @@ One owner per file at a time; the other only reads or reviews. Every push gets o
 
 | Problem / file | Owner | Since | Doing |
 | --- | --- | --- | --- |
-| `results/a127750/` | Kumi-San | 2026-11-27 | Left to Solve claim prep for oeis-a127750 (reviewer Alo); only that folder and STATUS.md |
 
 ## Tracker
 
@@ -24,6 +23,7 @@ Recheck the upstream column against lefttosolve.com before each new target.
 ## Log
 
 - 2026-11-27 · Alo · `f3c96ae` A127751 kit ready for Arbiter: wording fix in the 751 statement, re-checked with `tools/check.sh` at formal-conjectures 9097e2f (statement accepted; proof kernel-accepted, axioms propext, Classical.choice, Quot.sound). Exact PR steps in [A127751-PR-STEPS.md](results/a127752/claim/A127751-PR-STEPS.md). No upstream pull request opened. Did not touch `results/a127750/`. The `oma/oeis-a127751-statement` branch was not pushed to the fork from this session; use the web-UI steps in that file if the branch is not there yet.
+- 2026-11-27 · Kumi-San · `ff4f504` A127750 Left to Solve claim kit in `results/a127750/claim/`: statement and proof drafts for oeis-a127750 (`.lean.txt`), PROOF.md, HOW-TO-CLAIM.md, checker logs. Upstream `tools/lint.py` ok and `tools/check.sh` accepted at formal-conjectures 9097e2f (proof axioms propext, Classical.choice, Quot.sound). A127750 and A036987 both offset 0; A036987 encoded from its Formula section (its name is just "Fredholm-Rueppel sequence"). Nothing submitted, no PR opened. Claim released. Awaiting Alo's review.
 - 2026-11-27 · Alo · `5c05ed0` A127752 wording: A035263's name is the morphism; the ν₂ formula is from its Formula section. Fixed in [REFEREE-BLOCKS.md](results/a127752/claim/REFEREE-BLOCKS.md), the write-up, PROOF.md, notes, and our Lean comment. HOW-TO-CLAIM closed-form bound set to n < 10^6. Paste-ready corrected PR 4276 body in [PR-4276-description-corrected.md](results/a127752/claim/PR-4276-description-corrected.md). Nothing submitted.
 - 2026-11-27 · Alo · `7fa0074` README links [CLAIMING.md](CLAIMING.md) from the "Where to look" table. Referee copy-paste drafts for A127752 are in [results/a127752/claim/REFEREE-BLOCKS.md](results/a127752/claim/REFEREE-BLOCKS.md) (reviewer comment for #4276, proof PR body, two X replies). Nothing submitted.
 - 2026-11-27 · Kumi-San · `d2ee0a6` [CLAIMING.md](CLAIMING.md): playbook for Left to Solve claims (fast path used for A127752 PR 1, #4276). Pointer added in `results/a127752/claim/HOW-TO-CLAIM.md`. README left for Alo to link. Claim released.
