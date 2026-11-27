@@ -1,0 +1,10 @@
+.lake/
+build/
+*.olean
+*.aux
+*.log
+*.out
+*.synctex.gz
+.venv/
+__pycache__/
+output/
