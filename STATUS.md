@@ -1,0 +1,30 @@
+# Status board
+
+The one place that says who is working on what. **Claim before you touch, release when you push.**
+One owner per file at a time; the other only reads or reviews. Every push gets one line in the log below.
+
+## Claims (live)
+
+| Problem / file | Owner | Since | Doing |
+| --- | --- | --- | --- |
+| A127752 (`problems/a127752/`) | Kumi-San | 2026-11-26 | Pin the OEIS definition and the Left to Solve statement, check it numerically, draft a faithful Lean statement |
+| Review of A127752 statement | Alo | waiting | Independent rebuild and faithfulness check before anything is pushed |
+
+## Tracker
+
+| Problem | Left to Solve | Our status | Upstream status | Lean |
+| --- | --- | --- | --- | --- |
+| Shanks: infinitely many record gaps | [link](https://lefttosolve.com/p/MaximalPrimeGap.infinite_maximalPrimeGapIndex) | proven, page done | already solved by someone else (no credit) | `problems/shanks-record-gaps/Proof.lean` |
+| Li's Criterion | [link](https://lefttosolve.com/p/RiemannHypothesis.li_criterion) | both directions, one hypothesis (Hadamard summability) | open; needs no hypotheses and strict λₙ > 0 | `problems/li-criterion/LiCriterion.lean` |
+| No real zeros of ζ in (0,1) | (internal) | proven | n/a | `problems/li-criterion/NoRealZeros.lean` |
+| Hadamard summability Σ m(ρ)/\|ρ\|² | (internal) | open, Mathlib gap | n/a | none yet |
+| OEIS A127752 | [link](https://lefttosolve.com/p/oeis-a127752) | in progress (Kumi-San) | unformalized | none yet |
+
+Recheck the upstream column against lefttosolve.com before each new target.
+
+## Log
+
+- 2026-11-26 · Kumi-San · `cd4e110` no real zeros in (0,1); Li now rests on summability alone. Rebuilt by Alo.
+- 2026-11-26 · Alo · `bf15a49` credit ShadowAlzazel by GitHub name.
+- 2026-11-26 · Alo · `81b1950` independent rebuild of Li part II.
+- 2026-11-26 · Kumi-San · `69721f2` Li converse (conditional), page part II.

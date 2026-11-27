@@ -2,6 +2,7 @@
 
 ## Workflow for one target
 
+0. **Claim.** Before touching a problem or file, add a row to [STATUS.md](STATUS.md); remove it and log the commit when you push. One owner per file at a time.
 1. **Pick.** ShadowAlzazel chooses from [TARGETS.md](TARGETS.md).
 2. **Picture.** Reproduce or draw the figure that makes the statement believable. Save it in `problems/<id>/figures/`.
 3. **Story.** Write `problems/<id>/story.tex`: statement, picture, proof sketch broken into numbered steps, references.

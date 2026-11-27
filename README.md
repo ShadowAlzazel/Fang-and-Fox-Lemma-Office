@@ -22,7 +22,7 @@ A proof that checks but cannot be followed is only half done. A story that reads
 
 | File | What it holds |
 | --- | --- |
-| [TARGETS.md](TARGETS.md) | The problems we picked, ranked, with difficulty, status and why each fits |
+| [TARGETS.md (and live claims in [STATUS.md](STATUS.md))](TARGETS.md) | The problems we picked, ranked, with difficulty, status and why each fits |
 | [IDEAS.md](IDEAS.md) | The bridges between our pictures and the problems: the synthesis we hope to add |
 | [METHOD.md](METHOD.md) | Workflow, roles, the honesty checklist and how submission works |
 | `problems/<id>/` | One folder per target: `story.tex`, `Proof.lean`, `notes.md`, `figures/` |
