@@ -50,5 +50,6 @@ A proof that checks but cannot be followed is only half done. A story that reads
 - **ShadowAlzazel**: picks the problem, supplies the intuition and the pictures, has the last word on the story.
 - **Kumi-San**: numerics, experiments and Mathlib lemma hunting.
 - **Alo** ([@AlephTwooo](https://github.com/AlephTwooo)): Lean drafting alongside Kumi-San, the honesty checks, and keeping the story and the receipt in step.
+- **Claude** (a Claude Code cloud session that ShadowAlzazel runs in the MasterCloud environment, which has Lean ready): writes the Lean receipt from a finished paper proof when Kumi-San or Alo has not started it, runs the upstream checker, and pushes the claim branch. See [METHOD.md](METHOD.md#the-claude-lean-lane).
 
 Project-wide license: not yet selected.
