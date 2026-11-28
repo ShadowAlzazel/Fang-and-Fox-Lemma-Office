@@ -8,6 +8,8 @@ Site: [lefttosolve.com](https://lefttosolve.com). Join notes: [lefttosolve.com/j
 
 Nothing in this file is a submission. We prepare branches and drafts; **Arbiter opens every upstream pull request** from his own GitHub account.
 
+> **Read [Lessons from A127750 / A127752 (2026-11-28)](#lessons-from-a127750--a127752-2026-11-28) at the end first.** We lost two solves by waiting. Checklist step 7, the section "PR 2 only after PR 1 merges", and every "needs-human-review / not auto-merged" line below are out of date; the corrections are in that section.
+
 ## Checklist
 
 1. Claim the draft files in [STATUS.md](STATUS.md). One owner per file; Alo reviews.
@@ -201,3 +203,48 @@ This is Arbiter's, on his own account, in his own words. A new OEIS account need
 ## Optional Zenodo DOI
 
 A GitHub release of this repo can be archived on [Zenodo](https://zenodo.org) for a permanent DOI: sign in with GitHub, enable Fang-and-Fox-Lemma-Office under GitHub → Repositories, then create a release such as `<id>-v1`. Add the DOI to the OEIS comment and the write-up page if we make one.
+
+## Lessons from A127750 / A127752 (2026-11-28)
+
+Written after the fact, with the upstream git history, the PR pages and lefttosolve.com. Times are UTC. The upstream repo has since moved to [lefttosolve2/open-math-agents](https://github.com/lefttosolve2/open-math-agents); the old GuillaumeBAUD-coder links redirect, and PR numbers are unchanged.
+
+### What happened
+
+| When (UTC) | Event |
+| --- | --- |
+| Nov 27 07:15 | Our A127752 and A127751 proofs kernel-accepted locally (`0fd31d7`). |
+| Nov 27 08:00–09:35 | Statement PRs [#4276](https://github.com/lefttosolve2/open-math-agents/pull/4276) (A127752), [#4771](https://github.com/lefttosolve2/open-math-agents/pull/4771) (A127751), [#4797](https://github.com/lefttosolve2/open-math-agents/pull/4797) (A127750) opened. A bot labels each `needs-human-review`. Our A127750 proof was already accepted locally (`ff4f504`, 09:16). |
+| Nov 27 10:33 | Upstream removes the human gate (commit "No human gate: every Lean-accepted submission is merged and credited at once"). PRs already labelled go into a backlog that a merger script works through every 20 minutes. |
+| Nov 27 13:00 → Nov 28 08:00 | The backlog nearly stops (about 170 merges in 19 hours while the merger was rewritten). Our three statements sit in it. |
+| Nov 27 23:11 | Statement PR [#14038](https://github.com/lefttosolve2/open-math-agents/pull/14038) (A402341) opened after the rule change. Its check passes, but it gets no label and is never merged. |
+| Nov 28 05:27 / 05:29 | oh-meh opens proof PRs [#20837](https://github.com/lefttosolve2/open-math-agents/pull/20837) (A127750) and [#20865](https://github.com/lefttosolve2/open-math-agents/pull/20865) (A127752), each marked "Depends on" our statement. The lint gate rejects them: the statement is not on `main` yet. |
+| Nov 28 09:53 / 10:01 | The backlog merges #4797 and #4276. |
+| Nov 28 ~10:20 | oh-meh pushes "Refresh against its merged statement", which re-runs the check. |
+| Nov 28 10:33 / 10:34 | Both oh-meh proofs pass and merge within minutes. The solves are theirs. Our proofs, ready about 20 hours earlier, were never opened. |
+| Nov 28 11:07 / 11:08 | We merge upstream `main` into the #14038 and #4771 branches (no content change). The new check runs pass, and both merge at 11:10 and 11:11. |
+| Nov 28 ~11:30 | Branches pushed for the A127751 proof (`oma/oeis-a127751-proof`, nobody had sent one) and for a shorter A127752 proof (`oma/oeis-a127752-shorter`: 2415 characters by their `tools/prooflen.py` vs 2549, 5.3% shorter). |
+
+Credit check on the site: all four statements show "stated it in Lean" by @ShadowAlzazel, and `https://lefttosolve.com/api/pending?handle=ShadowAlzazel` lists them as "Accepted: merged and credited". The two solves show "@oh-meh · proved it in Lean". Their proofs use the same idea as ours (window identity, doubling recursion, invertible lower-triangular truncation, parity by induction), written differently; it is the natural proof.
+
+### Lessons
+
+1. **Open the proof PR at the same time as the statement PR, not after.** Their CI rejects it while the statement is unmerged; that is fine. The moment the statement merges, re-run the proof's check (lesson 3). The first accepted proof to merge wins the solve. Holding the lease, writing the statement, or having the proof ready earlier counts for nothing.
+2. **There is no human gate any more (since Nov 27 10:33).** Every Lean-accepted proof and statement is merged and credited automatically, usually within minutes. A statement's faithfulness is checked afterwards ("statement being verified" on the page). Ignore the "needs-human-review / not auto-merged" lines in the sections above.
+3. **If a PR's check is green but it is still open after an hour, re-run the check.** Merge upstream `main` into the PR branch and push (no other change; the diff must stay one file). That is what unstuck #14038 and #4771 within 3 minutes. GitHub's "Update branch" button does not appear in the new PR page for our case, so do it with git:
+
+   ```bash
+   git fetch https://github.com/lefttosolve2/open-math-agents main
+   git checkout <branch>
+   git merge --no-edit FETCH_HEAD
+   git push origin <branch>
+   ```
+
+4. **Watch our PRs, and watch for PRs that depend on ours.** A "Depends on #<our PR>" cross-reference means someone has a proof waiting for our statement. Status page: `https://lefttosolve.com/api/pending?handle=ShadowAlzazel`. Rivals: search the upstream PRs for the problem id.
+5. **Credit rules, from their code** (`app/api/verdict/route.ts`, `tools/credit.sh`, `lib/points.ts`). Credit goes to the GitHub account that opened the merged PR, and nothing else: commit authors, the `Credit:` line, `Agent:` / `Model:` lines and leases do not matter. A statement earns formalization credit and **0 points**. A proof earns the problem's points (computed from its difficulty, not from a lease) and the solve.
+6. **Shortest-proof credit is still available after losing a race.** If our proof is at least 5% and 20 characters shorter by their `tools/prooflen.py OLD NEW`, send it as an edit of the existing `proofs/<id>.lean` (not a new file). The first solve keeps its credit; we get "shortest proof".
+7. **Do not split one theorem into two statement PRs.** A127751's statement is the same theorem as A127752's. It merged, but anyone who proved one could prove the other by renaming the namespace. If we send a companion statement, send its proof with it.
+8. **Our drafts are public.** This repo and its Pages site show finished proofs before we submit them. Either submit as soon as Alo signs off, or keep the proof out of the public repo until its PR is open.
+
+### Corrected checklist step 7
+
+7. If the problem was unformalized: open PR 1 (statement) and PR 2 (proof) together, from two one-file branches cut from upstream `main`. PR 2 fails its check until PR 1 merges. Watch PR 1; as soon as it merges, merge upstream `main` into the PR 2 branch and push, so its check re-runs and it merges. If either PR is green but still open after an hour, do the same for it.
